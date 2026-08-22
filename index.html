@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Infinite Pixel World</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <aside id="assets-panel">
+    <header id="assets-header">
+      <span id="assets-title">Assets</span>
+      <button id="assets-toggle" class="ctl" aria-label="Toggle assets panel" title="Assets">»</button>
+    </header>
+    <div id="assets-body">
+      <div class="asset-cat open" data-biome="people">
+        <button type="button" class="asset-cat-head" onclick="this.parentElement.classList.toggle('open')"><span class="cat-chevron">&#9656;</span><span class="cat-label">People &#129461;</span><span class="cat-count">1</span></button>
+        <div class="asset-archive" data-biome="people">
+          <div class="asset-card" data-kind="caveman" data-asset="caveman">
+            <canvas id="caveman-canvas"></canvas>
+            <span class="asset-name">Caveman</span>
+          </div>
+          <div class="asset-card" data-kind="cavewoman" data-asset="caveman">
+            <canvas id="cavewoman-canvas"></canvas>
+            <span class="asset-name">Cavewoman</span>
+          </div>
+        </div>
+      </div>
+      <div id="nature-root"></div>
+    </div>
+  </aside>
+
+  <button id="book-toggle" class="ctl" aria-label="Open knowledge book" title="Knowledge">📖</button>
+
+  <aside id="book-panel">
+    <header id="book-header">
+      <span id="book-title">📖 Knowledge</span>
+      <button id="book-close" aria-label="Close knowledge book">×</button>
+    </header>
+    <div id="know-tree"></div>
+    <div id="know-detail">
+      <p class="know-hint">Tap a node of humanity's story…</p>
+    </div>
+  </aside>
+
+  <div id="game">
+    <div id="app"></div>
+    <div id="rail">
+      <button id="toggle-ui" class="ctl" aria-label="Toggle controls" title="Show / hide UI">👁</button>
+      <span class="rail-sep"></span>
+      <button id="regenerate" class="rbtn" title="New world">🌍</button>
+      <button id="autorotate" class="rbtn" title="Auto-spin">🔄</button>
+      <button id="topview" class="rbtn" title="Top view">🗺️</button>
+      <button id="home" class="rbtn" title="Go home">🏠</button>
+      <button id="box-select" class="rbtn" title="Box-select villagers">⬚</button>
+    </div>
+
+    <div id="ui">
+      <p class="hint">Drag rotate · WASD move · R/F fly · Joystick walks a picked villager</p>
+      <p id="readout" class="readout"></p>
+    </div>
+
+    <div id="place-hint">Tap dry land to place the caveman · tap card again to cancel</div>
+
+    <div id="timebar">
+      <div id="daypill">
+        <canvas id="celestial-icon" width="48" height="48"></canvas>
+        <span id="day-label">Day 1</span>
+      </div>
+      <div id="envpill">
+        <span id="season-icon">☀️</span>
+        <span id="season-label">Summer</span>
+        <span class="env-sep">·</span>
+        <span id="temp-label">20°C</span>
+      </div>
+      <div class="timebtns">
+        <button id="pause-btn" class="tbtn" aria-label="Pause or resume time">❚❚</button>
+        <button class="tbtn spd" data-spd="2">×2</button>
+        <button class="tbtn spd" data-spd="4">×4</button>
+        <button class="tbtn spd" data-spd="6">×6</button>
+        <button class="tbtn spd" data-spd="10">×10</button>
+        <button class="tbtn spd" data-spd="25">×25</button>
+      </div>
+    </div>
+
+    <div id="globe-pop">
+      <h3>🏕️ Camp</h3>
+      <div class="gp-row"><span>Camp age</span><b id="gp-age">-</b></div>
+      <div class="gp-row"><span>Population</span><b id="gp-pop">-</b></div>
+      <div class="gp-row"><span>Births</span><b id="gp-births">-</b></div>
+      <div class="gp-row"><span>Deaths</span><b id="gp-deaths">-</b></div>
+      <div class="gp-sep"></div>
+      <div class="gp-row"><span>Season</span><b id="gp-season">-</b></div>
+      <div class="gp-row"><span>Temperature</span><b id="gp-temp">-</b></div>
+    </div>
+
+    <div id="cloudfade"></div>
+    <div id="marquee"></div>
+    <div id="toasts"></div>
+    <div id="flash"></div>
+
+    <div id="joystick">
+      <div id="joystick-base">
+        <div id="joystick-knob"></div>
+      </div>
+    </div>
+
+    <div id="vert-pad">
+      <button class="ctl vdir" data-dir="raise" aria-label="Fly up">Up</button>
+      <button class="ctl vdir" data-dir="lower" aria-label="Descend">Down</button>
+    </div>
+
+    <button id="char-toggle" class="ctl" aria-label="Open villager panel">
+      <span id="char-toggle-face">👤</span><span>Villager</span>
+    </button>
+  </div>
+
+  <div id="char-panel">
+    <button id="char-close" aria-label="Collapse">×</button>
+    <div id="char-preview">
+      <canvas id="char-bg"></canvas>
+      <canvas id="char-canvas"></canvas>
+      <span id="char-sex"></span>
+      <button id="anat-btn" aria-label="Open body view" title="Body view">🫀</button>
+    </div>
+
+    <div id="anat-view">
+      <div id="anat-head">
+        <button id="anat-back" title="Return to live preview">◀ Live</button>
+        <span id="anat-title">Body & limbs</span>
+        <div id="anat-tabs">
+          <button class="atab active" data-tab="body" aria-label="Body view">🧍</button>
+          <button class="atab" data-tab="organs" aria-label="Organs view">🫀</button>
+          <button class="atab" data-tab="bones" aria-label="Bones view">🦴</button>
+        </div>
+      </div>
+      <canvas id="anat-canvas"></canvas>
+      <div id="anat-list"></div>
+    </div>
+
+    <div id="char-name">-</div>
+    <div class="statrow"><span>Age</span><b id="st-age">-</b></div>
+    <div class="statrow"><span>Condition</span><b id="st-cond">-</b></div>
+    <div class="statrow"><span>Health</span><b id="st-hp">-</b></div>
+    <div class="hpbar"><div id="hp-fill"></div></div>
+    <div id="hand-slots">
+      <div class="hslot" data-hand="L"></div>
+      <div class="hslot" data-hand="R"></div>
+    </div>
+    <div id="squad-list"></div>
+    <div class="statrow"><span>Weight</span><b id="st-weight">-</b></div>
+    <div class="statrow"><span>Height</span><b id="st-height">-</b></div>
+    <div class="statrow"><span>IQ</span><b id="st-iq">-</b></div>
+  </div>
+
+  <script type="module" src="main.js?v=34"></script>
+</body>
+</html>
