@@ -1,73 +1,98 @@
-# Pixel World — Spritesheet Reference
+# 🎨 Pixel World — Spritesheet Reference
 
-All pixel art is generated at runtime by painter functions in `main.js` — no image files.
-This document catalogs every sprite, where it lives, and what it looks like.
+> Every sprite in Pixel World is **painted by code** at runtime — no image files are loaded.
+> The pixel art lives in painter functions inside `main.js`, and each sprite below is a
+> **live capture** of what those painters produce. This doc catalogs every sprite, where it
+> lives in the code, and what it looks like.
+
+![Vegetation atlas](docs/assets/spritesheet/tree-atlas.png)
+![Fish atlas](docs/assets/spritesheet/fish-atlas.png)
+![Icon atlas](docs/assets/spritesheet/icon-atlas.png)
 
 ---
 
 ## 1. Vegetation Atlas — `treeAtlasCanvas`
 
-- Cell size: **48×48 px**, one column per species (`ATLAS_CELL`), ground line ≈ y 46.
-- 4 season rows per column: spring (row 0), summer (row 1), autumn (row 2), winter (row 3).
-- Autumn/winter rows are derived from the painted summer base by `deriveSeasons()`
-  (hue-shift to the species `autumn` color, snow tinting, leaf-drop).
-- Uploaded once as `treeAtlasTex` (NearestFilter, SRGB) and sampled by the wind-shader.
+The heart of the plant world: **25 species**, one 48×48 cell per species.
 
-| Col | Key | Label | Biome | Description |
+- Cell size: **48×48 px**, one column per species (`ATLAS_CELL`), ground line ≈ y 46.
+- **4 season rows** per column: spring (row 0), summer (row 1), autumn (row 2), winter (row 3).
+- Autumn/winter rows are derived from the painted summer base by `deriveSeasons()`
+  (hue-shift to the species' autumn color, snow tinting, leaf-drop).
+- Uploaded once as `treeAtlasTex` (NearestFilter, SRGB) and sampled by the wind-shader.
+- Zoomed-out map markers are **1:1 copies** of the summer row — same art, bigger life.
+
+| Art | Key | Label | Biome | Description |
 |-----|-----|-------|-------|-------------|
-| 0 | `cactus` | Cactus | desert | Green saguaro column with lighter highlight edge, dark ribs, two side arms, spines dots. |
-| 1 | `agave` | Agave | desert | Rosette of stiff pointed leaves fanning from a dry centre, blue-green tones. |
-| 2 | `acacia` | Acacia | desert | Tall slim dark trunk, flat wide umbrella canopy, dusty olive greens; turns ochre in autumn. |
-| 3 | `shrub` | Desert Shrub | desert | Low scrubby ball of twiggy grey-green stems. |
-| 4 | `tumble` | Tumble Bush | desert | Round skeletal tumbleweed, tan criss-cross branches. |
-| 5 | `jungle` | Jungle Tree | jungle | Massive broadleaf: thick trunk, huge layered canopy blobs, deep greens. |
-| 6 | `palm` | Palm | jungle | Curved ringed trunk leaning with the wind, 7 arcing fronds, coconut cluster at the crown. |
-| 7 | `bamboo` | Bamboo | jungle | Cluster of segmented yellow-green culms with leaf tufts; autumn golds. |
-| 8 | `fern` | Fern Thicket | jungle | Low spread of arching fronds. |
-| 9 | `oak` | Oak | forest | **Pro-art pass**: shaded bark trunk (lit left edge, knots, root flare) + volumetric canopy (AO under-mass, lit upper-left cap, dithered shine, depth holes), side boughs. Blossoms in spring, fiery orange in autumn. |
-| 10 | `pine` | Pine | forest | **Pro-art pass**: gradient trunk + 4 conical tiers, each tier lit on its upper-left edge and separated by an under-skirt shadow line. |
-| 11 | `birch` | Birch | forest | **Pro-art pass**: white bark with black lenticel dashes, airy light-green canopy with shine dither. Spring blossoms, gold autumn. |
-| 12 | `maple` | Maple | forest | **Pro-art pass**: broad two-sided crown spilling over a shaded trunk, dense 4-tone green shading. Crimson red in autumn. |
-| 13 | `berry` | Berry Bush | forest | Rounded bush with scattered dark-red berry pixels. |
-| 14 | `apple` | Apple Tree | forest | Rounded canopy dotted with red apple pixels. |
-| 15 | `snowpine` | Snow Pine | snow | Conical tiers with white snow caps along each skirt + summit dot. |
-| 16 | `spruce` | Spruce | snow | **Pro-art pass**: slim dark spruce, 4 tight tiers with lit edges and shadow lines under each skirt. |
-| 17 | `dead` | Dead Tree | snow | Bare gnarled trunk with broken branch stubs, no foliage. |
-| 18 | `frostbush` | Frost Bush | snow | Low bush with icy-white frosting on top. |
-| 19 | `pebble` | Small Rock | all | Single grey stone lump with highlight. |
-| 20 | `rock` | Medium Rock | all | Faceted grey boulder, darker base shade. |
-| 21 | `boulder` | Big Rock | all | Large two-tone boulder with cracks and moss hints. |
-| 22 | `greatbush` | Great Bush | forest | Big rounded shrub taller than a villager. |
-| 23 | `bloom` | Blossom Bush | forest | Green mound covered in pink/white blossom specks. |
-| 24 | `bramble` | Bramble Tangle | jungle | Chaotic thorny tangle with dark thorn ticks. |
+| ![cactus](docs/assets/spritesheet/species-cactus.png) | `cactus` | Cactus | desert | Green saguaro column with lighter highlight edge, dark ribs, two side arms, spine dots. |
+| ![agave](docs/assets/spritesheet/species-agave.png) | `agave` | Agave | desert | Rosette of stiff pointed leaves fanning from a dry centre, blue-green tones. |
+| ![acacia](docs/assets/spritesheet/species-acacia.png) | `acacia` | Acacia | desert | Tall slim dark trunk, flat wide umbrella canopy, dusty olive greens; turns ochre in autumn. |
+| ![shrub](docs/assets/spritesheet/species-shrub.png) | `shrub` | Desert Shrub | desert | Low scrubby ball of twiggy grey-green stems. |
+| ![tumble](docs/assets/spritesheet/species-tumble.png) | `tumble` | Tumble Bush | desert | Round skeletal tumbleweed, tan criss-cross branches. |
+| ![jungle](docs/assets/spritesheet/species-jungle.png) | `jungle` | Jungle Tree | jungle | Massive broadleaf: thick trunk, huge layered canopy blobs, deep greens. |
+| ![palm](docs/assets/spritesheet/species-palm.png) | `palm` | Palm | jungle | Curved ringed trunk leaning with the wind, 7 arcing fronds, coconut cluster at the crown. |
+| ![bamboo](docs/assets/spritesheet/species-bamboo.png) | `bamboo` | Bamboo | jungle | Cluster of segmented yellow-green culms with leaf tufts; autumn golds. |
+| ![fern](docs/assets/spritesheet/species-fern.png) | `fern` | Fern Thicket | jungle | Low spread of arching fronds. |
+| ![oak](docs/assets/spritesheet/species-oak.png) | `oak` | Oak | forest | **Pro-art pass**: shaded bark trunk (lit left edge, knots, root flare) + volumetric canopy (AO under-mass, lit upper-left cap, dithered shine, depth holes), side boughs. Blossoms in spring, fiery orange in autumn. |
+| ![pine](docs/assets/spritesheet/species-pine.png) | `pine` | Pine | forest | **Pro-art pass**: gradient trunk + 4 conical tiers, each tier lit on its upper-left edge and separated by an under-skirt shadow line. |
+| ![birch](docs/assets/spritesheet/species-birch.png) | `birch` | Birch | forest | **Pro-art pass**: white bark with black lenticel dashes, airy light-green canopy with shine dither. Spring blossoms, gold autumn. |
+| ![maple](docs/assets/spritesheet/species-maple.png) | `maple` | Maple | forest | **Pro-art pass**: broad two-sided crown spilling over a shaded trunk, dense 4-tone green shading. Crimson red in autumn. |
+| ![berry](docs/assets/spritesheet/species-berry.png) | `berry` | Berry Bush | forest | Rounded bush with scattered dark-red berry pixels. |
+| ![apple](docs/assets/spritesheet/species-apple.png) | `apple` | Apple Tree | forest | Rounded canopy dotted with red apple pixels. |
+| ![snowpine](docs/assets/spritesheet/species-snowpine.png) | `snowpine` | Snow Pine | snow | Conical tiers with white snow caps along each skirt + summit dot. |
+| ![spruce](docs/assets/spritesheet/species-spruce.png) | `spruce` | Spruce | snow | **Pro-art pass**: slim dark spruce, 4 tight tiers with lit edges and shadow lines under each skirt. |
+| ![dead](docs/assets/spritesheet/species-dead.png) | `dead` | Dead Tree | snow | Bare gnarled trunk with broken branch stubs, no foliage. |
+| ![frostbush](docs/assets/spritesheet/species-frostbush.png) | `frostbush` | Frost Bush | snow | Low bush with icy-white frosting on top. |
+| ![pebble](docs/assets/spritesheet/species-pebble.png) | `pebble` | Small Rock | all | Single grey stone lump with highlight. |
+| ![rock](docs/assets/spritesheet/species-rock.png) | `rock` | Medium Rock | all | Faceted grey boulder, darker base shade. |
+| ![boulder](docs/assets/spritesheet/species-boulder.png) | `boulder` | Big Rock | all | Large two-tone boulder with cracks and moss hints. |
+| ![greatbush](docs/assets/spritesheet/species-greatbush.png) | `greatbush` | Great Bush | forest | Big rounded shrub taller than a villager. |
+| ![bloom](docs/assets/spritesheet/species-bloom.png) | `bloom` | Blossom Bush | forest | Green mound covered in pink/white blossom specks. |
+| ![bramble](docs/assets/spritesheet/species-bramble.png) | `bramble` | Bramble Tangle | jungle | Chaotic thorny tangle with dark thorn ticks. |
+
+---
 
 ## 2. Fish Atlas — `fishAtlasCanvas` (192×64)
 
-- 6 species × 32px cells, two rows: row 0 tail-left, row 1 tail-right (swim animation).
-- Painted by `paintFish(g, ox, oy, k, frameB)` directly into card thumbs / map chip too.
+The sea's cast of six, each 32×32 px with a two-frame swim cycle.
 
-| Cell | Species | Body | Belly | Fin | Stripe |
-|------|---------|------|-------|-----|--------|
-| 0 | Sardine | silver-blue `#b8c4cc` | pale | grey | — |
-| 1 | Clownfish | orange `#f4772e` | light orange | orange | white bands |
-| 2 | Blue Tang | royal blue `#2e6fd4` | sky | yellow | navy |
-| 3 | Angelfish | golden yellow | pale lemon | olive | dark vertical band |
-| 4 | Puffer | sandy khaki | cream | brown | spikes when puffed |
-| 5 | Tuna | steel blue | silver | slate | dark back stripe |
+- 6 species × 32px cells, two rows: row 0 tail-left, row 1 tail-right (swim animation).
+- Painted by `paintFish(g, ox, oy, k, frameB)` directly into card thumbs / map chips too.
+- Schools only spawn in **deep water** (≥ 3 blocks), each school at its own depth,
+  with `DoubleSide` billboards so they're visible from above *and* below the surface.
+
+| Art | Cell | Species | Body | Belly | Fin | Stripe |
+|-----|------|---------|------|-------|-----|--------|
+| ![sardine](docs/assets/spritesheet/fish-sardine.png) | 0 | Sardine | silver-blue `#b8c4cc` | pale | grey | — |
+| ![clownfish](docs/assets/spritesheet/fish-clownfish.png) | 1 | Clownfish | orange `#f4772e` | light orange | orange | white bands |
+| ![blue tang](docs/assets/spritesheet/fish-blue-tang.png) | 2 | Blue Tang | royal blue `#2e6fd4` | sky | yellow | navy |
+| ![angelfish](docs/assets/spritesheet/fish-angelfish.png) | 3 | Angelfish | golden yellow | pale lemon | olive | dark vertical band |
+| ![puffer](docs/assets/spritesheet/fish-puffer.png) | 4 | Puffer | sandy khaki | cream | brown | spikes when puffed |
+| ![tuna](docs/assets/spritesheet/fish-tuna.png) | 5 | Tuna | steel blue | silver | slate | dark back stripe |
+
+---
 
 ## 3. Map Icon Atlas — `iconAtlasCanvas`
 
-One row of 48px cells mirroring KIND_ORDER plus special chips. Tree/bush/rock
+One row of **48px cells** mirroring `KIND_ORDER` plus special chips. Tree/bush/rock
 chips are **1:1 copies of the summer vegetation row** (`ICON_CELL = ATLAS_CELL`),
-so zoomed-out markers show the exact same art as the in-world trees:
+so zoomed-out markers show the exact same art as the in-world trees — just fewer
+and bigger (each marker represents a whole grove).
 
-- Tree chips (per species): miniaturized summer art.
+- Tree chips (per species): 1:1 summer art, one representative marker per ~64u area.
 - Campfire chip (`FIRE_COL`): log teepee + flame overlay.
 - Face chip (`FACE_COL`): villager head icon for people markers.
 - Fish chip (`FISH_COL`, painted straight via `paintFish`, clownfish): school marker —
-  one chip clusters many fish within a ~12u grid so the map isn't flooded.
+  one chip clusters many fish within a ~200u grid, so the open sea shows a handful
+  of markers instead of hundreds.
+
+![Icon atlas](docs/assets/spritesheet/icon-atlas.png)
+
+---
 
 ## 4. Villagers
+
+![Villager face](docs/assets/spritesheet/face.png)
 
 - Base rows in `CAVEMAN_ART` / `CAVEWOMAN_ART` char maps with palette lookup;
   per-villager variants restyle hair/beard/clothes (`artVariant`) using `LOOK_POOL`.
@@ -75,10 +100,16 @@ so zoomed-out markers show the exact same art as the in-world trees:
   `[matR, matL, matSleep]`.
 - **Sleep art**: eyes closed (`S` glyph with lash pixels below), baked −90° rotation into a
   lying pose canvas (`matSleep`) — head to the left, body along the ground.
+- **The founding couple spawns asleep** by the campfire and only wakes when you strike
+  the first campfire (`tribeAwoken`).
 - Name tag sprite above each head (canvas): name · age, **health bar** (green→red),
   **energy bar** (amber→red, blue + `zZ` while asleep).
 
+---
+
 ## 5. Camp & effects
+
+![Campfire](docs/assets/spritesheet/campfire.png)
 
 - `CAMPFIRE` char-map art: stone ring + crossed logs teepee; `FLAME` overlays animated fire.
 - ZZZ stream: three rising "z" glyphs fading in loop above sleepers (`drawZzz`).
@@ -91,22 +122,25 @@ so zoomed-out markers show the exact same art as the in-world trees:
   pale regolith with speckle and rimmed craters — plus a radial-glow sun sprite
   that dresses the planet view.
 
+---
+
 ## 6. Anatomy view — `ANAT_ART` + `BODY_MAP`
 
-Pixel art for the 🫀 anatomy sheet, painted from char maps via `anatSprite`:
+The 🫀 anatomy sheet's organ sprites, painted from char maps via `anatSprite`:
 
-| Sprite | What it looks like |
-|---|---|
-| `heart` | red valved heart, pale top-left highlight |
-| `brain` | pink convoluted lobes, dark outline |
-| `lungs` | two grey-pink lobes flanking a trachea |
-| `stomach` | orange J-pouch with darker edge |
-| `liver` | dark maroon slab, lighter top edge |
-| `guts` | coiled pink intestines, outlined |
-| `skull` | white cranium, dark eye sockets, teeth row |
-| `spine` | vertebrae column with a rib fan |
-| `pelvis` | butterfly-shaped hip bones |
-| `armbone` / `legbone` | long bone with knuckle joints at both ends |
+| Art | Sprite | What it looks like |
+|-----|--------|--------------------|
+| ![heart](docs/assets/spritesheet/organs-heart.png) | `heart` | red valved heart, pale top-left highlight |
+| ![brain](docs/assets/spritesheet/organs-brain.png) | `brain` | pink convoluted lobes, dark outline |
+| ![lungs](docs/assets/spritesheet/organs-lungs.png) | `lungs` | two grey-pink lobes flanking a trachea |
+| ![stomach](docs/assets/spritesheet/organs-stomach.png) | `stomach` | orange J-pouch with darker edge |
+| ![liver](docs/assets/spritesheet/organs-liver.png) | `liver` | dark maroon slab, lighter top edge |
+| ![guts](docs/assets/spritesheet/organs-guts.png) | `guts` | coiled pink intestines, outlined |
+| ![skull](docs/assets/spritesheet/organs-skull.png) | `skull` | white cranium, dark eye sockets, teeth row |
+| ![spine](docs/assets/spritesheet/organs-spine.png) | `spine` | vertebrae column with a rib fan |
+| ![pelvis](docs/assets/spritesheet/organs-pelvis.png) | `pelvis` | butterfly-shaped hip bones |
+| ![armbone](docs/assets/spritesheet/organs-armbone.png) | `armbone` | long bone with knuckle joints at both ends |
+| ![legbone](docs/assets/spritesheet/organs-legbone.png) | `legbone` | long bone with knuckle joints at both ends |
 
 - `BODY_MAP`: a 26×46 silhouette of a ~7.5-heads-tall figure (crown → feet) with
   regions keyed `h` head · `n`/`t` torso · `a`/`b` arms · `l`/`r` legs;
@@ -114,6 +148,8 @@ Pixel art for the 🫀 anatomy sheet, painted from char maps via `anatSprite`:
   into a 4×-scaled icon for the part list.
 - Wound chips are small DOM pills (bleeding / scratched / bruised / fractured /
   damaged) layered on each part row.
+
+---
 
 ## 7. UI glyphs (DOM, not canvas)
 

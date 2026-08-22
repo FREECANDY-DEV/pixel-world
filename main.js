@@ -5833,17 +5833,26 @@ const ANAT_PAL = {
 };
 
 function anatSprite(rows) {
+  const c = renderAnatRows(rows, 1);
+  c.rows = rows; // keep source rows: the GPU quirk wipes canvases created at
+  // load, so docs/export re-render organs from these rows instead
+  return c;
+}
+
+// deterministic pixel renderer for anatomy art (scale=1 is the original)
+function renderAnatRows(rows, scale) {
   const w = Math.max(...rows.map((r) => r.length));
   const c = document.createElement('canvas');
-  c.width = w;
-  c.height = rows.length;
+  c.width = w * scale;
+  c.height = rows.length * scale;
   const g = c.getContext('2d');
+  g.imageSmoothingEnabled = false;
   rows.forEach((row, y) => {
     for (let x = 0; x < row.length; x++) {
       const ch = row[x];
       if (ch === '.' || ch === ' ') continue;
       g.fillStyle = ANAT_PAL[ch] || '#fff';
-      g.fillRect(x, y, 1, 1);
+      g.fillRect(x * scale, y * scale, scale, scale);
     }
   });
   return c;
