@@ -461,6 +461,15 @@ water.rotation.x = -Math.PI / 2;
 water.position.y = SEA_LEVEL + 0.35;
 scene.add(water);
 
+// fullscreen tint + drifting light rays shown while the camera is underwater
+const underwaterOverlay = document.createElement('div');
+underwaterOverlay.id = 'underwater-overlay';
+underwaterOverlay.setAttribute('aria-hidden', 'true');
+document.body.appendChild(underwaterOverlay);
+const UNDERWATER_FOG = new THREE.Color(0x0b3a6e);
+const UNDERWATER_BG = new THREE.Color(0x072a52);
+let underwater = false;
+
 // ============================================================================
 // Clouds
 // ============================================================================
@@ -530,7 +539,7 @@ function phaseName(h) {
 // Seasons, temperature & weather
 // ============================================================================
 
-const SEASON_DAYS = 7; // game days per season
+const SEASON_DAYS = 91.25; // game days per season — 4 equal seasons = a 365-day year, like real life
 const SEASONS = [
   { name: 'Spring', icon: '\u{1F338}', tempBase: 14, skyTint: new THREE.Color(0xbfe0c8), tintK: 0.16, fogMul: 1.0, lightMul: 1.0 },
   { name: 'Summer', icon: '\u2600\uFE0F', tempBase: 29, skyTint: new THREE.Color(0xffd9a0), tintK: 0.10, fogMul: 1.06, lightMul: 1.05 },
@@ -1119,7 +1128,11 @@ function findDryHome() {
 }
 
 // every fresh camp starts with a young couple and their apple tree
+// the founding couple sleeps by the fire until the campfire is struck for
+// the first time — only then does the tribe wake (tribeAwoken)
+let tribeAwoken = false;
 function spawnDefaultCamp() {
+  tribeAwoken = false;
   // candidate ring around the fire; scored to favour dry, unblocked ground
   // on the DEFAULT-CAMERA side (+z) so both are in frame immediately
   const cands = [];
@@ -1148,6 +1161,7 @@ function spawnDefaultCamp() {
       c.sleeping = true;
       c.energy = 100;
       c.forcedSleep = false;
+      c.founder = true;
       c.faceL = true;
       mPlaced = true;
       continue;
@@ -1157,6 +1171,7 @@ function spawnDefaultCamp() {
       const c = cavemen[cavemen.length - 1];
       c.homebound = true;
       c.sleeping = true;
+      c.founder = true;
       c.faceL = false;
       fPlaced = true;
     }
@@ -3176,6 +3191,7 @@ const fishMat = new THREE.ShaderMaterial({
   },
   transparent: true,
   depthWrite: false,
+  side: THREE.DoubleSide, // visible from below the surface too (diving view)
   vertexShader: `
     attribute vec3 iPos;
     attribute float iCol;
@@ -3204,8 +3220,8 @@ const fishMat = new THREE.ShaderMaterial({
       float flip = step(0.0, rightDot);
       vRowBlend = flip;
       vec3 right = normalize(vec3(-toCam.z, 0.0, toCam.x));
-      vec3 wpq = p + right * position.x * 1.45
-                   + vec3(0.0, 1.0, 0.0) * position.y * 1.45;
+      vec3 wpq = p + right * position.x * 1.7
+                   + vec3(0.0, 1.0, 0.0) * position.y * 1.7;
       vec4 mv = viewMatrix * vec4(wpq, 1.0);
       mv.z += 0.03; // hug the underside of the water plane
       // never let the water plane or nearby floor swallow the school
@@ -3261,12 +3277,14 @@ function buildChunkFish(cx, cz) {
       const fx = ix * FISH_CELL_WORLD + hash3(ix, 5, iz, SEED + 552) * FISH_CELL_WORLD;
       const fz = iz * FISH_CELL_WORLD + hash3(ix, 6, iz, SEED + 553) * FISH_CELL_WORLD;
       const depth = SEA_LEVEL - terrainHeight(Math.round(fx), Math.round(fz), SEED);
-      if (depth < 1.2) continue; // need some water under the fins
+      if (depth < 3.0) continue; // schools only form in deep sea water (3+ blocks)
       // single ownership by cell centre, same trick as trees
       if (Math.floor((ix * FISH_CELL_WORLD + FISH_CELL_WORLD / 2) / CHUNK) !== cx) continue;
       if (Math.floor((iz * FISH_CELL_WORLD + FISH_CELL_WORLD / 2) / CHUNK) !== cz) continue;
-      // backs break the surface so schools read clearly through the waves
-      pos.push(fx, SEA_LEVEL + 0.02, fz);
+      // schools swim a little below the surface so divers see them in the
+      // water column; each school picks its own depth (0.4–1.8 blocks)
+      const fy = SEA_LEVEL - (0.4 + hash3(ix, 11, iz, SEED + 557) * 1.4);
+      pos.push(fx, fy, fz);
       col.push(Math.floor(hash3(ix, 8, iz, SEED + 554) * FISH_COLS));
       phase.push(hash3(ix, 9, iz, SEED + 555));
       speed.push(0.25 + hash3(ix, 10, iz, SEED + 556) * 0.3);
@@ -3326,7 +3344,9 @@ const FIRE_COL = ATLAS_COLS;      // campfire chip column (after all species)
 const FACE_COL = ATLAS_COLS + 1;  // human face chip column
 const FISH_COL = ATLAS_COLS + 2;  // fish-school chip for the sea
 const ICON_COLS = ATLAS_COLS + 3;
-const ICON_CELL = 32;
+// icon cells match the tree atlas cell exactly so zoomed-out markers reuse
+// the same 48px art 1:1 — a downscaled icon never needs to invent pixels
+const ICON_CELL = ATLAS_CELL; // 48, same as the vegetation atlas
 
 const iconAtlasCanvas = document.createElement('canvas');
 iconAtlasCanvas.width = ICON_CELL * ICON_COLS;
@@ -3350,7 +3370,7 @@ const ICON_MAT = new THREE.ShaderMaterial({
       vCol = aCol;
       vec4 mv = modelViewMatrix * vec4(position, 1.0);
       float d = max(-mv.z, 1.0);
-      gl_PointSize = clamp(430.0 / d, 20.0, 58.0) * uPx;
+      gl_PointSize = clamp(430.0 / d, 44.0, 110.0) * uPx;
       gl_Position = projectionMatrix * mv;
     }
   `,
@@ -3380,17 +3400,18 @@ function buildIconAtlas() {
       i * ICON_CELL, 0, ICON_CELL, ICON_CELL
     );
   });
-  // campfire chip: log teepee + a small flame licking over it
+  // campfire chip: log teepee + a small flame licking over it (scaled to
+  // match the bigger 48px tree chips)
   const fc = document.createElement('canvas');
-  drawPixelArt(fc, CAMPFIRE, CAMPFIRE_PALETTE, 1);
-  g.drawImage(fc, FIRE_COL * ICON_CELL + 6, 15);
+  drawPixelArt(fc, CAMPFIRE, CAMPFIRE_PALETTE, 2);
+  g.drawImage(fc, FIRE_COL * ICON_CELL + 5, 12);
   const flc = document.createElement('canvas');
-  drawPixelArt(flc, FLAME, FLAME_PALETTE, 1);
-  g.drawImage(flc, FIRE_COL * ICON_CELL + 11, 3);
+  drawPixelArt(flc, FLAME, FLAME_PALETTE, 2);
+  g.drawImage(flc, FIRE_COL * ICON_CELL + 15, 1);
   // face chip
   const hc = document.createElement('canvas');
-  drawPixelArt(hc, FACE_ICON, FACE_PALETTE, 4);
-  g.drawImage(hc, FACE_COL * ICON_CELL, 0);
+  drawPixelArt(hc, FACE_ICON, FACE_PALETTE, 5);
+  g.drawImage(hc, FACE_COL * ICON_CELL + 4, 4);
   // fish chip: a swimmer painted straight from the species painter
   const fic = document.createElement('canvas');
   fic.width = ICON_CELL;
@@ -3398,8 +3419,8 @@ function buildIconAtlas() {
   const fig = fic.getContext('2d');
   fig.imageSmoothingEnabled = false;
   fig.save();
-  fig.translate(5, 12);
-  fig.scale(1.15, 1.15);
+  fig.translate(9, 14);
+  fig.scale(1.5, 1.5);
   paintFish(fig, 0, 0, FISH_KINDS[1], false);
   fig.restore();
   g.drawImage(fic, FISH_COL * ICON_CELL, 0);
@@ -3416,12 +3437,40 @@ function buildIconAtlas() {
   iconAtlasBuilt = true;
 }
 
+// zoomed-out tree/bush/rock icons: instead of one point per plant, cluster
+// them onto a coarse grid and emit a single marker per cell carrying the
+// dominant species — "here lives a grove of oaks", not a pixel for every tree
+const TREE_ICON_GRID = 64; // world units per marker cell (~1 per 4 chunks)
 function ensureChunkIcons(ch) {
   if (ch.icons || !ch.trees || !ch.trees.userData.iconData) return;
   const ud = ch.trees.userData.iconData;
+  const pos = ud.pos, col = ud.col;
+  const cells = new Map();
+  for (let i = 0; i < col.length; i++) {
+    const x = pos[i * 3], z = pos[i * 3 + 2];
+    const key = Math.round(x / TREE_ICON_GRID) + ':' + Math.round(z / TREE_ICON_GRID);
+    let cell = cells.get(key);
+    if (!cell) {
+      cell = { x, y: pos[i * 3 + 1], z, counts: new Map(), best: col[i] };
+      cells.set(key, cell);
+    }
+    const k = col[i];
+    cell.counts.set(k, (cell.counts.get(k) || 0) + 1);
+    if (cell.counts.get(k) > cell.counts.get(cell.best)) cell.best = k;
+  }
+  const ppos = new Float32Array(cells.size * 3);
+  const pcol = new Float32Array(cells.size);
+  let w = 0;
+  for (const cell of cells.values()) {
+    ppos[w * 3] = cell.x;
+    ppos[w * 3 + 1] = cell.y;
+    ppos[w * 3 + 2] = cell.z;
+    pcol[w] = cell.best;
+    w++;
+  }
   const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.BufferAttribute(ud.pos, 3));
-  g.setAttribute('aCol', new THREE.BufferAttribute(ud.col, 1));
+  g.setAttribute('position', new THREE.BufferAttribute(ppos, 3));
+  g.setAttribute('aCol', new THREE.BufferAttribute(pcol, 1));
   g.boundingSphere = ch.trees.geometry.boundingSphere.clone();
   const pts = new THREE.Points(g, ICON_MAT);
   pts.visible = false;
@@ -3438,13 +3487,16 @@ function releaseChunkIcons(ch) {
 
 // fish schools get map icons too — but clustered: nearby schools merge
 // into a few "there be fish here" group markers per area
+// fish-school markers: same idea as the tree icons — one bigger marker per
+// area, so the open sea reads as scattered "there be fish" spots
+const FISH_ICON_GRID = 200; // world units per marker cell — the open sea shows only a few "there be fish" spots
 function ensureChunkFishIcons(ch) {
   if (ch.fishIcons || !ch.fish || !ch.fish.userData.iconData) return;
   const src = ch.fish.userData.iconData.pos;
   const seen = new Map();
   for (let i = 0; i < src.length; i += 3) {
     // snap to a coarse grid so adjacent schools share one marker
-    const key = Math.round(src[i] / 12) + ':' + Math.round(src[i + 2] / 12);
+    const key = Math.round(src[i] / FISH_ICON_GRID) + ':' + Math.round(src[i + 2] / FISH_ICON_GRID);
     if (!seen.has(key)) seen.set(key, [src[i], SEA_LEVEL + 0.6, src[i + 2]]);
   }
   const pos = new Float32Array(seen.size * 3);
@@ -4872,6 +4924,9 @@ window.addEventListener('wheel', () => { camTween = null; }, { passive: true, ca
 
 function wakeCaveman(cm) {
   if (!cm || !cm.sleeping) return;
+  // the founding couple stays asleep until the first campfire strike;
+  // no dawn, selection or steering may rouse them before that moment
+  if (cm.founder && !tribeAwoken) return;
   cm.sleeping = false;
   cm.hold = false;
   cm.wait = 0;
@@ -5033,6 +5088,7 @@ function strikeCampfire() {
     desiredDist = clampZoom(Math.hypot(44, 55)); // match the home-button zoom
   }
   // the blast wakes every sleeping villager: they hop up startled
+  tribeAwoken = true; // first strike rouses the founding couple for good
   for (const c of cavemen) wakeCaveman(c);
   const sx = homePos.x + (Math.random() - 0.5) * 2;
   const sz = homePos.z + (Math.random() - 0.5) * 2;
@@ -7638,6 +7694,38 @@ function animate() {
   const sBase = nightF * starVis;
   starsA.material.opacity = sBase * (0.55 + 0.3 * Math.sin(t * 1.7));
   starsB.material.opacity = sBase * (0.55 + 0.3 * Math.sin(t * 2.3 + 2));
+
+  // --- underwater camera: submerge the view when diving below the surface ---
+  {
+    const uW =
+      !spaceMode && camera.position.y < water.position.y - 0.15;
+    if (uW !== underwater) {
+      underwater = uW;
+      underwaterOverlay.style.opacity = underwater ? '1' : '0';
+    }
+    if (underwater) {
+      // murky blue fog, tight enough that light dies a few blocks down
+      scene.fog.color.copy(UNDERWATER_FOG);
+      scene.fog.near = 2;
+      scene.fog.far = 30;
+      scene.background.copy(UNDERWATER_BG);
+      // keep the vegetation / fish shaders fogged to the same blue
+      treeMat.uniforms.uFogColor.value.copy(UNDERWATER_FOG);
+      treeMat.uniforms.uFogNear.value = 2;
+      treeMat.uniforms.uFogFar.value = 30;
+      fishMat.uniforms.uFogColor.value.copy(UNDERWATER_FOG);
+      fishMat.uniforms.uFogNear.value = 2;
+      fishMat.uniforms.uFogFar.value = 30;
+      // dim the sky, sun and starlight — you're under the sea now
+      sun.intensity *= 0.18;
+      hemi.intensity *= 0.25;
+      amb.intensity *= 0.3;
+      sunDisc.material.opacity *= 0.12;
+      moonDisc.material.opacity *= 0.12;
+      starsA.material.opacity *= 0.08;
+      starsB.material.opacity *= 0.08;
+    }
+  }
 
   const dstr = 'Day ' + (Math.floor(gameMs / 86400000) - epochDay + 1) + ' · ' + phaseName(hrs);
   if (dstr !== lastDayStr) {

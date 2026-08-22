@@ -8,20 +8,22 @@
 
 **Every sprite you see is drawn by code at runtime** — there is not a single
 image file in this game. One seed grows an endless world of deserts, jungles,
-forests and snow; a little tribe wakes, explores, discovers fire, and sleeps
-by the campfire under a full day-night sky.
+forests and snow; a little tribe sleeps by the fire until you strike it — then
+wakes, explores, discovers fire, and lives through a full day-night cycle.
+A game year is 365 days in four ~91-day seasons, ticking 60× faster than
+real time.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Vanilla JS](https://img.shields.io/badge/vanilla-JS-f7df1e?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![three.js](https://img.shields.io/badge/three.js-049EF4?logo=threedotjs&logoColor=white)](https://threejs.org)
-[![Build step](https://img.shields.io/badge/build%20step-none-success)](#-quick-start)
+[![Build step](https://img.shields.io/badge/build%20step-none-success)](#quick-start)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 <img src="docs/assets/hero-sprites.png" alt="Birch, oak and pine trees, the campfire and a clownfish — all painted by code" width="600">
 
 *Left to right: birch, oak, pine, the campfire, and a clownfish — every pixel placed by `fillRect`.*
 
-[🎮 Play it](#-quick-start) · [🕹️ Controls](#️-controls) · [🧠 How it works](#-how-it-works) · [🎨 The art](#-the-art-all-painted-by-code) · [🤝 Contribute](CONTRIBUTING.md)
+[🎮 Play it](#quick-start) · [🕹️ Controls](#controls) · [🧠 How it works](#how-it-works) · [🎨 The art](#the-art--all-painted-by-code) · [🤝 Contribute](CONTRIBUTING.md)
 
 </div>
 
@@ -55,7 +57,7 @@ npx serve .                     # or Node via npx
 
 | | Input | Action |
 |---|---|---|
-| ⌨️ | **W A S D** · **R / F** | Fly across the world · dive / climb |
+| ⌨️ | **W A S D** · **R / F** | Fly across the world · dive / climb — dive under the sea for the underwater view |
 | 🖱️ | **Drag** | Orbit & zoom |
 | 👆 | **Click a villager** | Select them, then steer with WASD or joystick |
 | 🔥 | **Strike the campfire** | Gather the tribe → unlock *Fire* 📖 |
@@ -73,7 +75,7 @@ every system is right there, behind a banner comment:
 ```mermaid
 flowchart LR
     SEED[(🌱 Seed)] --> GEN["Terrain generator<br/>biomes · caves · sea"]
-    GEN --> FLORA["Vegetation scatter<br/>26 species"]
+    GEN --> FLORA["Vegetation scatter<br/>25 species"]
     subgraph SIM ["Simulation"]
         VIL["👥 Villagers<br/>energy · sleep · AI"] --- FISH["🐟 Fish schools"] --- SKY["🌗 Day-night · seasons"]
     end
@@ -89,6 +91,11 @@ A few things we're proud of:
   unlock permanently in the 📖 book (`localStorage` saves your progress)
 - **Daily energy** — villagers run out of battery, collapse dramatically, sleep
   it off, and wake at dawn. Watch long enough and you'll see the whole rhythm
+- **Realistic calendar** — a year is 365 game days in four ~91-day seasons,
+  and game time still runs 60× faster than real life
+- **Underwater world** — dive below the surface and the sea swallows the view:
+  murky blue fog, dimmed sun, drifting light rays, and fish schools swimming
+  right beside you (they only gather where the water is 3+ blocks deep)
 - **Headless-testable** — a `window.__DBG` API lets tests strike fires, skip
   time and teleport villagers without touching the mouse
 
@@ -101,9 +108,9 @@ The images below were rendered by re-running those exact painters headlessly —
 
 <div align="center">
 
-| 🌳 A few of 26 species | 🐟 A few of 6 fish |
+| 🌳 A few of 25 species | 🐟 A few of 6 fish |
 |:---:|:---:|
-| <img src="docs/assets/tree-oak.png" width="120">&nbsp;<img src="docs/assets/tree-pine.png" width="100">&nbsp;<img src="docs/assets/tree-maple.png" width="115">&nbsp;<img src="docs/assets/tree-cactus.png" width="60"> | <img src="docs/assets/fish-clownfish.png" width="95">&nbsp;<img src="docs/assets/fish-blue-tang.png" width="95">&nbsp;<img src="docs/assets/fish-tuna.png" width="95"> |
+| <img src="docs/assets/tree-oak.png" width="120">&nbsp;<img src="docs/assets/tree-pine.png" width="100">&nbsp;<img src="docs/assets/tree-maple.png" width="115">&nbsp;<img src="docs/assets/tree-jungle.png" width="115">&nbsp;<img src="docs/assets/tree-cactus.png" width="60"> | <img src="docs/assets/fish-clownfish.png" width="95">&nbsp;<img src="docs/assets/fish-blue-tang.png" width="95">&nbsp;<img src="docs/assets/fish-tuna.png" width="95"> |
 
 | 🔥 The campfire | 😀 A villager's face — everyone's is unique |
 |:---:|:---:|
@@ -118,7 +125,7 @@ clownfish's real swim cycle, frame-for-frame from the code:
 <img src="docs/assets/fish-swim.gif" alt="Clownfish swim cycle" width="140">
 </div>
 
-Want the full catalog of all 26 plant and rock species?
+Want the full catalog of all 25 plant and rock species?
 [`SPRITESHEET.md`](SPRITESHEET.md) documents every painter.
 
 ## 🧪 Testing
@@ -126,7 +133,7 @@ Want the full catalog of all 26 plant and rock species?
 Smoke-test any change headlessly with the built-in debug API:
 
 ```js
-__DBG.version()          // e.g. "v34"
+__DBG.version()          // debug API version (the game itself is v34)
 __DBG.strike()           // light the campfire gathering
 __DBG.know()             // → { fire: true, water: false, … }
 __DBG.setHour(22)        // jump to night — bedtime AI kicks in

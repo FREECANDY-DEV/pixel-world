@@ -57,7 +57,9 @@ This document catalogs every sprite, where it lives, and what it looks like.
 
 ## 3. Map Icon Atlas — `iconAtlasCanvas`
 
-One row of 40px cells mirroring KIND_ORDER plus special chips:
+One row of 48px cells mirroring KIND_ORDER plus special chips. Tree/bush/rock
+chips are **1:1 copies of the summer vegetation row** (`ICON_CELL = ATLAS_CELL`),
+so zoomed-out markers show the exact same art as the in-world trees:
 
 - Tree chips (per species): miniaturized summer art.
 - Campfire chip (`FIRE_COL`): log teepee + flame overlay.
@@ -82,12 +84,48 @@ One row of 40px cells mirroring KIND_ORDER plus special chips:
 - ZZZ stream: three rising "z" glyphs fading in loop above sleepers (`drawZzz`).
 - Reaction bubbles: ascii `!`, `!!`, `?!`, `‼`, `✦` (+`✨` for the Water discovery).
 - Lightning bolt polyline flash + expanding shockwave rings.
+- **Camp label sprite** above the camp (`campLabelCanvas`, 256×72): a little
+  pixel house with a stepped roof and door, outlined `CAMP` text, and a
+  pixel-person icon carrying the live villager count.
+- **Space dressing**: a hand-pixelled moon skin (`makeMoonTexture`, 64×32) —
+  pale regolith with speckle and rimmed craters — plus a radial-glow sun sprite
+  that dresses the planet view.
 
-## 6. UI glyphs (DOM, not canvas)
+## 6. Anatomy view — `ANAT_ART` + `BODY_MAP`
+
+Pixel art for the 🫀 anatomy sheet, painted from char maps via `anatSprite`:
+
+| Sprite | What it looks like |
+|---|---|
+| `heart` | red valved heart, pale top-left highlight |
+| `brain` | pink convoluted lobes, dark outline |
+| `lungs` | two grey-pink lobes flanking a trachea |
+| `stomach` | orange J-pouch with darker edge |
+| `liver` | dark maroon slab, lighter top edge |
+| `guts` | coiled pink intestines, outlined |
+| `skull` | white cranium, dark eye sockets, teeth row |
+| `spine` | vertebrae column with a rib fan |
+| `pelvis` | butterfly-shaped hip bones |
+| `armbone` / `legbone` | long bone with knuckle joints at both ends |
+
+- `BODY_MAP`: a 26×46 silhouette of a ~7.5-heads-tall figure (crown → feet) with
+  regions keyed `h` head · `n`/`t` torso · `a`/`b` arms · `l`/`r` legs;
+  `BODY_BOXES` derives per-part bounds so `partIconURL()` crops each body part
+  into a 4×-scaled icon for the part list.
+- Wound chips are small DOM pills (bleeding / scratched / bruised / fractured /
+  damaged) layered on each part row.
+
+## 7. UI glyphs (DOM, not canvas)
 
 👁 toggle UI · 🌍 regenerate · 🔄 auto-spin · 🗺️ top view · 🏠 home · ⬚ box-select ·
 ❚❚ pause · 👤 villager panel · » assets panel · 🫀 anatomy · 📖 knowledge book ·
 🔒 locked knowledge nodes · ☀️/🍂/❄️/🌸 season pill · 🐟 sea-life tab
+
+### Sky pill icon — `celestial-icon` (48×48 canvas)
+
+`drawCelestialIcon` paints the live sky in the season pill: a warm sun disc with
+8 rotating rays (dusk-shifted colour), four twinkling stars, and a moon that
+fades in as night falls.
 
 ---
 

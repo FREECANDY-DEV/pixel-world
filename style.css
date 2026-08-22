@@ -1361,6 +1361,34 @@ body.sheet-open #char-toggle {
   text-shadow: 0 1px 0 #000;
 }
 
+/* --- underwater camera: blue tint + drifting light rays over the stage ---- */
+#underwater-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 8; /* above the 3D stage, under every UI panel */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(190, 230, 255, 0.10), transparent 62%),
+    linear-gradient(to bottom, rgba(18, 72, 140, 0.32), rgba(6, 34, 82, 0.55) 55%, rgba(2, 16, 44, 0.78));
+}
+#underwater-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    100deg,
+    transparent 0 90px,
+    rgba(220, 240, 255, 0.045) 90px 132px
+  );
+  animation: underwater-rays 10s linear infinite;
+}
+@keyframes underwater-rays {
+  from { transform: translateX(0); }
+  to   { transform: translateX(132px); }
+}
+
 /* --- anatomy body view (replaces the live preview inside the sheet) -------- */
 #anat-btn {
   position: absolute;
