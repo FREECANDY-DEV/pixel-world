@@ -203,10 +203,10 @@ function colorFor(wx, y, wz, surfY, seed) {
 //   8 ocean-floor   9 clay         10 gravel       11 cave-stone
 //  12 snow-side    13 sand-side    14 grass-dry-side 15 gravel-side
 
-const ATLAS_COLS = 16;   // tiles across
-const ATLAS_CELL = 16;   // px per tile side
-const ATLAS_W = ATLAS_COLS * ATLAS_CELL; // 256 px
-const ATLAS_H = ATLAS_CELL;              // 16 px
+const BT_COLS = 16;   // tiles across
+const BT_CELL = 16;   // px per tile side
+const BT_W = BT_COLS * BT_CELL; // 256 px
+const BT_H = BT_CELL;              // 16 px
 
 // Block type constants (must match atlas column indices)
 const BT = {
@@ -253,7 +253,7 @@ function classifyBlock(wx, y, wz, surfY, seed) {
 // Generate the block texture atlas at runtime (no image files needed)
 function buildBlockAtlas() {
   const c = document.createElement('canvas');
-  c.width = ATLAS_W; c.height = ATLAS_H;
+  c.width = BT_W; c.height = BT_H;
   const g = c.getContext('2d');
   g.imageSmoothingEnabled = false;
 
@@ -728,7 +728,7 @@ function buildChunkData(cx, cz, seed, lod) {
           const face = FACES[f];
           if (solidAt(wx + face.n[0], wy + face.n[1], wz + face.n[2])) continue;
           const tileIdx = face.ft === 1 ? bt.top : face.ft === 2 ? bt.bottom : bt.side;
-          const u0 = tileIdx / ATLAS_COLS;
+          const u0 = tileIdx / BT_COLS;
           for (let k = 0; k < 4; k++) {
             positions.push(wx + face.v[k][0], wy + face.v[k][1], wz + face.v[k][2]);
           }
@@ -739,7 +739,7 @@ function buildChunkData(cx, cz, seed, lod) {
           }
           for (let k = 0; k < 4; k++) colors.push(col[0], col[1], col[2]);
           for (let k = 0; k < 4; k++) {
-            uvs.push(u0 + face.uv[k][0] / ATLAS_COLS, face.uv[k][1]);
+            uvs.push(u0 + face.uv[k][0] / BT_COLS, face.uv[k][1]);
           }
           for (let k = 0; k < 4; k++) {
             const ao = calcAO(wx, wy, wz, face, k);
@@ -775,7 +775,7 @@ function buildChunkData(cx, cz, seed, lod) {
 
 const WORKER_SRC = [
   'const CHUNK=' + CHUNK + ',SEA_LEVEL=' + SEA_LEVEL + ',MAX_HEIGHT=' + MAX_HEIGHT + ';',
-  'const ATLAS_COLS=' + ATLAS_COLS + ';',
+  'const BT_COLS=' + BT_COLS + ';',
   'var HOME_FLAT=null;',
   hash3.toString(),
   'const sstep=' + sstep.toString() + ';',
@@ -788,11 +788,13 @@ const WORKER_SRC = [
   terrainHeight.toString(),
   isCave.toString(),
   colorFor.toString(),
+  'const BT=' + JSON.stringify(BT) + ';',
   classifyBlock.toString(),
   homeFlatten.toString(),
   'const FACES=' + JSON.stringify(FACES) + ';',
   buildChunkData.toString(),
   'self.onmessage = function (e) {' +
+    'try {' +
     'var d = e.data;' +
     'HOME_FLAT = d.home || null;' +
     'var r = buildChunkData(d.cx, d.cz, d.seed, d.lod);' +
@@ -801,6 +803,7 @@ const WORKER_SRC = [
       'positions: r.positions, normals: r.normals,' +
       'colors: r.colors, uvs: r.uvs, aos: r.aos, indices: r.indices' +
     '}, [r.positions.buffer, r.normals.buffer, r.colors.buffer, r.uvs.buffer, r.aos.buffer, r.indices.buffer]);' +
+    '} catch(err) { self.postMessage({error: err.message, cx: d.cx, cz: d.cz}); }' +
   '};',
 ].join('\n');
 
@@ -820,6 +823,7 @@ try {
       const d = e.data;
       applyQueue.push({ cx: d.cx, cz: d.cz, lod: d.lod, seed: d.seed, data: d });
     };
+    w.onerror = (e) => { console.warn('Chunk worker error:', e.message); busy.delete(w); };
     workers.push(w);
   }
 } catch (err) {
@@ -1480,7 +1484,7 @@ chunkMat.onBeforeCompile = (shader) => {
   shader.uniforms.uShadeFar = { value: VIEW_DIST * 0.98 };
   shader.uniforms.uSnow = { value: 0 };
   shader.uniforms.uParched = { value: 0 };
-  shader.uniforms.uAtlasW = { value: 1 / ATLAS_COLS };
+  shader.uniforms.uAtlasW = { value: 1 / BT_COLS };
   chunkMat.userData.shader = shader;
   // --- vertex shader: pass AO + worldY + smooth normal to fragment ---
   shader.vertexShader = shader.vertexShader
