@@ -1464,7 +1464,13 @@ autoBtn.addEventListener('click', () => {
 });
 
 document.getElementById('topview').addEventListener('click', () => {
-  camera.position.set(controls.target.x, controls.target.y + 90, controls.target.z + 0.01);
+  // stay at the current zoom distance: snapping to a fixed height would drop
+  // below the icon LOD threshold and make every map icon vanish (and swap the
+  // map view for raw 3D terrain). Keeping the radial distance preserves the
+  // LOD stage the user is in — map icons or 3D world — and just rotates the
+  // camera to look straight down.
+  const d = Math.max(camera.position.distanceTo(controls.target), ZOOM_MIN);
+  camera.position.set(controls.target.x, controls.target.y + d, controls.target.z + 0.01);
   controls.update();
   snapZoom();
 });
