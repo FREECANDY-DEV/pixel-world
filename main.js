@@ -446,13 +446,18 @@ const waterMat = new THREE.MeshStandardMaterial({
 // gentle swell so the waterline shimmers as motion, not aliasing stutter
 waterMat.onBeforeCompile = (sh) => {
   sh.uniforms.uTime = { value: 0 };
+  sh.uniforms.uOffset = { value: new THREE.Vector3() };
   sh.vertexShader =
-    'uniform float uTime;\n' +
+    'uniform float uTime;\nuniform vec3 uOffset;\n' +
     sh.vertexShader.replace(
       '#include <begin_vertex>',
       `#include <begin_vertex>
-       transformed.z += sin(position.x * 0.045 + uTime * 1.6) * 0.09
-                      + cos(position.y * 0.037 - uTime * 1.1) * 0.07;`
+       // waves are anchored to WORLD coordinates (uOffset = the plane's own
+       // world position, added to the local grid): the plane follows the
+       // camera, so local-space waves used to jump every time it snapped —
+       // that made the sea surface and the shoreline stutter
+       transformed.z += sin((position.x + uOffset.x) * 0.045 + uTime * 1.6) * 0.09
+                      + cos((position.y + uOffset.z) * 0.037 - uTime * 1.1) * 0.07;`
     );
   waterMat.userData.shader = sh;
 };
@@ -2055,7 +2060,11 @@ function clearCampfires() {
 function groundYAt(x, z) {
   const rx = Math.round(x), rz = Math.round(z);
   const g = homeFlatten(rx, rz, terrainHeight(rx, rz, SEED)) + 1;
-  return Math.max(g, SEA_LEVEL - 0.4);
+  // the real ground everywhere — including the seabed. (There used to be a
+  // clamp here keeping every water floor at knee depth, which made villagers
+  // wade on the surface of every sea and hid the oceans' real depth; people
+  // are kept afloat by charGroundY instead.)
+  return g;
 }
 
 // ============================================================================
@@ -6114,14 +6123,14 @@ function updateCavemen(dt, t) {
       if (aS || bS) {
         // the steered one holds course; the other gives way completely
         const full = pushAmt / d2;
-        if (aS) { b.x += dx * full; b.z += dz * full; cb.gy = groundYAt(b.x, b.z); }
-        else { a.x -= dx * full; a.z -= dz * full; ca.gy = groundYAt(a.x, a.z); }
+        if (aS) { b.x += dx * full; b.z += dz * full; cb.gy = charGroundY(b.x, b.z); }
+        else { a.x -= dx * full; a.z -= dz * full; ca.gy = charGroundY(a.x, a.z); }
       } else {
         const half = pushAmt / 2 / d2;
         a.x -= dx * half; a.z -= dz * half;
         b.x += dx * half; b.z += dz * half;
-        ca.gy = groundYAt(a.x, a.z);
-        cb.gy = groundYAt(b.x, b.z);
+        ca.gy = charGroundY(a.x, a.z);
+        cb.gy = charGroundY(b.x, b.z);
       }
     }
   }
@@ -6162,10 +6171,21 @@ function updateCavemen(dt, t) {
     }
     const depS = cm.swimming ? SEA_LEVEL - cm.gy : 0;
     const airH = cm.airH || 0;
+    // real swimming, not wading: in water deeper than knee-deep the villager
+    // rides lower (head and shoulders above the surface, body under) with a
+    // slower, stronger stroke bob and a forward lean, so they read as
+    // swimming in the sea instead of walking on it
+    const wdep = Math.max(0, waterDepthAt(cm.spr.position.x, cm.spr.position.z));
+    const deepK = cm.swimming ? THREE.MathUtils.clamp((wdep - 0.4) / 1.6, 0, 1) : 0;
     cm.spr.position.y =
       cm.gy + airH -
-      Math.min(0.9, Math.max(0, depS) * 0.5) +
-      (cm.moving ? Math.abs(Math.sin(t * 9 + cm.phase)) * (cm.swimming ? 0.2 : 0.12) : 0);
+      Math.min(0.9, Math.max(0, depS) * 0.5) -
+      deepK * 1.0 +
+      (cm.moving
+        ? Math.abs(Math.sin(t * (deepK > 0.5 ? 4.6 : 9) + cm.phase)) * (deepK > 0.5 ? 0.42 : 0.12)
+        : 0);
+    // gentle forward lean while swimming (screen-space roll, zero on land)
+    cm.spr.rotation.z = deepK > 0.5 ? 0.32 : 0;
     // dedicated sleeping sprite: each villager's own lying-down pixel art
     if (cm.sleeping && !cm.sleepApplied) applySleepPose(cm, true);
     else if (!cm.sleeping && cm.sleepApplied) applySleepPose(cm, false);
@@ -9361,6 +9381,7 @@ function animate() {
   water.position.z = Math.round(controls.target.z / 4) * 4;
   if (waterMat.userData.shader) {
     waterMat.userData.shader.uniforms.uTime.value = animT;
+    waterMat.userData.shader.uniforms.uOffset.value.set(water.position.x, 0, water.position.z);
   }
   headLight.position.copy(camera.position);
 
