@@ -26,9 +26,29 @@ real time.
 
 *Left to right: birch, oak, pine, the campfire, and a clownfish — every pixel placed by `fillRect`.*
 
-[🎮 Play it](#quick-start) · [🕹️ Controls](#controls) · [✨ Features](#features) · [🧠 How it works](#how-it-works) · [🎨 The art](#the-art--all-painted-by-code) · [🧪 Testing](#testing) · [🤝 Contribute](CONTRIBUTING.md)
+[🎮 Play it](#quick-start) · [🔥 Live demo](#-live-demo) · [🕹️ Controls](#controls) · [✨ Features](#features) · [🧠 How it works](#how-it-works) · [🎨 The art](#the-art--all-painted-by-code) · [🧪 Testing](#testing) · [🤝 Contribute](CONTRIBUTING.md)
 
 </div>
+
+---
+
+## 🔥 Live demo — play it with friends
+
+**Enter the world beside the campfire with your own caveman — and meet everyone else who's there.**
+
+> 🌐 **https://FREECANDY-DEV.github.io/pixel-world/demo.html**
+
+Each visitor controls a caveman that appears in everyone else's world as a ghost with a name tag.
+Type a message and it pops as a **pixel chat bubble above your human** — and above the human
+of whoever you're talking to. **Grunk the Elder**, a knowledge NPC by the fire, answers
+questions about the game (try *"what fish live here?"* or *"help"*).
+
+- No accounts, no servers of ours: the page is pure static (it also runs from the repo root
+  via `index.html?demo=1`), and multiplayer rides a **public MQTT demo broker** over WebSockets
+  (HiveMQ → EMQX fallback), loaded from a CDN only when demo mode is on
+- Leave the tab and your ghost is cleaned up automatically (MQTT Last-Will)
+- If the broker is unreachable, the camp still works solo and Grunk still chats with you
+- Change your name with the ✏️ next to "You are…" — the whole tribe sees it
 
 ---
 
@@ -351,6 +371,14 @@ __DBG.pickUp(1)          // hoist villager #1 over the selected human's head
 __DBG.putDown(1)         // set villager #1 back down
 __DBG.rebuildIconAtlas() // force the seasonal map chips to repaint
 __DBG.fishIconLayer      // the global (per water-body) fish marker layer
+```
+
+Demo mode (`?demo=1`) adds its own hooks:
+
+```js
+__DBG.demoState()        // → { mode, name, connected, online, ghosts, botHost }
+__DBG.demoSend('hi!')    // send a chat message as the player (drives the full MQTT path)
+__DBG.demoBot('seasons') // ask Grunk directly — returns his answer text
 ```
 
 `node --check main.js` catches syntax slips; a five-line puppeteer script

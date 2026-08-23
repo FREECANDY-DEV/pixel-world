@@ -1,10 +1,30 @@
 # Pixel World — Project TODO
 
-Last updated: 2026-08-23 (v37)
+Last updated: 2026-08-23 (v38)
 
 ---
 
 ## ✅ Completed
+
+### Online demo mode — multiplayer campfire chat (v38)
+- [x] **Demo entry** (`?demo=1`, landing at `demo.html`): spawns your own caveman on dry
+  ground beside the camp, gives you a random stone-age name (✏️ to change — the tribe sees
+  it), selects & follows you
+- [x] **Multiplayer with zero accounts**: the demo rides a public MQTT broker over WebSockets
+  (HiveMQ → EMQX fallback), mqtt.js loaded from a CDN only in demo mode; the page stays pure
+  static so it also runs from GitHub Pages
+- [x] **Remote players as ghosts**: every visitor's human appears in your world as a ghost
+  caveman with a colored name tag, positions smoothed and throttled (~160ms / 0.22u move)
+- [x] **Chat bubbles above humans**: messages pop as pixel bubbles over the speaker's head,
+  seen by everyone; chat log panel bottom-left with online counter
+- [x] **Grunk the Elder**: a knowledge NPC by the fire who answers questions about the game
+  (seasons, fish, species, fire/water knowledge, energy/sleep, controls, world) from live
+  game state. One client is elected bot-host (retained-topic election) so his replies are
+  world-synced; solo/offline camp still chats locally
+- [x] **Cleanup**: MQTT Last-Will tombstones drop departed players' ghosts + presence;
+  45s silence TTL as a backstop
+- [x] Headless-verified: two real browser clients discovered each other, exchanged chat both
+  ways, saw the same world-synced bot reply, and the departing client's ghost was removed
 
 ### Sea, action menu & classic party window (v37)
 - [x] **Fish swim properly**: each school cruises in its own random direction

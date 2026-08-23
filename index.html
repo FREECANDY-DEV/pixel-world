@@ -168,6 +168,24 @@
 
   <div id="roster" aria-label="Selected party — click a human to control them"></div>
 
+  <!-- demo mode (?demo=1): multiplayer campfire chat -->
+  <div id="demo-ui" class="hidden">
+    <button id="demo-chat-toggle" class="ctl" title="Campfire chat">💬<span id="demo-online-badge"></span></button>
+    <div id="demo-chat" class="hidden">
+      <div id="demo-chat-head">
+        <span id="demo-chat-title">🏕️ Campfire chat</span>
+        <span id="demo-online"></span>
+        <button id="demo-chat-close" title="Collapse">–</button>
+      </div>
+      <div id="demo-you">You are <span id="demo-you-name"></span><button id="demo-rename" title="Change your name">✏️</button></div>
+      <div id="demo-chat-msgs"></div>
+      <div id="demo-chat-row">
+        <input id="demo-chat-input" maxlength="140" placeholder="Say something to the tribe…" autocomplete="off" />
+        <button id="demo-chat-send" title="Send">➤</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="main.js?v=35"></script>
 </body>
 </html>

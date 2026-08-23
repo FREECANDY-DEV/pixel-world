@@ -63,6 +63,9 @@ Include the commands you ran in your PR description.
 | `__DBG.fishCount()` / `__DBG.fishState()` | Sea life |
 | `__DBG.depthAt(x,z)` / `__DBG.findSea()` | Terrain queries |
 | `__DBG.setIconMode(on)` | Icon LOD mode |
+| `__DBG.demoState()` | Demo mode state (`?demo=1`): name, online count, ghosts |
+| `__DBG.demoSend(text)` | Send a chat message through the full MQTT path |
+| `__DBG.demoBot(text)` | Ask Grunk directly — returns his answer |
 
 ## Adding a new species (the fun part)
 

@@ -7778,12 +7778,640 @@ function spawnLightning(pos) {
 }
 
 // ============================================================================
-// Main loop
+// Online demo mode (?demo=1) — multiplayer campfire chat.
+//
+// The demo page drops you beside the camp with your own caveman. Every
+// player who opens the same page appears in your world as a ghost caveman
+// with a name tag; chat messages pop as pixel bubbles above the speaker,
+// and Grunk the Elder — a knowledge NPC by the fire — answers questions
+// about the game. The wire is a PUBLIC MQTT broker over WebSockets (HiveMQ,
+// falling back to EMQX): zero accounts, zero servers of our own — the page
+// is pure static, so it also runs from GitHub Pages. mqtt.js is loaded from
+// a CDN only when demo mode is on; without a connection the camp still
+// works solo (Grunk still chats locally).
 // ============================================================================
+
+const DEMO_MODE = new URLSearchParams(location.search).has('demo');
+const DEMO_BROKERS = [
+  'wss://broker.hivemq.com:8884/mqtt',
+  'wss://broker.emqx.io:8084/mqtt',
+];
+const DEMO_TOPIC = 'pixelworld/demo/v1';
+const DEMO_COLORS = ['#ffd23f', '#7dd3fc', '#a7f3d0', '#f9a8d4', '#fdba74', '#c4b5fd', '#f87171', '#86efac'];
+const DEMO_POS_MS = 160;       // position publish throttle
+const DEMO_MOVE_EPS = 0.22;    // …only when the human actually moved this far
+const DEMO_HEARTBEAT_MS = 3000; // …or at least this often (keeps ghosts alive)
+const DEMO_TTL_MS = 45000;     // drop a ghost/presence after this much silence
+
+const demoState = {
+  id: '',
+  name: '',
+  color: '#ffd23f',
+  mqtt: null,
+  connected: false,
+  brokerIdx: 0,
+  me: null,            // the player's own caveman
+  meBubble: null,      // chat bubble sprite above the player's human
+  ghosts: new Map(),   // remote player id -> ghost
+  presence: new Map(), // remote player id -> { name, color, ts }
+  seen: new Set(),     // chat message dedupe
+  lastPosPub: 0,
+  lastPos: null,
+  botHost: false,      // one client runs Grunk and relays his replies
+  botBusy: false,
+  botGhost: null,
+  online: 1,
+};
+
+function demoPickName() {
+  const saved = (localStorage.getItem('pw-demo-name') || '').trim();
+  if (saved) return saved.slice(0, 14);
+  const all = [...CAVEMAN_NAMES, ...CAVEWOMAN_NAMES];
+  return all[Math.floor(Math.random() * all.length)];
+}
+
+function demoEl(id) { return document.getElementById(id); }
+
+function initDemoMode() {
+  if (!DEMO_MODE) return;
+  demoState.id = 'p' + Math.random().toString(36).slice(2, 10);
+  demoState.name = demoPickName();
+  demoState.color = DEMO_COLORS[Math.floor(Math.random() * DEMO_COLORS.length)];
+
+  // --- the player's own caveman, spawned on dry ground near the fire ---
+  let sx = homePos.x + 3, sz = homePos.z + 3;
+  for (let a = 0; a < 24; a++) {
+    const ang = (a / 24) * Math.PI * 2;
+    const r = 4 + (a % 3) * 2.4;
+    const x = homePos.x + Math.cos(ang) * r;
+    const z = homePos.z + Math.sin(ang) * r;
+    if (isDry(x, z) && !treeHit(x, z)) { sx = x; sz = z; break; }
+  }
+  spawnCaveman(sx, sz, Math.random() < 0.5, 20 + Math.floor(Math.random() * 30));
+  const me = cavemen[cavemen.length - 1];
+  me.stats.name = demoState.name;
+  me.homebound = true;
+  demoState.me = me;
+  selectCaveman(me);
+  me.hold = false; // the demo pick is steerable from the first frame
+  toast('\u{1F3D6}\uFE0F You are ' + demoState.name + ' — say hi to the tribe!', 'demo');
+
+  // --- chat bubble above the player's own head ---
+  demoState.meBubble = demoMakeBubble();
+  scene.add(demoState.meBubble);
+
+  // --- Grunk, the elder by the fire (everyone sees the same Grunk) ---
+  demoState.botGhost = demoMakeGhost('grunk', 'Grunk the Elder', '#ffd23f');
+
+  // --- UI wiring ---
+  demoEl('demo-ui').classList.remove('hidden');
+  demoEl('demo-chat-toggle').addEventListener('click', () => {
+    const c = demoEl('demo-chat');
+    c.classList.toggle('hidden');
+    if (!c.classList.contains('hidden')) demoEl('demo-chat-input').focus();
+  });
+  demoEl('demo-chat-close').addEventListener('click', () => demoEl('demo-chat').classList.add('hidden'));
+  demoEl('demo-chat-send').addEventListener('click', demoSendChat);
+  demoEl('demo-chat-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') demoSendChat();
+  });
+  demoEl('demo-rename').addEventListener('click', () => {
+    const chip = demoEl('demo-you-name');
+    const input = document.createElement('input');
+    input.id = 'demo-name-input';
+    input.maxLength = 14;
+    input.value = demoState.name;
+    chip.replaceWith(input);
+    input.focus();
+    input.select();
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { demoCommitName(input); }
+      else if (e.key === 'Escape') { demoRestoreNameChip(); }
+    });
+    input.addEventListener('blur', () => demoCommitName(input));
+  });
+  demoRenderYou();
+  demoSetOnline(1);
+  demoAddMsg({
+    name: 'Grunk', color: demoState.botGhost.color, bot: true,
+    text: 'Welcome, ' + demoState.name + '! Ask me about the seasons, the fish, the fire, or say \u201Chelp\u201D.',
+  });
+  demoLoadMqtt();
+}
+
+function demoRenderYou() {
+  const el = demoEl('demo-you-name');
+  if (el) {
+    el.textContent = demoState.name;
+    el.style.color = demoState.color;
+  }
+  if (demoState.me && demoState.me.stats) demoState.me.stats.name = demoState.name;
+}
+
+function demoCommitName(input) {
+  const v = (input.value || '').trim().slice(0, 14);
+  if (v) {
+    demoState.name = v;
+    localStorage.setItem('pw-demo-name', v);
+    demoRenderYou();
+    if (demoState.me) { demoState.me.stats.name = v; drawNameTag(demoState.me); }
+    demoPubPresence(); // let everyone see the new name
+  } else {
+    demoRestoreNameChip();
+  }
+}
+
+function demoRestoreNameChip() {
+  const old = demoEl('demo-name-input');
+  if (!old) return;
+  const span = document.createElement('span');
+  span.id = 'demo-you-name';
+  old.replaceWith(span);
+  demoRenderYou();
+}
+
+function demoSetOnline(n) {
+  demoState.online = Math.max(1, n);
+  const b = demoEl('demo-online');
+  if (b) b.textContent = demoState.connected ? demoState.online + ' here \u{1F525}' : 'solo camp';
+  const badge = demoEl('demo-online-badge');
+  if (badge) badge.textContent = demoState.connected && demoState.online > 1 ? '' + demoState.online : '';
+}
+
+function demoSendChat() {
+  const input = demoEl('demo-chat-input');
+  const text = (input.value || '').trim();
+  if (!text) return;
+  input.value = '';
+  const msg = {
+    id: demoState.id, name: demoState.name, color: demoState.color,
+    text: text.slice(0, 140), ts: Date.now(), mid: demoState.id + '-' + Math.random().toString(36).slice(2, 10),
+  };
+  demoState.seen.add(msg.mid);
+  demoAddMsg(msg);
+  demoShowBubble(demoState.meBubble, demoState.me, msg.name, msg.color, msg.text);
+  demoPub('chat', msg);
+}
+
+function demoAddMsg(m) {
+  const list = demoEl('demo-chat-msgs');
+  if (!list) return;
+  const row = document.createElement('div');
+  row.className = 'demo-msg' + (m.id === demoState.id ? ' mine' : '') + (m.bot ? ' bot' : '');
+  const who = document.createElement('span');
+  who.className = 'demo-who';
+  who.textContent = m.bot ? '\u{1F9D2} ' : '';
+  who.textContent += m.name + ':';
+  who.style.color = m.color;
+  const txt = document.createElement('span');
+  txt.className = 'demo-txt';
+  txt.textContent = m.text;
+  row.appendChild(who);
+  row.appendChild(txt);
+  list.appendChild(row);
+  while (list.childNodes.length > 80) list.removeChild(list.firstChild);
+  list.scrollTop = list.scrollHeight;
+}
+
+// --- DEMO MODULE part 2: mqtt -------------------------------------------------
+function demoLoadMqtt() {
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/mqtt@5/dist/mqtt.min.js';
+  s.onload = () => demoConnect(0);
+  s.onerror = () => demoSetOffline('chat CDN unreachable');
+  document.head.appendChild(s);
+}
+
+function demoSetOffline(reason) {
+  demoState.connected = false;
+  demoState.botHost = true; // solo camp: Grunk talks to you directly
+  demoSetOnline(1);
+  const t = demoEl('demo-chat-title');
+  if (t) t.textContent = '\u{1F3D6}\uFE0F Campfire chat \u00B7 offline (' + reason + ')';
+}
+
+function demoConnect(idx) {
+  if (idx >= DEMO_BROKERS.length) return demoSetOffline('all brokers busy');
+  if (typeof mqtt === 'undefined') return demoSetOffline('mqtt missing');
+  demoState.brokerIdx = idx;
+  const will = {
+    topic: DEMO_TOPIC + '/presence/' + demoState.id,
+    payload: '',
+    retain: true,
+    qos: 0,
+  };
+  const c = mqtt.connect(DEMO_BROKERS[idx], {
+    clientId: 'pw-' + demoState.id,
+    connectTimeout: 9000,
+    reconnectPeriod: 4000,
+    keepalive: 30,
+    will,
+  });
+  demoState.mqtt = c;
+  let connectedOnce = false;
+  c.on('connect', () => {
+    connectedOnce = true;
+    demoState.connected = true;
+    demoState.brokerIdx = 0;
+    const sub = [DEMO_TOPIC + '/chat', DEMO_TOPIC + '/pos', DEMO_TOPIC + '/presence/+', DEMO_TOPIC + '/bot'];
+    c.subscribe(sub, { qos: 0 }, () => {
+      demoPubPresence();
+      demoClaimBot();
+      demoSetOnline(demoState.presence.size + 1);
+      const t = demoEl('demo-chat-title');
+      if (t) t.textContent = '\u{1F3D6}\uFE0F Campfire chat';
+    });
+  });
+  c.on('message', (topic, payload) => demoOnMqtt(topic, payload.toString()));
+  c.on('error', () => { /* broker hiccup — reconnectPeriod handles it */ });
+  c.on('close', () => {
+    if (connectedOnce) return; // transient; the client auto-reconnects
+    // never connected: try the next public broker
+    setTimeout(() => demoConnect(idx + 1), 600);
+  });
+}
+
+function demoPub(topic, obj) {
+  const c = demoState.mqtt;
+  if (!c || !demoState.connected) return;
+  try { c.publish(DEMO_TOPIC + '/' + topic, JSON.stringify(obj), { qos: 0 }); } catch (e) { /* ignore */ }
+}
+
+function demoPubPresence() {
+  demoPub('presence/' + demoState.id, {
+    id: demoState.id, name: demoState.name, color: demoState.color, ts: Date.now(),
+  });
+}
+
+function demoPubPos() {
+  if (!demoState.me) return;
+  const p = demoState.me.spr.position;
+  demoPub('pos', {
+    id: demoState.id, name: demoState.name, color: demoState.color,
+    x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2),
+  });
+}
+
+function demoOnMqtt(topic, payload) {
+  if (topic.startsWith(DEMO_TOPIC + '/presence/')) {
+    const id = topic.slice(topic.lastIndexOf('/') + 1);
+    if (id === demoState.id) return; // my own echo
+    if (!payload) { // Last-Will tombstone: this player left
+      demoState.presence.delete(id);
+      demoRemoveGhost(id);
+      demoSetOnline(demoState.presence.size + 1);
+    } else {
+      try {
+        const m = JSON.parse(payload);
+        demoState.presence.set(m.id, { name: m.name, color: m.color, ts: m.ts || Date.now() });
+        demoSetOnline(demoState.presence.size + 1);
+      } catch (e) { /* ignore */ }
+    }
+    return;
+  }
+  if (topic.endsWith('/bot')) {
+    if (!payload) return; // host tombstone; reclaimed on the next staleness check
+    try {
+      const m = JSON.parse(payload);
+      demoState.botHost = m.host === demoState.id;
+      demoState.botClaimedAt = m.ts || Date.now();
+    } catch (e) { /* ignore */ }
+    return;
+  }
+  if (topic.endsWith('/chat')) {
+    try {
+      const m = JSON.parse(payload);
+      if (demoState.seen.has(m.mid)) return;
+      demoState.seen.add(m.mid);
+      if (demoState.seen.size > 300) {
+        const first = demoState.seen.values().next().value;
+        demoState.seen.delete(first);
+      }
+      demoAddMsg(m);
+      if (m.id === 'grunk') {
+        if (demoState.botGhost) demoShowBubble(demoState.botGhost.bubble, demoState.botGhost, m.name, m.color, m.text);
+      } else if (m.id === demoState.id) {
+        demoShowBubble(demoState.meBubble, demoState.me, m.name, m.color, m.text);
+      } else {
+        const g = demoGhostFor(m.id, m.name, m.color);
+        demoShowBubble(g.bubble, g, m.name, m.color, m.text);
+      }
+      demoMaybeReply(m); // only the bot host answers
+    } catch (e) { /* ignore */ }
+    return;
+  }
+  if (topic.endsWith('/pos')) {
+    try {
+      const m = JSON.parse(payload);
+      if (m.id === demoState.id) return;
+      const g = demoGhostFor(m.id, m.name, m.color);
+      g.target.set(m.x, m.y, m.z);
+      g.lastSeen = performance.now();
+      const pr = demoState.presence.get(m.id);
+      if (!pr) {
+        demoState.presence.set(m.id, { name: m.name, color: m.color, ts: Date.now() });
+        demoSetOnline(demoState.presence.size + 1);
+      }
+    } catch (e) { /* ignore */ }
+  }
+}
+
+function demoClaimBot() {
+  // single-host election for Grunk: the retained bot topic names the host;
+  // a stale host (silent for 30s) can be replaced, and a fresh claim wins
+  demoState.botClaimedAt = 0;
+  demoState.botHost = false;
+  setTimeout(() => {
+    if (!demoState.connected) return;
+    const stale = Date.now() - (demoState.botClaimedAt || 0) > 30000;
+    if (stale || !demoState.botClaimedAt) {
+      demoState.botHost = true;
+      demoState.botClaimedAt = Date.now();
+      demoPub('bot', { host: demoState.id, ts: demoState.botClaimedAt });
+      // Grunk welcomes the newest face to the fire
+      setTimeout(() => demoGrunkSay('Welcome, ' + demoState.name + '! Ask me about the seasons, the fish, the fire \u2014 or say \u201Chelp\u201D.'), 1200);
+    }
+  }, 2500);
+}
+
+// --- DEMO MODULE part 3: ghosts & bubbles ------------------------------------
+const DEMO_GHOST_MATS = [cavemanMatR, cavemanMatL, womanMatR, womanMatL];
+
+function demoMakeGhost(id, name, color) {
+  const spr = new THREE.Sprite(DEMO_GHOST_MATS[Math.floor(Math.random() * DEMO_GHOST_MATS.length)]);
+  spr.center.set(0.5, 0);
+  spr.scale.set(2.7, 3.0, 1);
+  spr.visible = false;
+  scene.add(spr);
+  const nameSpr = makeNameSprite();
+  scene.add(nameSpr);
+  const bubble = demoMakeBubble();
+  scene.add(bubble);
+  const g = {
+    id, name, color, spr, nameSpr, bubble,
+    cur: new THREE.Vector3(),
+    target: new THREE.Vector3(),
+    lastSeen: performance.now(),
+    bubbleUntil: 0, bubbleFade: 0,
+  };
+  demoDrawGhostTag(g);
+  demoState.ghosts.set(id, g);
+  return g;
+}
+
+function demoGhostFor(id, name, color) {
+  let g = demoState.ghosts.get(id);
+  if (!g) g = demoMakeGhost(id, name, color);
+  else { g.name = name; g.color = color; }
+  return g;
+}
+
+function demoRemoveGhost(id) {
+  const g = demoState.ghosts.get(id);
+  if (!g) return;
+  demoState.ghosts.delete(id);
+  scene.remove(g.spr);
+  scene.remove(g.nameSpr);
+  scene.remove(g.bubble);
+  if (g.nameSpr.material.map) g.nameSpr.material.map.dispose();
+  g.nameSpr.material.dispose();
+  if (g.bubble.material.map) g.bubble.material.map.dispose();
+  g.bubble.material.dispose();
+}
+
+function demoDrawGhostTag(g) {
+  const ns = g.nameSpr;
+  const c = ns.userData.canvas;
+  const ctx = c.getContext('2d');
+  ctx.font = 'bold 26px monospace';
+  const tw = Math.ceil(ctx.measureText(g.name).width);
+  const W = Math.max(72, tw + 18);
+  c.width = W;
+  c.height = 68;
+  ctx.font = 'bold 26px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  // small colored underline chip so players read as distinct
+  ctx.fillStyle = g.color;
+  ctx.fillRect(3, 55, W - 6, 4);
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = 'rgba(10,10,14,0.9)';
+  ctx.strokeText(g.name, W / 2, 34);
+  ctx.fillStyle = '#fff';
+  ctx.fillText(g.name, W / 2, 34);
+  ns.userData.tex.needsUpdate = true;
+  const H = 0.78;
+  ns.scale.set(H * (W / c.height), H, 1);
+}
+
+function demoMakeBubble() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 320;
+  canvas.height = 90;
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+  spr.renderOrder = 24;
+  spr.center.set(0.5, 0);
+  spr.visible = false;
+  spr.userData = { canvas, tex };
+  return spr;
+}
+
+function demoWrap(ctx, text, maxChars) {
+  const words = text.split(' ');
+  const lines = [];
+  let line = '';
+  for (const w of words) {
+    const test = line ? line + ' ' + w : w;
+    if (ctx.measureText(test).width > maxChars * 14 && line) {
+      lines.push(line);
+      line = w;
+    } else line = test;
+  }
+  if (line) lines.push(line);
+  return lines.slice(0, 3);
+}
+
+function demoShowBubble(bubble, owner, name, color, text) {
+  if (!bubble || !owner) return;
+  const cvs = bubble.userData.canvas;
+  const ctx = cvs.getContext('2d');
+  ctx.font = 'bold 26px monospace';
+  const lines = demoWrap(ctx, text, 30);
+  const nameW = ctx.measureText(name).width;
+  const bodyW = Math.max(...lines.map((l) => ctx.measureText(l).width));
+  const W = Math.max(120, nameW + 26, bodyW + 30);
+  const H = 40 + lines.length * 28 + 12;
+  cvs.width = W;
+  cvs.height = H;
+  ctx.font = 'bold 26px monospace';
+  const r = 12;
+  ctx.beginPath();
+  ctx.moveTo(r, 0); ctx.lineTo(W - r, 0); ctx.quadraticCurveTo(W, 0, W, r);
+  ctx.lineTo(W, H - r); ctx.quadraticCurveTo(W, H, W - r, H);
+  ctx.lineTo(W / 2 + 10, H); ctx.lineTo(W / 2, H + 9); ctx.lineTo(W / 2 - 10, H);
+  ctx.lineTo(r, H); ctx.quadraticCurveTo(0, H, 0, H - r);
+  ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(15,19,28,0.9)';
+  ctx.fill();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = color;
+  ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = color;
+  ctx.font = 'bold 26px monospace';
+  ctx.fillText(name, W / 2, 19);
+  ctx.fillStyle = '#fff';
+  ctx.font = '22px monospace';
+  lines.forEach((ln, i) => ctx.fillText(ln, W / 2, 46 + i * 27));
+  bubble.userData.tex.needsUpdate = true;
+  const pxPerUnit = 68 / 0.78; // same world sizing as name tags
+  bubble.scale.set(W / pxPerUnit, H / pxPerUnit, 1);
+  const p = owner.spr ? owner.spr.position : owner.position;
+  bubble.position.set(p.x, p.y + (owner.spr ? owner.spr.scale.y : 3) + 1.05, p.z);
+  bubble.visible = true;
+  bubble.userData.until = performance.now() + 4500;
+  bubble.userData.fade = 0;
+  bubble.material.opacity = 1;
+}
+
+function demoStepBubble(owner, dt) {
+  const b = owner.bubble;
+  if (!b || !b.visible) return;
+  const p = owner.spr.position;
+  b.position.set(p.x, p.y + owner.spr.scale.y + 1.05 + Math.sin(performance.now() * 0.004) * 0.06, p.z);
+  if (performance.now() > (b.userData.until || 0)) {
+    b.userData.fade = (b.userData.fade || 0) + dt;
+    b.material.opacity = Math.max(0, 1 - b.userData.fade / 0.4);
+    if (b.material.opacity <= 0) b.visible = false;
+  }
+}
+
+// --- DEMO MODULE part 4: Grunk the bot + the per-frame update ----------------
+function demoGrunkSay(text) {
+  if (!demoState.botHost) return;
+  const msg = {
+    id: 'grunk', name: 'Grunk the Elder', color: '#ffd23f', bot: true,
+    text, ts: Date.now(), mid: 'grunk-' + Math.random().toString(36).slice(2, 10),
+  };
+  demoState.seen.add(msg.mid);
+  demoAddMsg(msg);
+  if (demoState.botGhost) demoShowBubble(demoState.botGhost.bubble, demoState.botGhost, msg.name, msg.color, msg.text);
+  demoPub('chat', msg);
+}
+
+function grunkAnswer(q) {
+  const s = q.toLowerCase();
+  const has = (...ws) => ws.some((w) => s.includes(w));
+  const b = seasonInfo();
+  const season = SEASONS[b.i];
+  if (has('hi', 'hello', 'hey', 'yo ', 'howdy')) return '\u{1F44B} Hello, ' + demoState.name + '! I am Grunk, keeper of the fire. Ask me about the seasons, the fish, the trees, or how the tribe lives.';
+  if (has('who are you', 'who r u', 'your name', 'grunk')) return 'I am Grunk the Elder. I have watched ' + Math.floor(gameMs / 86400000) + ' suns rise over this camp. Ask me anything about our world.';
+  if (has('help', 'what can you')) return 'I know of: \u{1F33F} seasons, \u{1F420} fish, \u{1F332} trees & plants, \u{1F525} fire, \u{1F30A} water, \u{1F634} sleep & energy, \u{1F3D6}\uFE0F the world, and how to move about.';
+  if (has('season', 'weather', 'winter', 'summer', 'spring', 'autumn', 'fall', 'snow', 'blossom')) {
+    const next = SEASONS[b.next];
+    const w = b.w > 0.001 ? ' (turning to ' + next.name + ')' : '';
+    return '\u{1F33F} It is ' + season.name + ' ' + season.icon + ' now' + w + '. Our year has 365 days: spring blossoms, summer green, autumn gold, winter snow \u2014 the trees paint themselves as it turns.';
+  }
+  if (has('fish', 'sea', 'ocean', 'water animal', 'swim')) return '\u{1F420} The sea holds ' + FISH_KINDS.length + ' kinds: ' + FISH_KINDS.map((f) => f.label).join(', ') + '. They cruise deep under the waves in passing shoals \u2014 dive down and you will see them.';
+  if (has('tree', 'plant', 'species', 'flora', 'forest', 'oak', 'pine', 'cactus', 'palm', 'bamboo')) return '\u{1F332} ' + KIND_ORDER.length + ' plant & rock species grow here, from oak and pine to cactus, bamboo and blossom bush. Every one is painted by code, and they change with the seasons.';
+  if (has('fire', 'campfire', 'flint', 'spark')) return '\u{1F525} Fire! Strike the campfire to wake the tribe and unlock the Fire knowledge in the \u{1F4D6} book. Knowledge changes how we live \u2014 until Water is known, nobody wades into the wet.';
+  if (has('water', 'river', 'lake', 'swim across', 'wade')) return '\u{1F30A} Water runs deep. Command one of us to wade into the sea and you unlock the Water knowledge. Before that, we fear the wet.';
+  if (has('sleep', 'energy', 'tired', 'zzz', 'rest', 'night', 'bed')) return '\u{1F634} Everyone carries a daily battery. It drains while awake; at zero we collapse and sleep it off, and the ZZZs rise. Tired ones head for bed when dusk falls.';
+  if (has('world', 'seed', 'map', 'planet', 'terrain', 'biome', 'desert', 'jungle', 'snow')) return '\u{1F3D6}\uFE0F One seed grows this whole world \u2014 deserts, jungles, forests, snow, caves and a living sea. This world\u2019s seed is ' + SEED + '. Zoom out far enough and you\u2019ll see the planet itself.';
+  if (has('move', 'walk', 'control', 'steer', 'how do i', 'wasd', 'joystick')) return '\u{1F6B6} To walk your human: WASD (or the joystick on a phone) steers them. Drag to orbit, wheel to zoom. The \u{1F3D6}\uFE0F top-view button looks straight down.';
+  if (has('know', 'book', 'unlock', 'discover')) return '\u{1F4D6} The knowledge book tracks what we\u2019ve discovered: Fire and Water are real; Toolmaking, Farming, Writing and The Wheel wait to be dreamed up.';
+  if (has('name', 'who am i')) return 'You are ' + demoState.name + '! Tap the pencil \u{270F}\uFE0F next to your name to choose a new one \u2014 the whole tribe will see it.';
+  if (has('bye', 'goodbye', 'see you')) return '\u{1F44B} Safe travels, ' + demoState.name + '. The fire stays lit.';
+  if (has('love', 'marry', 'kiss', 'girlfriend', 'boyfriend')) return '\u{1F493} Ah, the heart\u2019s fire! Pick someone up with the Move command and carry them to the fire \u2014 we shall see what the sparks do.';
+  if (has('thank', 'ty', 'thanks')) return '\u{1F44D} The tribe thanks you, ' + demoState.name + '.';
+  return 'I am but an old caveman, ' + demoState.name + ' \u2014 I know the seasons, fish, trees, fire, water, sleep and the world. Say \u201Chelp\u201D and I will list them.';
+}
+
+function demoMaybeReply(m) {
+  if (!demoState.botHost || demoState.botBusy) return;
+  if (m.id === 'grunk') return;
+  const answer = grunkAnswer(m.text);
+  if (!answer) return;
+  demoState.botBusy = true;
+  setTimeout(() => {
+    demoState.botBusy = false;
+    demoGrunkSay(answer);
+  }, 900 + Math.random() * 1300);
+}
+
+function updateDemo(dt, t) {
+  if (!DEMO_MODE) return;
+  const s = demoState;
+  const now = performance.now();
+  const hide = iconMode || spaceMode;
+
+  // publish my position (throttled by movement or heartbeat)
+  if (s.me && s.connected) {
+    const p = s.me.spr.position;
+    const moved = !s.lastPos || Math.hypot(p.x - s.lastPos.x, p.z - s.lastPos.z) > DEMO_MOVE_EPS;
+    if ((moved && now - s.lastPosPub > DEMO_POS_MS) || now - s.lastPosPub > DEMO_HEARTBEAT_MS) {
+      s.lastPosPub = now;
+      s.lastPos = { x: p.x, z: p.z };
+      demoPubPos();
+    }
+    // refresh retained presence so late joiners still see me
+    if (now - (s.lastPresencePub || 0) > 20000) {
+      s.lastPresencePub = now;
+      demoPubPresence();
+    }
+  }
+
+  // remote players: smooth toward their broadcast spot, tags & bubbles above
+  for (const [id, g] of s.ghosts) {
+    if (g === s.botGhost) continue;
+    if (now - g.lastSeen > DEMO_TTL_MS) { demoRemoveGhost(id); continue; }
+    g.cur.lerp(g.target, 1 - Math.exp(-6 * dt));
+    g.spr.position.set(g.cur.x, charGroundY(g.cur.x, g.cur.z), g.cur.z);
+    g.spr.visible = !hide;
+    if (g.nameSpr) {
+      g.nameSpr.visible = !hide;
+      g.nameSpr.position.set(g.spr.position.x, g.spr.position.y + g.spr.scale.y + 0.32, g.spr.position.z);
+    }
+    demoStepBubble(g, dt);
+  }
+
+  // Grunk: stands by the fire, bobs gently, wears his name & bubbles
+  const gr = s.botGhost;
+  if (gr) {
+    const fy = homeFire ? homeFire.position.y : groundYAt(homePos.x, homePos.z);
+    gr.spr.position.set(homePos.x + 2.1, fy + Math.sin(t * 1.6) * 0.06, homePos.z + 1.9);
+    gr.spr.visible = !hide;
+    if (gr.nameSpr) {
+      gr.nameSpr.visible = !hide;
+      gr.nameSpr.position.set(gr.spr.position.x, gr.spr.position.y + gr.spr.scale.y + 0.32, gr.spr.position.z);
+    }
+    demoStepBubble(gr, dt);
+  }
+
+  // my own chat bubble rides above my human
+  const mb = s.meBubble;
+  if (mb && mb.visible && s.me) {
+    mb.position.set(s.me.spr.position.x, s.me.spr.position.y + s.me.spr.scale.y + 1.05, s.me.spr.position.z);
+    demoStepBubble({ spr: s.me.spr, bubble: mb }, dt);
+  }
+
+  // prune stale presence entries (retained messages can outlive their owner)
+  let pruned = false;
+  for (const [id, pr] of s.presence) {
+    if (now - (pr.ts || 0) > DEMO_TTL_MS) { s.presence.delete(id); pruned = true; }
+  }
+  if (pruned) demoSetOnline(s.presence.size + 1);
+}
+
 
 buildBeacon();
 goHome(); // spawn on the home view, fixed height above the campfire
 spawnDefaultCamp();
+initDemoMode(); // (?demo=1) multiplayer campfire chat — see the demo module above
 syncChunks(true);
 resizeGame();
 
@@ -8840,6 +9468,7 @@ function animate() {
       '  ·  seed ' + SEED;
   }
 
+  updateDemo(dt, t); // online demo mode: ghosts, bubbles, Grunk, position sync
   updateWorldLod(dt);
   renderer.render(scene, camera);
 
@@ -8962,7 +9591,13 @@ window.__DBG = {
   rebuildIconAtlas: () => { buildTreeAtlas(); buildIconAtlas(); return iconAtlasCanvas; },
   fishShaderSrc: () => fishMat.vertexShader,
   state: () => ({ iconMode, spaceMode, fishVisDist: FISH_VIS_DIST }),
-  version: 24,
+  version: 25,
+  demoState: () => DEMO_MODE
+    ? { mode: true, id: demoState.id, name: demoState.name, connected: demoState.connected,
+        online: demoState.online, ghosts: demoState.ghosts.size, botHost: demoState.botHost }
+    : { mode: false },
+  demoSend: (text) => { demoEl('demo-chat-input').value = text; demoSendChat(); return true; },
+  demoBot: (text) => grunkAnswer(text),
   selectCaveman: (cm) => selectCaveman(cm),
   action: (on) => setActionMode(on),
   move: (x, z) => commandMoveTo(x, z),

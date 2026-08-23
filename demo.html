@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pixel World — Live Demo</title>
+  <link rel="icon" href="data:," />
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(1200px 600px at 50% -10%, #1c2733 0%, #0d1218 55%, #080b10 100%);
+      color: #e8eef4;
+      font-family: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 64px;
+    }
+    .camp { font-size: 64px; line-height: 1; margin: 0 0 6px; filter: drop-shadow(0 4px 18px rgba(255, 150, 60, 0.35)); }
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: 1px; }
+    h1 .pw { color: #ffd98a; }
+    .tag { margin: 0 0 26px; color: #9fb4c8; font-size: 14px; }
+    .enter {
+      display: inline-block;
+      margin: 4px 0 10px;
+      padding: 15px 38px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #ffd23f, #f0a63c);
+      color: #241a05;
+      font: bold 19px ui-monospace, monospace;
+      text-decoration: none;
+      box-shadow: 0 6px 24px rgba(255, 180, 60, 0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .enter:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255, 180, 60, 0.45); }
+    .sub { margin: 0 0 34px; color: #c9d4de; font-size: 13px; max-width: 520px; text-align: center; line-height: 1.6; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      width: 100%;
+      max-width: 860px;
+      margin-bottom: 30px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+    .card .ico { font-size: 26px; }
+    .card h3 { margin: 8px 0 6px; font-size: 15px; color: #ffd98a; }
+    .card p { margin: 0; font-size: 12.5px; line-height: 1.6; color: #b9c6d2; }
+    .note {
+      max-width: 620px;
+      text-align: center;
+      font-size: 12px;
+      color: #7f93a8;
+      line-height: 1.7;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      padding-top: 18px;
+    }
+    .note code { color: #c9d4de; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="camp">🏕️</div>
+  <h1><span class="pw">Pixel World</span> — Live Demo</h1>
+  <p class="tag">An infinite caveman world that paints its own art — now with a campfire to share.</p>
+
+  <a class="enter" href="index.html?demo=1">🔥 Enter the world</a>
+  <p class="sub">
+    You spawn beside the camp with your own caveman. Everyone who opens this page appears
+    in your world — walk up, say hi, and watch the words pop above their heads.
+  </p>
+
+  <div class="cards">
+    <div class="card"><div class="ico">👥</div><h3>Play together</h3><p>Every visitor controls their own caveman near the fire. Other players' humans appear as live ghosts with name tags — no accounts, no servers of ours.</p></div>
+    <div class="card"><div class="ico">💬</div><h3>Chat bubbles</h3><p>Type a message and it pops as a pixel bubble above your human — and above the human of whoever you're talking to.</p></div>
+    <div class="card"><div class="ico">🧙</div><h3>Grunk the Elder</h3><p>A knowledge NPC by the fire answers questions about the world: seasons, fish, trees, fire, sleep and more. Ask him for help.</p></div>
+    <div class="card"><div class="ico">🗺️</div><h3>The full world</h3><p>Four biomes, 25 painted species, 6 fish, day &amp; night, seasons, knowledge book, Move commands and carry mechanics — everything the game has.</p></div>
+  </div>
+
+  <p class="note">
+    Multiplayer chat rides a <b>public MQTT demo broker</b> over WebSockets (HiveMQ/EMQX) —
+    zero sign-ups, but it's a shared public channel, so keep it friendly. If the broker is
+    unreachable the camp still works solo and Grunk still chats with you.
+    <br />Tip: you can always come back — <code>index.html?demo=1</code> is the demo entry point.
+  </p>
+</body>
+</html>
