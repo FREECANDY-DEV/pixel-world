@@ -8439,7 +8439,7 @@ window.__DBG = {
   rebuildIconAtlas: () => { buildTreeAtlas(); buildIconAtlas(); return iconAtlasCanvas; },
   fishShaderSrc: () => fishMat.vertexShader,
   state: () => ({ iconMode, spaceMode, fishVisDist: FISH_VIS_DIST }),
-  version: 19,
+  version: 20,
   selectCaveman: (cm) => selectCaveman(cm),
   action: (on) => setActionMode(on),
   move: (x, z) => commandMoveTo(x, z),
@@ -8641,5 +8641,84 @@ window.__DBG = {
       frames.push(cv.toDataURL());
     }
     return JSON.stringify(frames);
+  },
+  // animated forest seasons for the docs: the same two atlas rows the wind
+  // shader blends (mix(a, b, w) via source-over), morphed through a full year
+  // for a strip of species — "watch the forest change colour"
+  captureSeasonCycle: (frames, speciesIdx) => {
+    const smooth = (e0, e1, x) => {
+      const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+      return t * t * (3 - 2 * t);
+    };
+    const S = 2, GAP = 8;
+    const out = [];
+    for (let k = 0; k < frames; k++) {
+      const f = (k / frames) * 4;               // a full year → 4 seasons
+      const i = ((Math.floor(f) % 4) + 4) % 4;
+      const w = smooth(0.72, 1, f - Math.floor(f)); // last 28% of each season eases into the next
+      const cv = document.createElement('canvas');
+      cv.width = speciesIdx.length * ATLAS_CELL * S + (speciesIdx.length - 1) * GAP;
+      cv.height = ATLAS_CELL * S;
+      const g = cv.getContext('2d');
+      g.imageSmoothingEnabled = false;
+      speciesIdx.forEach((si, col) => {
+        const sx = si * ATLAS_CELL;
+        const tmp = document.createElement('canvas');
+        tmp.width = ATLAS_CELL; tmp.height = ATLAS_CELL;
+        const tg = tmp.getContext('2d');
+        tg.imageSmoothingEnabled = false;
+        tg.drawImage(treeAtlasCanvas, sx, i * ATLAS_CELL, ATLAS_CELL, ATLAS_CELL, 0, 0, ATLAS_CELL, ATLAS_CELL);
+        if (w > 0.001) {
+          tg.globalAlpha = w;
+          tg.drawImage(treeAtlasCanvas, sx, ((i + 1) % 4) * ATLAS_CELL, ATLAS_CELL, ATLAS_CELL, 0, 0, ATLAS_CELL, ATLAS_CELL);
+          tg.globalAlpha = 1;
+        }
+        g.drawImage(tmp, col * (ATLAS_CELL * S + GAP), 0, ATLAS_CELL * S, ATLAS_CELL * S);
+      });
+      out.push(cv.toDataURL());
+    }
+    return JSON.stringify(out);
+  },
+  // day/night cycle for the docs: re-derives sunDir exactly like the game's
+  // update loop (hour of day → sun angle) and captures the live sky-pill
+  // canvas through a full 24h
+  captureSkyCycle: (frames) => {
+    const out = [];
+    for (let k = 0; k < frames; k++) {
+      const hrs = (k / frames) * 24;
+      const sunAng = ((hrs - 6) / 24) * Math.PI * 2;
+      sunDir.set(Math.cos(sunAng), Math.sin(sunAng), 0.38).normalize();
+      const duskF = Math.max(0, 1 - Math.abs(sunDir.y) * 3.2);
+      drawCelestialIcon(k * 0.7, duskF);
+      const cv = document.createElement('canvas');
+      cv.width = 96; cv.height = 96;
+      const g = cv.getContext('2d');
+      g.imageSmoothingEnabled = false;
+      g.drawImage(document.getElementById('celestial-icon'), 0, 0, 96, 96);
+      out.push(cv.toDataURL());
+    }
+    return JSON.stringify(out);
+  },
+  // sleeping villager with rising ZZZ for the docs: the exact baked sleep
+  // pose the game shows, with the same animated ZZZ sprite cycling above it
+  captureSleepZzz: (frames) => {
+    const sleepImg = makeCavemanMats(CAVEMAN, CAVEMAN_PALETTE)[2].map.image;
+    const zzzCv = document.createElement('canvas');
+    zzzCv.width = 40; zzzCv.height = 26;
+    const zzzTex = { needsUpdate: false };
+    const S = 2, PAD = 6;
+    const out = [];
+    for (let k = 0; k < frames; k++) {
+      drawZzz({ zzzCv, zzzTex }, k * 0.18);
+      const cv = document.createElement('canvas');
+      cv.width = Math.max(sleepImg.width, zzzCv.width) * S;
+      cv.height = (zzzCv.height + PAD + sleepImg.height) * S;
+      const g = cv.getContext('2d');
+      g.imageSmoothingEnabled = false;
+      g.drawImage(zzzCv, 0, 0, zzzCv.width, zzzCv.height, 0, 0, zzzCv.width * S, zzzCv.height * S);
+      g.drawImage(sleepImg, 0, 0, sleepImg.width, sleepImg.height, 0, (zzzCv.height + PAD) * S, sleepImg.width * S, sleepImg.height * S);
+      out.push(cv.toDataURL());
+    }
+    return JSON.stringify(out);
   },
 };

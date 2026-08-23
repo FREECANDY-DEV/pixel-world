@@ -203,21 +203,31 @@ The images below were rendered by re-running those exact painters headlessly —
 
 </div>
 
-The **caveman & cavewoman models are animated**: their pixel art re-rolls
-every **3 seconds** into a different look from the same variant pool the
-tribe spawns from — hairstyles, beards, skin and clothes — so one image
-shows the variety you'll meet in-game:
+### 🎬 Animated — painters are just functions
+
+Every sprite is painted by code, so animation is free. These are the real
+frames the game renders, live from the painters:
 
 <div align="center">
-<img src="docs/assets/villagers-animated.gif" alt="Animated caveman & cavewoman models — the pixel art re-rolls every 3 seconds through the spawnable human variant looks" width="170">
+
+| 🌳 A year in the forest | 🌗 A day & night | 👫 Villager variants |
+|:---:|:---:|:---:|
+| <img src="docs/assets/seasons-forest.gif" alt="Eight species through a full year — spring blossoms, summer green, autumn gold, winter snow" width="380"> | <img src="docs/assets/day-night-sky.gif" alt="The sky pill through a full day-night cycle" width="96"> | <img src="docs/assets/villagers-animated.gif" alt="Caveman & cavewoman models — the pixel art re-rolls every 3 seconds through the spawnable variant looks" width="150"> |
+
+| 😴 Sleep it off | 🐟 Swim cycle |
+|:---:|:---:|
+| <img src="docs/assets/villager-sleep.gif" alt="A villager who ran out of energy, asleep with rising ZZZ" width="120"> | <img src="docs/assets/fish-swim.gif" alt="Clownfish swim cycle, frame-for-frame from the code" width="150"> |
+
 </div>
 
-And because painters are just functions, animation comes free — here's the
-clownfish's real swim cycle, frame-for-frame from the code:
-
-<div align="center">
-<img src="docs/assets/fish-swim.gif" alt="Clownfish swim cycle" width="140">
-</div>
+- **A year in the forest** — oak, pine, birch, maple, apple, berry, snow
+  pine and blossom bush through all four seasons, using the *same* two
+  atlas rows the wind shader blends, at the *same* weight
+- **A day & night** — the sky pill through 24 hours: sunrise, noon, dusk,
+  stars, moonrise
+- **Villager variants** — every 3 seconds a different look from the spawn
+  pool: hairstyles, beards, skin, clothes
+- **Sleep it off** — collapse at zero energy, curl up, and let the ZZZs rise
 
 Want the full catalog of all 25 plant and rock species?
 [`SPRITESHEET.md`](SPRITESHEET.md) documents every painter.

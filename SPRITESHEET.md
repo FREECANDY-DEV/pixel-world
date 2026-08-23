@@ -22,6 +22,13 @@ The heart of the plant world: **25 species**, one 48×48 cell per species.
 - Uploaded once as `treeAtlasTex` (NearestFilter, SRGB) and sampled by the wind-shader.
 - Zoomed-out map markers are **1:1 copies** of the summer row — same art, bigger life.
 
+The two season rows the shader blends, morphed through a full year — a strip
+of eight species (oak, pine, birch, maple, apple, berry, snow pine, blossom
+bush) cycling spring → summer → autumn → winter at the exact blend weight the
+in-world trees use:
+
+![A year in the forest](docs/assets/seasons-forest.gif)
+
 | Art | Key | Label | Biome | Description |
 |-----|-----|-------|-------|-------------|
 | ![cactus](docs/assets/spritesheet/species-cactus.png) | `cactus` | Cactus | desert | Green saguaro column with lighter highlight edge, dark ribs, two side arms, spine dots. |
@@ -64,6 +71,10 @@ The sea's cast of six, each 32×32 px with a two-frame swim cycle.
 - `DoubleSide` billboards so they're visible from above *and* below the surface.
 - **Distance-culled**: schools farther than 320 units from the camera aren't drawn.
 
+The two-frame swim cycle in action — a clownfish, frame-for-frame from `paintFish`:
+
+![Clownfish swim cycle](docs/assets/fish-swim.gif)
+
 | Art | Cell | Species | Body | Belly | Fin | Stripe |
 |-----|------|---------|------|-------|-----|--------|
 | ![sardine](docs/assets/spritesheet/fish-sardine.png) | 0 | Sardine | silver-blue `#b8c4cc` | pale | grey | — |
@@ -102,6 +113,17 @@ and bigger (each marker represents a whole grove).
 
 ![Villager face](docs/assets/spritesheet/face.png)
 
+The **animated villager variants** — every 3 seconds a different look from
+the spawn pool (hairstyle, beard, skin, clothes), all painted by the same
+`artVariant` / `pickLook` code the tribe uses:
+
+![Villager variants](docs/assets/villagers-animated.gif)
+
+And the **sleep pose** with its rising ZZZ cycle — eyes shut, lash lines,
+curled up, `zZ` energy bar:
+
+![Sleeping villager](docs/assets/villager-sleep.gif)
+
 - Base rows in `CAVEMAN_ART` / `CAVEWOMAN_ART` char maps with palette lookup;
   per-villager variants restyle hair/beard/clothes (`artVariant`) using `LOOK_POOL`.
 - Age stages scale height (child → adult → elder); three materials per villager:
@@ -117,7 +139,7 @@ and bigger (each marker represents a whole grove).
 
 ## 5. Camp & effects
 
-![Campfire](docs/assets/spritesheet/campfire.png)
+![Campfire flicker](docs/assets/campfire-flicker.gif)
 
 - `CAMPFIRE` char-map art: stone ring + crossed logs teepee; `FLAME` overlays animated fire.
 - ZZZ stream: three rising "z" glyphs fading in loop above sleepers (`drawZzz`).
@@ -169,7 +191,10 @@ The 🫀 anatomy sheet's organ sprites, painted from char maps via `anatSprite`:
 
 `drawCelestialIcon` paints the live sky in the season pill: a warm sun disc with
 8 rotating rays (dusk-shifted colour), four twinkling stars, and a moon that
-fades in as night falls.
+fades in as night falls. The whole 24-hour cycle, re-rendered exactly as the
+game does (sun angle derived from the hour of day):
+
+![Day & night](docs/assets/day-night-sky.gif)
 
 ---
 
