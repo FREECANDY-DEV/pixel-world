@@ -38,7 +38,7 @@ const puppeteer = require('puppeteer-core');
   const errors = [];
   p.on('pageerror', (e) => errors.push(e));
   await p.goto('http://localhost:8000', { waitUntil: 'load' });
-  await p.waitForFunction(() => window.__DBG && __DBG.version());
+  await p.waitForFunction(() => window.__DBG && __DBG.version != null);
   await p.evaluate(() => { __DBG.strike(); __DBG.setHour(22); });
   console.log('know:', await p.evaluate(() => __DBG.know()));
   console.log('errors:', errors.length);
@@ -52,7 +52,7 @@ Include the commands you ran in your PR description.
 
 | Hook | What it does |
 |---|---|
-| `__DBG.version()` | Current version string |
+| `__DBG.version` | Debug API version (a number; the game itself is v35) |
 | `__DBG.cavemen()` | Villager roster |
 | `__DBG.strike()` | Trigger campfire gathering |
 | `__DBG.know()` / `__DBG.unlock(name)` | Read / force knowledge state |

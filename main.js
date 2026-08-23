@@ -8418,7 +8418,9 @@ function animate() {
     }
   }
 }
-animate();
+// headless doc-capture mode: ?capture=1 skips the render loop so the page
+// boots without a GPU — SPRITESHEET.md's PNGs are captured this way
+if (!new URLSearchParams(location.search).has('capture')) animate();
 
 // debug/testing hook (read-only)
 window.__DBG = {
@@ -8540,4 +8542,104 @@ window.__DBG = {
       return [d[0], d[1], d[2], d[3]];
     })(),
   }),
+  // deterministic sprite captures for the docs (SPRITESHEET.md): re-runs the
+  // painters into fresh canvases so every PNG is pixel-exact with the game
+  captureArt: () => {
+    const out = {};
+    const draw = (art, pal, scale) => {
+      const c = document.createElement('canvas');
+      drawPixelArt(c, art, pal, scale);
+      return c.toDataURL();
+    };
+    // villagers: base adult man/woman, child, elders
+    out.caveman = draw(CAVEMAN, CAVEMAN_PALETTE, 4);
+    out.cavewoman = draw(CAVEWOMAN, CAVEWOMAN_PALETTE, 4);
+    out.child = draw(CAVEMAN_CHILD, CAVEMAN_PALETTE, 4);
+    out.elder = draw(CAVEMAN_ELDER, CAVEMAN_ELDER_PALETTE, 4);
+    out.womanElder = draw(CAVEWOMAN_ELDER, CAVEWOMAN_ELDER_PALETTE, 4);
+    // a row of unique looks: same base art, per-person hairstyle + colours
+    const rows = [
+      [CAVEMAN, false, 1, 0],   // plain man
+      [CAVEMAN, false, 1, 1],   // side ponytail + full beard
+      [CAVEMAN, false, 3, 2],   // headband + chin puff
+      [CAVEMAN, false, 2, 0],   // long strands
+      [CAVEWOMAN, true, 1, -1], // side tail
+      [CAVEWOMAN, true, 2, -1], // hair flower
+    ];
+    const cellW = 20, cellH = 26, S = 4, GAP = 4;
+    const strip = document.createElement('canvas');
+    strip.width = (cellW + GAP) * rows.length;
+    strip.height = cellH * S;
+    const sg = strip.getContext('2d');
+    sg.imageSmoothingEnabled = false;
+    rows.forEach(([art, female, style, beard], i) => {
+      const vArt = artVariant(art, female, style, beard);
+      const look = pickLook(mulberry32(1000 + i * 77), female);
+      look.style = style; look.beard = beard;
+      const vp = lookPal(art === CAVEWOMAN ? CAVEWOMAN_PALETTE : CAVEMAN_PALETTE, look);
+      const c = document.createElement('canvas');
+      drawPixelArt(c, vArt, vp, 1);
+      sg.drawImage(c, i * (cellW + GAP), 0);
+    });
+    out.variants = strip.toDataURL();
+    // the baked lying-down sleep pose (same canvas the game displays)
+    out.sleep = makeCavemanMats(CAVEMAN, CAVEMAN_PALETTE)[2].map.image.toDataURL();
+    // effects & UI sprites
+    out.flame = draw(FLAME, FLAME_PALETTE, 5);
+    out.moon = makeMoonTexture().image.toDataURL();
+    const zzz = document.createElement('canvas');
+    zzz.width = 40; zzz.height = 26;
+    drawZzz({ zzzCv: zzz, zzzTex: { needsUpdate: false } }, 1.3);
+    out.zzz = zzz.toDataURL();
+    drawCampLabel();
+    out.campLabel = campLabelCanvas.toDataURL();
+    out.moveFlag = moveFlag.material.map.image.toDataURL();
+    // sample name tag: name · age, health bar, daily energy bar
+    const ns = makeNameSprite();
+    drawNameTag({
+      nameSpr: ns,
+      stats: {
+        name: 'Krag', baseAge: 30, bornGameMs: gameMs - 30 * 86400000,
+        health: 88, heightCm: 174, weightKg: 76, iqBase: 80,
+      },
+      energy: 64, sleeping: false,
+    });
+    out.nameTag = ns.userData.canvas.toDataURL();
+    drawCelestialIcon(0, 0);
+    out.celestial = document.getElementById('celestial-icon').toDataURL();
+    return out;
+  },
+  // animated caveman+cavewoman variant pairs for the README GIF: 8 frames,
+  // one (man, woman) combo each, painted with the same variant logic the
+  // tribe uses, so the animation shows real spawnable looks
+  captureVillagerFrames: () => {
+    const S = 4, GAP = 8;
+    const build = (art, female, style, beard, seed) => {
+      const vArt = artVariant(art, female, style, beard);
+      const look = pickLook(mulberry32(seed), female);
+      look.style = style; look.beard = beard;
+      const pal = lookPal(art === CAVEWOMAN ? CAVEWOMAN_PALETTE : CAVEMAN_PALETTE, look);
+      const c = document.createElement('canvas');
+      drawPixelArt(c, vArt, pal, S);
+      return c;
+    };
+    const men = [[1, 0], [1, 1], [3, 2], [2, 0]];  // [style, beard] male looks
+    const women = [[1], [2]];                      // female looks: side tail / flower
+    const frames = [];
+    for (let i = 0; i < 8; i++) {
+      const [ms, mb] = men[i % 4];
+      const [ws] = women[i % 2];
+      const m = build(CAVEMAN, false, ms, mb, 1000 + i * 77);
+      const w = build(CAVEWOMAN, true, ws, -1, 2000 + i * 91);
+      const cv = document.createElement('canvas');
+      cv.width = m.width + GAP + w.width;
+      cv.height = Math.max(m.height, w.height);
+      const g = cv.getContext('2d');
+      g.imageSmoothingEnabled = false;
+      g.drawImage(m, 0, 0);
+      g.drawImage(w, m.width + GAP, 0);
+      frames.push(cv.toDataURL());
+    }
+    return JSON.stringify(frames);
+  },
 };

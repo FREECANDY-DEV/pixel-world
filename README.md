@@ -203,6 +203,15 @@ The images below were rendered by re-running those exact painters headlessly —
 
 </div>
 
+The **caveman & cavewoman models are animated**: their pixel art re-rolls
+every **3 seconds** into a different look from the same variant pool the
+tribe spawns from — hairstyles, beards, skin and clothes — so one image
+shows the variety you'll meet in-game:
+
+<div align="center">
+<img src="docs/assets/villagers-animated.gif" alt="Animated caveman & cavewoman models — the pixel art re-rolls every 3 seconds through the spawnable human variant looks" width="170">
+</div>
+
 And because painters are just functions, animation comes free — here's the
 clownfish's real swim cycle, frame-for-frame from the code:
 
@@ -218,7 +227,7 @@ Want the full catalog of all 25 plant and rock species?
 Smoke-test any change headlessly with the built-in debug API:
 
 ```js
-__DBG.version()          // debug API version (the game itself is v35)
+__DBG.version           // debug API version (a number; the game itself is v35)
 __DBG.strike()           // light the campfire gathering
 __DBG.know()             // → { fire: true, water: false, … }
 __DBG.setHour(22)        // jump to night — bedtime AI kicks in
