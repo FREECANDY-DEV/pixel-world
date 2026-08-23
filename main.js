@@ -2749,12 +2749,15 @@ const treeMat = new THREE.ShaderMaterial({
       float flutter = sin(uTime * (1.5 + vnoise(wp + 7.3)) + iPhase);
       // bend in WORLD space so orbiting the camera never spins the tree
       vec3 bendWorld = vec3(wdir.x, 0.0, wdir.y) * (flutter * lmag * position.y * iH * 0.14);
-      // steep-camera response: viewed from above, a tree rises a little and
-      // tilts back away from the viewer instead of sinking into its block
+      // steep-camera response: viewed from above, a sprite must never become
+      // an edge-on sliver that sinks under its block. Below ~35° elevation it
+      // stands upright as normal; as the camera climbs it tilts back, and at
+      // a fully vertical view it lays FLAT (facing the camera) so the art
+      // stays visible from top view instead of disappearing under the block.
       vec3 toCam = cameraPosition - iPos;
       float distC = max(length(toCam), 0.001);
       float vertK = clamp(toCam.y / distC, 0.0, 1.0);
-      float tiltA = vertK * vertK * 0.55;
+      float tiltA = smoothstep(0.35, 1.0, vertK) * 1.45; // ~83° at vertical
       vec2 dirXZ = toCam.xz / max(length(toCam.xz), 0.001);
       // anchor every plant to the block edge FACING the camera: hugging the
       // rim grounds it against the block face below (no mid-block floating),
@@ -2763,7 +2766,9 @@ const treeMat = new THREE.ShaderMaterial({
       // and buries it at grazing angles.
       float edgeAmt = (1.0 - vertK) * 0.16 * (1.0 - aLift * 0.4);
       vec3 basePos = iPos + vec3(dirXZ.x, 0.0, dirXZ.y) * edgeAmt + bendWorld;
-      basePos.y += vertK * vertK * (0.10 + iH * 0.02);
+      // clear the block top it stands on: the laid-flat sprite sits a touch
+      // higher so the voxel face below can never cover it from above
+      basePos.y += vertK * vertK * (0.16 + iH * 0.04);
       // low sprites (bushes, rocks): tilt/rise toward the camera like the
       // tall trees do, so steep angles never sink them into the block
       basePos.y += aLift * vertK * vertK * (0.75 + iH * 0.16);
