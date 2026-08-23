@@ -1,10 +1,25 @@
 # Pixel World — Project TODO
 
-Last updated: 2026-08-23 (v35)
+Last updated: 2026-08-23 (v36)
 
 ---
 
 ## ✅ Completed
+
+### Carry & party roster (v36)
+- [x] **Hoist & carry**: with the Move command armed, tapping another human picks them up
+  — they dangle over the carrier's head (gentle sway) and ride along while the carrier
+  walks, steers or is sent with the Move command. Tap the carried human again to set them
+  down; disarming Move or deselecting drops everyone.
+- [x] One at a time: a carrier with a full load can't pick up a second; busy carriers
+  can't be lifted; selecting a dangling human sets them down first so you can steer them
+- [x] Carried humans stop being their own person: no AI wander, no squad trailing, no
+  gathering, no commands — they just ride
+- [x] **Floating party roster (bottom-right)**: a scrollable list of every selected
+  human, with live pixel face, name, age · condition, and YOU / 🫳 carry / lifted badges.
+  Click any row to make them the one you control (camera glides over). Shows the squad
+  when one exists, else your solo pick; hides when nothing is selected.
+- [x] Carries are dropped safely on death, and carried villagers wake before hoisting
 
 ### World & rendering
 - [x] Procedural voxel terrain: biomes (desert / jungle / forest / snow), beaches, sea, caves

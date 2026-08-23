@@ -138,6 +138,13 @@ On phone? There's a joystick and touch buttons built in.
 - **Squad follow (v35)**: squad members trail the leader at personal offsets —
   behind a walking leader, spread around a standing one — and hustle up to 65%
   faster when they lag so the pack never strings out
+- **🫳 Hoist & carry (v36)**: while Move is armed, tap another human to pick
+  them up — they dangle over your head and ride along as you walk, steer or
+  command the squad. Tap the carried one again to set them down; disarming
+  Move drops everyone
+- **👥 Party roster (v36)**: a scrollable roster at the bottom-right lists
+  every human you've picked — live pixel faces, names, age · condition and
+  YOU / 🫳 carry badges. Click any row to make them the one you control
 
 <div align="center">
 
@@ -332,7 +339,7 @@ Want the full catalog of all 25 plant and rock species?
 Smoke-test any change headlessly with the built-in debug API:
 
 ```js
-__DBG.version           // debug API version (a number; the game itself is v35)
+__DBG.version           // debug API version (a number; the game itself is v36)
 __DBG.strike()           // light the campfire gathering
 __DBG.know()             // → { fire: true, water: false, … }
 __DBG.setHour(22)        // jump to night — bedtime AI kicks in
@@ -340,6 +347,8 @@ __DBG.energy(0)          // villager #0's battery level
 __DBG.fishCount()        // fish currently swimming
 __DBG.action(true)       // arm the Move command
 __DBG.move(x, z)         // send the picked human (and squad) walking there
+__DBG.pickUp(1)          // hoist villager #1 over the selected human's head
+__DBG.putDown(1)         // set villager #1 back down
 __DBG.rebuildIconAtlas() // force the seasonal map chips to repaint
 __DBG.fishIconLayer      // the global (per water-body) fish marker layer
 ```

@@ -1272,15 +1272,15 @@ body.sheet-open #char-toggle {
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
+  gap: 3px;
+  padding: 2px 7px;
   border: 1px solid #6b5327;
   border-radius: 999px;
   background: linear-gradient(180deg, rgba(46, 38, 24, 0.94), rgba(26, 22, 14, 0.96));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 224, 130, 0.14);
   color: #ffe9a8;
-  font: 600 12px/1 'Segoe UI', system-ui, sans-serif;
-  letter-spacing: 0.4px;
+  font: 600 9.5px/1 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: 0.3px;
   cursor: pointer;
   z-index: 18;
   pointer-events: auto;
@@ -1290,7 +1290,7 @@ body.sheet-open #char-toggle {
   background: linear-gradient(180deg, rgba(64, 52, 30, 0.96), rgba(34, 28, 17, 0.98));
 }
 #action-btn .action-ico {
-  font-size: 13px;
+  font-size: 10px;
 }
 #action-btn.active {
   border-color: #58d95e;
@@ -1342,6 +1342,122 @@ body.sheet-open #char-toggle {
 }
 
 #squad-list.has { display: flex; }
+
+/* ---- floating party roster: scrollable list, bottom-right ---- */
+/* lists every selected human; click a row to make them the one you control */
+#roster {
+  position: fixed;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+  z-index: 26;
+  display: none;
+  flex-direction: column;
+  width: 200px;
+  max-height: 216px;
+  overflow-y: auto;
+  border: 1px solid #6b5327;
+  outline: 1px solid rgba(0, 0, 0, 0.65);
+  box-shadow: inset 0 0 0 1px rgba(255, 224, 130, 0.12), 0 3px 10px rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(38, 30, 18, 0.92), rgba(24, 20, 13, 0.94));
+  scrollbar-width: thin;
+  scrollbar-color: #8a6d35 rgba(0, 0, 0, 0.3);
+}
+#roster.visible { display: flex; }
+#roster::-webkit-scrollbar { width: 8px; }
+#roster::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.35); }
+#roster::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #a9852f, #6b5327);
+  border-radius: 4px;
+}
+.roster-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: center;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #ffe08a;
+  padding: 5px 0 4px;
+  background: linear-gradient(180deg, #3a2d16, #241c0e);
+  border-bottom: 1px solid #6b5327;
+  text-shadow: 0 1px 0 #000;
+}
+.roster-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 8px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(107, 83, 39, 0.35);
+  transition: background 0.15s ease;
+}
+.roster-row:last-child { border-bottom: none; }
+.roster-row:hover { background: rgba(255, 224, 138, 0.08); }
+.roster-row.lead {
+  background: rgba(88, 217, 94, 0.10);
+  box-shadow: inset 2px 0 0 #58d95e;
+}
+.roster-face {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+  border: 1px solid #6b5327;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.35);
+  flex: none;
+}
+.roster-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+.roster-name {
+  font: 600 10.5px/1.1 'Segoe UI', system-ui, sans-serif;
+  color: #ffe9a8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.roster-sub {
+  font: 400 8.5px/1.1 'Segoe UI', system-ui, sans-serif;
+  color: #cbb27e;
+}
+.roster-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-end;
+  flex: none;
+}
+.roster-badge {
+  font-size: 8.5px;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(88, 217, 94, 0.5);
+  color: #d8ffd8;
+  background: rgba(30, 64, 34, 0.55);
+  white-space: nowrap;
+}
+.roster-badge.carry {
+  border-color: rgba(255, 213, 74, 0.5);
+  color: #ffe08a;
+  background: rgba(64, 52, 30, 0.6);
+}
+
+@media (max-width: 640px) {
+  #roster {
+    right: calc(10px + env(safe-area-inset-right, 0px));
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    width: 174px;
+    max-height: 176px;
+  }
+}
 
 .sq-head {
   position: sticky;

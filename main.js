@@ -4853,6 +4853,8 @@ function reapElders() {
     buried = true;
     campStats.deaths++;
     toast('🪦 ' + cm.stats.name + ' passed away at ' + Math.floor(yrs));
+    if (cm.carrying) putDownVillager(cm.carrying);
+    else if (cm.carriedBy) putDownVillager(cm);
     if (selectedCm === cm) selectCaveman(null);
     else if (followCm === cm) followCm = null;
     squad.delete(cm);
@@ -4873,7 +4875,10 @@ function reapElders() {
     }
     cavemen.splice(i, 1);
   }
-  if (buried) renderSquadList();
+  if (buried) {
+    renderSquadList();
+    renderRoster();
+  }
 }
 
 function clearCavemen() {
@@ -5822,6 +5827,19 @@ function updateCavemen(dt, t) {
 
   // settle on the ground after all movement/collision (with blast air time)
   for (const cm of cavemen) {
+    // hoisted: dangle over the carrier's head and ride along wherever they go
+    if (cm.carriedBy) {
+      const ca = cm.carriedBy;
+      cm.spr.position.x = ca.spr.position.x + Math.sin(t * 4 + cm.phase) * 0.16;
+      cm.spr.position.z = ca.spr.position.z + Math.cos(t * 3.4 + cm.phase) * 0.12;
+      cm.gy = ca.spr.position.y + ca.spr.scale.y * 0.55 + 0.5;
+      cm.moving = false;
+      cm.swimming = false;
+      cm.spr.position.y = cm.gy;
+      if (cm.sleeping && !cm.sleepApplied) applySleepPose(cm, true);
+      else if (!cm.sleeping && cm.sleepApplied) applySleepPose(cm, false);
+      continue;
+    }
     if (cm.airH > 0 || cm.airV) {
       cm.airV -= 30 * dt;
       cm.airH += cm.airV * dt;
@@ -5979,6 +5997,7 @@ function selectCaveman(cm) {
   if (cm) {
     followPrev.copy(cm.spr.position);
     if (cm.sleeping) wakeCaveman(cm); // picking someone wakes them up
+    if (cm.carriedBy) putDownVillager(cm); // can't steer while dangling
     // squad members keep trailing whoever is now the lead human
     if (squad.size > 1) {
       for (const c of squad) {
@@ -6007,6 +6026,7 @@ function selectCaveman(cm) {
     clearSquad();      // closing the panel ends group command
     setActionMode(false); // the Move command only makes sense with a pick
     hideMoveFlag();
+    dropAllCarried();  // everything being hoisted comes back down too
   }
   // selecting never opens the sheet by itself: the panel only expands from
   // the Villager button. Tapping villagers just highlights + follows them.
@@ -6015,6 +6035,7 @@ function selectCaveman(cm) {
   lastPanelFace = null;
   if (!cm) {
     charSexEl.textContent = '';
+    renderRoster();
     return;
   }
   if (cm.outSpr) {
@@ -6034,6 +6055,7 @@ function selectCaveman(cm) {
   document.getElementById('st-iq').textContent = vit.iq;
   lastAgeStr = '';
   anatOnSelect();
+  renderRoster();
 }
 
 // realistic derived vitals: children are smaller & lighter, minds sharpen
@@ -6811,6 +6833,7 @@ function setActionMode(on) {
       if (c.actionMove) { c.actionMove = null; c.target = null; }
       if (c.followLead) c.followLead = null;
     }
+    dropAllCarried(); // and whoever was being hoisted comes back down
   }
   // idle yellow vs command green strokes on every picked human
   for (const c of cavemen) {
@@ -6863,6 +6886,48 @@ function hideMoveFlag() {
   moveFlag.visible = false;
 }
 
+// --- carrying: in Move mode, tap another human to hoist them over your head ---
+// and walk with them. The carried one rides along above the carrier until you
+// tap them again (or disarm Move / deselect), then they're set back down.
+function pickUpVillager(carrier, target) {
+  if (!carrier || !target || target === carrier) return;
+  if (target.carriedBy) return; // already in someone's arms
+  if (carrier.carrying) putDownVillager(carrier.carrying); // one at a time
+  if (target.carrying) return; // busy hands
+  if (target.sleeping) wakeCaveman(target);
+  target.carriedBy = carrier;
+  carrier.carrying = target;
+  // they stop being their own person for a moment: no AI, no trail, no command
+  target.target = null;
+  target.actionMove = null;
+  target.followLead = null;
+  target.hold = false;
+  target.wait = 0;
+  target.moving = false;
+  target.gatherSlot = null;
+  if (target.outSpr) target.outSpr.visible = true;
+  syncOutline(target);
+  toast('🫳 ' + carrier.stats.name + ' hoists ' + target.stats.name + ' up!');
+  renderRoster();
+}
+function putDownVillager(target) {
+  if (!target || !target.carriedBy) return;
+  const carrier = target.carriedBy;
+  target.carriedBy = null;
+  carrier.carrying = null;
+  target.gy = charGroundY(target.spr.position.x, target.spr.position.z);
+  target.spr.position.y = target.gy;
+  if (target.outSpr) {
+    target.outSpr.visible = target === selectedCm || squad.has(target);
+    syncOutline(target);
+  }
+  toast('🫳 ' + carrier.stats.name + ' sets ' + target.stats.name + ' down');
+  renderRoster();
+}
+function dropAllCarried() {
+  for (const cm of cavemen) if (cm.carrying) putDownVillager(cm.carrying);
+}
+
 // send the picked human (and the whole squad) walking to a spot on the map
 function commandMoveTo(x, z) {
   const lead = selectedCm;
@@ -6907,6 +6972,7 @@ function clearSquad() {
   }
   squad.clear();
   renderSquadList();
+  renderRoster();
 }
 
 function beginBoxSelect(on) {
@@ -6985,6 +7051,7 @@ function finishMarquee(e) {
   selectCaveman(arr.length ? arr[(Math.random() * arr.length) | 0] : null);
   for (const cm of squad) if (cm.outSpr) cm.outSpr.visible = true;
   renderSquadList();
+  renderRoster();
 }
 
 renderer.domElement.addEventListener('pointermove', moveMarquee);
@@ -7033,10 +7100,80 @@ function renderSquadList() {
       selectCaveman(cm); // focuses camera + opens their live preview
       for (const c of squad) if (c.outSpr) c.outSpr.visible = true;
       renderSquadList();
+      renderRoster();
     });
     squadListEl.appendChild(row);
   }
   refreshSquadThumbs();
+}
+
+// --- floating party roster (bottom-right): the humans you've picked, with a
+// tap-to-switch lead. Shows the squad when one exists, else the solo pick. ---
+const rosterEl = document.getElementById('roster');
+function rosterMembers() {
+  return squad.size ? [...squad] : selectedCm ? [selectedCm] : [];
+}
+function renderRoster() {
+  if (!rosterEl) return;
+  const mems = rosterMembers();
+  rosterEl.classList.toggle('visible', mems.length > 0);
+  rosterEl.innerHTML =
+    '<div class="roster-head">👥 Party \u00B7 ' + mems.length + '</div>';
+  for (const cm of mems) {
+    const row = document.createElement('div');
+    row.className = 'roster-row' + (cm === selectedCm ? ' lead' : '');
+    const th = document.createElement('canvas');
+    th.width = th.height = 28;
+    th.className = 'roster-face';
+    const meta = document.createElement('div');
+    meta.className = 'roster-meta';
+    const nm = document.createElement('span');
+    nm.className = 'roster-name';
+    const sub = document.createElement('span');
+    sub.className = 'roster-sub';
+    cm._roThumb = th;
+    cm._roName = nm;
+    cm._roSub = sub;
+    meta.appendChild(nm);
+    meta.appendChild(sub);
+    row.appendChild(th);
+    row.appendChild(meta);
+    const badges = [];
+    if (cm === selectedCm) badges.push('<span class="roster-badge">YOU</span>');
+    if (cm.carrying) badges.push('<span class="roster-badge carry">🫳 carry</span>');
+    if (cm.carriedBy) badges.push('<span class="roster-badge carry">lifted</span>');
+    if (badges.length) {
+      const bd = document.createElement('div');
+      bd.className = 'roster-badges';
+      bd.innerHTML = badges.join('');
+      row.appendChild(bd);
+    }
+    row.addEventListener('click', () => {
+      selectCaveman(cm); // make them the one you steer
+      for (const c of squad) if (c.outSpr) c.outSpr.visible = true;
+      renderSquadList();
+      renderRoster();
+    });
+    rosterEl.appendChild(row);
+  }
+  refreshRosterThumbs();
+}
+function refreshRosterThumbs() {
+  for (const cm of cavemen) {
+    const th = cm._roThumb;
+    if (!th) continue;
+    const g = th.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    g.clearRect(0, 0, th.width, th.height);
+    const img = cm.spr.material.map && cm.spr.material.map.image;
+    if (img) g.drawImage(img, 0, 0, th.width, th.height);
+    if (cm._roName) {
+      const vit = villagerVitals(cm);
+      cm._roName.textContent = cm.stats.name;
+      cm._roSub.textContent =
+        vit.yrs + ' yrs \u00B7 ' + vit.cond + (cm.sleeping ? ' \u00B7 \uD83D\uDCA4' : '');
+    }
+  }
 }
 
 renderer.domElement.addEventListener('pointerdown', (e) => {
@@ -7154,7 +7291,15 @@ renderer.domElement.addEventListener('pointerup', (e) => {
   }
   const sprHits = raycaster.intersectObjects(pickObjs, false);
   if (sprHits.length) {
-    selectCaveman(sprHits[0].object.userData.cm || null);
+    const hitCm = sprHits[0].object.userData.cm || null;
+    // Move mode: tapping another human hoists them over your head (tap the
+    // one you're carrying to set them back down). Otherwise it's a plain pick.
+    if (actionMode && selectedCm && hitCm && hitCm !== selectedCm) {
+      if (hitCm.carriedBy === selectedCm) putDownVillager(hitCm);
+      else pickUpVillager(selectedCm, hitCm);
+      return;
+    }
+    selectCaveman(hitCm);
     return;
   }
 
@@ -8160,9 +8305,10 @@ function animate() {
     for (const cm of cavemen) cm.spr.visible = true;
   }
   // live roster thumbs: real sprite faces + ages, refreshed twice a second
-  if (squad.size && t - lastThumbT > 0.5) {
+  if ((squad.size || selectedCm) && t - lastThumbT > 0.5) {
     lastThumbT = t;
     refreshSquadThumbs();
+    refreshRosterThumbs();
   }
   updateFootprints();
   updatePlaceGhost();
@@ -8439,10 +8585,20 @@ window.__DBG = {
   rebuildIconAtlas: () => { buildTreeAtlas(); buildIconAtlas(); return iconAtlasCanvas; },
   fishShaderSrc: () => fishMat.vertexShader,
   state: () => ({ iconMode, spaceMode, fishVisDist: FISH_VIS_DIST }),
-  version: 21,
+  version: 22,
   selectCaveman: (cm) => selectCaveman(cm),
   action: (on) => setActionMode(on),
   move: (x, z) => commandMoveTo(x, z),
+  pickUp: (i) => {
+    const c = cavemen[i || 0];
+    if (c && selectedCm && c !== selectedCm) pickUpVillager(selectedCm, c);
+    return !!(selectedCm && selectedCm.carrying);
+  },
+  putDown: (i) => {
+    const c = cavemen[i || 0];
+    if (c && c.carriedBy) putDownVillager(c);
+    return !!(c && c.carriedBy);
+  },
   get actionMode() { return actionMode; },
   get flagVisible() { return moveFlag.visible; },
   squadAdd: (cm) => {
@@ -8452,6 +8608,7 @@ window.__DBG = {
     cm.actionMove = null;
     if (cm.outSpr) cm.outSpr.visible = true;
     renderSquadList();
+    renderRoster();
   },
   strike: () => strikeCampfire(),
   know: () => ({ ...KNOW }),

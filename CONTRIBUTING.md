@@ -52,12 +52,13 @@ Include the commands you ran in your PR description.
 
 | Hook | What it does |
 |---|---|
-| `__DBG.version` | Debug API version (a number; the game itself is v35) |
+| `__DBG.version` | Debug API version (a number; the game itself is v36) |
 | `__DBG.cavemen()` | Villager roster |
 | `__DBG.strike()` | Trigger campfire gathering |
 | `__DBG.know()` / `__DBG.unlock(name)` | Read / force knowledge state |
 | `__DBG.energy(i)` / `__DBG.sleepCount()` | Energy & sleep stats |
 | `__DBG.setHour(h)` / `__DBG.day()` | Time control |
+| `__DBG.pickUp(i)` / `__DBG.putDown(i)` | Hoist / set down villager #i (Move mode) |
 | `__DBG.tpVillager(i,x,z)` / `__DBG.setStick(x,z)` | Move / steer villagers |
 | `__DBG.fishCount()` / `__DBG.fishState()` | Sea life |
 | `__DBG.depthAt(x,z)` / `__DBG.findSea()` | Terrain queries |
