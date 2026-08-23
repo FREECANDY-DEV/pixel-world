@@ -1,10 +1,36 @@
 # Pixel World — Project TODO
 
-Last updated: 2026-08-23 (v36)
+Last updated: 2026-08-23 (v37)
 
 ---
 
 ## ✅ Completed
+
+### Sea, action menu & classic party window (v37)
+- [x] **Fish swim properly**: each school cruises in its own random direction
+  (per-school heading rotates the orbit) with per-fish phases; schools are
+  clamped to 1.4–4.5 blocks below the surface (never nearer than 0.5 to the
+  seabed) so they read as swimming inside the water, not on top of it
+- [x] **Zoom-scaled fish radius**: fish are visible within a small radius when
+  the camera is close (you see the lively shoals near you) and spread across
+  the whole sea as you pull back
+- [x] **Map fish markers**: the zoomed-out sea shows a handful of spread fish
+  dots per water body (thinned to ~40u apart, capped per body) instead of one
+  lonely pixel, all floating above the waves on a depth-less layer so they
+  never drown under the water
+- [x] **Sea-floor map chips**: four new pixel-art map icons — rock, seaweed,
+  coral and shell — scattered across the shallows and shown on the map
+  (icon atlas now 38 columns)
+- [x] **Action options menu**: in Move mode, tapping another human highlights
+  them in white and opens a small popup — Pick up & carry (the selected human
+  walks over and hoists them), Add to party, Cancel. Party members just get
+  selected as the lead instead.
+- [x] **No random walking while acting**: with Move armed, or while the options
+  menu is open on someone, nobody wanders — the pick, the party and the
+  highlighted target all hold still
+- [x] **Classic party window** (right edge): every picked human as an RPG row
+  — pixel face, name, age, health bar and energy bar — plus a Next ▸ button to
+  cycle the controlled human and scrolling through the whole party
 
 ### Carry & party roster (v36)
 - [x] **Hoist & carry**: with the Move command armed, tapping another human picks them up

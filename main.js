@@ -1884,7 +1884,10 @@ function outlineMatFor(cm, faceL, color) {
 // from whatever art the material uses, so the lying pose lines up too
 function syncOutline(cm) {
   if (!cm.outSpr) return;
-  cm.outSpr.material = outlineMatFor(cm, cm.faceL, actionMode ? OUTLINE_GREEN : OUTLINE_YELLOW);
+  // the action-menu target glows white while the options popup is open
+  const col = cm === menuTarget ? '#ffffff'
+    : actionMode ? OUTLINE_GREEN : OUTLINE_YELLOW;
+  cm.outSpr.material = outlineMatFor(cm, cm.faceL, col);
   const img = cm.outSpr.material.map.image;
   const iw = img.width, ih = img.height;
   cm.outSpr.scale.set((iw + 4) / iw, (ih + 4) / ih, 1);
@@ -3280,6 +3283,7 @@ const fishMat = new THREE.ShaderMaterial({
     attribute float iCol;
     attribute float iPhase;
     attribute float iSpeed;
+    attribute float iAng;   // school heading: each shoal cruises its own way
     varying float vU;
     varying float vRowBlend;
     varying vec2 vQuad;
@@ -3289,17 +3293,23 @@ const fishMat = new THREE.ShaderMaterial({
       vU = iCol / ${FISH_COLS.toFixed(1)};
       vQuad = position.xy;
       float t = uTime * iSpeed + iPhase * 6.2831853;
-      // private elliptical loop around the school anchor
+      // private elliptical loop around the school anchor, rotated by the
+      // school's heading — so every shoal swims in its own random direction
+      // while each fish keeps its own phase around the loop
       float rx = 2.2 + fract(iPhase * 13.7) * 3.4;
       float rz = 1.6 + fract(iPhase * 7.3) * 2.6;
+      float cx = cos(t) * rx;
+      float cz = sin(t) * rz;
+      float ca = cos(iAng), sa = sin(iAng);
       vec3 p = iPos;
-      p.x += cos(t) * rx;
-      p.z += sin(t) * rz;
+      p.x += cx * ca - cz * sa;
+      p.z += cx * sa + cz * ca;
       p.y += sin(uTime * 1.3 + iPhase * 9.0) * 0.12;   // swell bob
       // face the direction of travel relative to the camera
       vec3 toCam = cameraPosition - p;
-      float rightDot = cos(t) * -sin(atan(toCam.z, toCam.x))
-                     + sin(t) * rz / max(rx, 0.001) * cos(atan(toCam.z, toCam.x));
+      vec2 vel = mat2(ca, sa, -sa, ca) * vec2(-sin(t) * rx, cos(t) * rz);
+      float rightDot = vel.x * -sin(atan(toCam.z, toCam.x))
+                     + vel.y * cos(atan(toCam.z, toCam.x));
       float flip = step(0.0, rightDot);
       vRowBlend = flip;
       vec3 right = normalize(vec3(-toCam.z, 0.0, toCam.x));
@@ -3346,6 +3356,7 @@ const fishMat = new THREE.ShaderMaterial({
 // sparse schools: one per ~7.5-unit cell, ~45% of cells, so the sea reads as
 // occasional passing shoals rather than a constant rain of pixels
 const FISH_CELL_WORLD = 7.5;
+const SEA_DECOR_COLS = 4; // map chips: rock, seaweed, coral, shell
 function buildChunkFish(cx, cz) {
   const startX = cx * CHUNK, startZ = cz * CHUNK;
   const i0 = Math.floor(startX / FISH_CELL_WORLD);
@@ -3356,7 +3367,10 @@ function buildChunkFish(cx, cz) {
   const col = [];
   const phase = [];
   const speed = [];
+  const ang = []; // per-school heading: the shoal cruises in its own direction
   const anchors = []; // one per school: feeds the zoomed-out map icon
+  const decorPos = []; // sea-floor rocks / seaweed / coral / shells
+  const decorCol = [];
   for (let ix = i0; ix <= i1; ix++) {
     for (let iz = k0; iz <= k1; iz++) {
       if (hash3(ix, 3, iz, SEED + 551) > 0.55) continue;
@@ -3367,18 +3381,37 @@ function buildChunkFish(cx, cz) {
       // single ownership by cell centre, same trick as trees
       if (Math.floor((ix * FISH_CELL_WORLD + FISH_CELL_WORLD / 2) / CHUNK) !== cx) continue;
       if (Math.floor((iz * FISH_CELL_WORLD + FISH_CELL_WORLD / 2) / CHUNK) !== cz) continue;
-      // schools cruise deep in the water column, fully submerged (1.8–4+ blocks
-      // down, never closer than ~0.4 above the seabed)
-      const fy = SEA_LEVEL - (1.8 + hash3(ix, 11, iz, SEED + 557) * Math.max(0.8, depth - 3.4));
+      // schools cruise fully submerged — 1.4–4.5 blocks below the surface,
+      // never closer than 0.5 to the seabed, so they read as swimming inside
+      // the water column instead of drifting on top of it
+      const fy = Math.max(
+        SEA_LEVEL - depth + 0.5,
+        SEA_LEVEL - (1.4 + hash3(ix, 11, iz, SEED + 557) * 3.1)
+      );
       pos.push(fx, fy, fz);
       col.push(Math.floor(hash3(ix, 8, iz, SEED + 554) * FISH_COLS));
       phase.push(hash3(ix, 9, iz, SEED + 555));
       speed.push(0.25 + hash3(ix, 10, iz, SEED + 556) * 0.3);
+      ang.push(hash3(ix, 12, iz, SEED + 558) * Math.PI * 2);
       // the map icon floats just above the waves so it never drowns
       anchors.push(fx, SEA_LEVEL + 0.6, fz);
     }
   }
-  if (!pos.length) return null;
+  // sea-floor decor for the zoomed-out map: rocks, seaweed, coral, shells
+  // scattered across the shallows (1–8 blocks deep), one item per ~7.5u cell
+  for (let ix = i0; ix <= i1; ix++) {
+    for (let iz = k0; iz <= k1; iz++) {
+      if (hash3(ix, 31, iz, SEED + 771) < 0.6) continue;
+      const fx = ix * FISH_CELL_WORLD + hash3(ix, 32, iz, SEED + 772) * FISH_CELL_WORLD;
+      const fz = iz * FISH_CELL_WORLD + hash3(ix, 33, iz, SEED + 773) * FISH_CELL_WORLD;
+      const depth = SEA_LEVEL - terrainHeight(Math.round(fx), Math.round(fz), SEED);
+      if (depth < 1.0 || depth > 9) continue;
+      const kind = Math.floor(hash3(ix, 34, iz, SEED + 774) * SEA_DECOR_COLS);
+      decorPos.push(fx, SEA_LEVEL + 0.6, fz);
+      decorCol.push(FISH_COL + FISH_COLS + kind);
+    }
+  }
+  if (!pos.length && !decorPos.length) return null;
   const n = pos.length / 3;
   const g = new THREE.InstancedBufferGeometry();
   g.setAttribute(
@@ -3389,6 +3422,7 @@ function buildChunkFish(cx, cz) {
   g.setAttribute('iCol', new THREE.InstancedBufferAttribute(new Float32Array(col), 1));
   g.setAttribute('iPhase', new THREE.InstancedBufferAttribute(new Float32Array(phase), 1));
   g.setAttribute('iSpeed', new THREE.InstancedBufferAttribute(new Float32Array(speed), 1));
+  g.setAttribute('iAng', new THREE.InstancedBufferAttribute(new Float32Array(ang), 1));
   g.setIndex([0, 1, 2, 2, 1, 3]);
   g.instanceCount = n;
   g.boundingSphere = new THREE.Sphere(
@@ -3402,6 +3436,8 @@ function buildChunkFish(cx, cz) {
   mesh.userData.iconData = {
     pos: new Float32Array(anchors),
     col: Float32Array.from(col), // species index per school (0..FISH_COLS-1)
+    decorPos: new Float32Array(decorPos),
+    decorCol: Float32Array.from(decorCol), // map chip column for sea-floor decor
   };
   return mesh;
 }
@@ -3429,7 +3465,11 @@ const FACE_PALETTE = { H: '#4a3020', F: '#f0c090', e: '#26201a', m: '#a05a3c' };
 const FIRE_COL = ATLAS_COLS;      // campfire chip column (after all species)
 const FACE_COL = ATLAS_COLS + 1;  // human face chip column
 const FISH_COL = ATLAS_COLS + 2;  // fish-school chips: one column per species
-const ICON_COLS = ATLAS_COLS + 2 + FISH_COLS; // campfire + face + 6 fish species
+const SEA_ROCK_COL = FISH_COL + FISH_COLS;     // sea-floor rock chip
+const SEAWEED_COL = SEA_ROCK_COL + 1;          // seaweed chip
+const CORAL_COL = SEAWEED_COL + 1;             // coral chip
+const SHELL_COL = CORAL_COL + 1;               // shell chip
+const ICON_COLS = ATLAS_COLS + 2 + FISH_COLS + SEA_DECOR_COLS; // campfire + face + 6 fish + 4 sea-floor items
 // icon cells match the tree atlas cell exactly so zoomed-out markers reuse
 // the same 48px art 1:1 — a downscaled icon never needs to invent pixels
 const ICON_CELL = ATLAS_CELL; // 48, same as the vegetation atlas
@@ -3554,6 +3594,85 @@ function buildIconAtlas() {
     fig.restore();
     g.drawImage(fic, (FISH_COL + i) * ICON_CELL, 0);
   });
+  // sea-floor decor chips: rocks, seaweed, coral and shells so the zoomed-out
+  // sea reads as a living seabed, not just fish dots
+  {
+    // rock: faceted boulder, lit top-left, moss hint
+    const rc = document.createElement('canvas');
+    rc.width = rc.height = ICON_CELL;
+    const rg = rc.getContext('2d');
+    rg.imageSmoothingEnabled = false;
+    rg.fillStyle = '#7d8694';
+    rg.fillRect(12, 26, 24, 13);
+    rg.fillRect(15, 21, 18, 6);
+    rg.fillRect(18, 17, 12, 5);
+    rg.fillStyle = '#99a3b1';
+    rg.fillRect(13, 27, 10, 6);
+    rg.fillRect(16, 22, 9, 3);
+    rg.fillStyle = '#5c6574';
+    rg.fillRect(27, 32, 7, 5);
+    rg.fillStyle = '#4a6b4a';
+    rg.fillRect(12, 37, 6, 2);
+    g.drawImage(rc, SEA_ROCK_COL * ICON_CELL, 0);
+  }
+  {
+    // seaweed: three swaying strands with a darker under-layer
+    const sc = document.createElement('canvas');
+    sc.width = sc.height = ICON_CELL;
+    const sg = sc.getContext('2d');
+    sg.imageSmoothingEnabled = false;
+    sg.fillStyle = '#2c5c34';
+    sg.fillRect(16, 14, 4, 30);
+    sg.fillRect(26, 20, 4, 24);
+    sg.fillRect(20, 8, 3, 36);
+    sg.fillStyle = '#4f9e54';
+    sg.fillRect(17, 14, 2, 28);
+    sg.fillRect(27, 20, 2, 22);
+    sg.fillRect(21, 8, 1, 34);
+    sg.fillStyle = '#7cc46a';
+    sg.fillRect(17, 10, 1, 4);
+    sg.fillRect(27, 16, 1, 4);
+    g.drawImage(sc, SEAWEED_COL * ICON_CELL, 0);
+  }
+  {
+    // coral: branched fan in warm pinks and oranges
+    const cc = document.createElement('canvas');
+    cc.width = cc.height = ICON_CELL;
+    const cg = cc.getContext('2d');
+    cg.imageSmoothingEnabled = false;
+    cg.fillStyle = '#8a4a52';
+    cg.fillRect(22, 20, 4, 20);
+    cg.fillRect(14, 26, 8, 4);
+    cg.fillRect(26, 24, 8, 4);
+    cg.fillStyle = '#e0707a';
+    cg.fillRect(18, 14, 4, 12);
+    cg.fillRect(24, 12, 4, 12);
+    cg.fillRect(30, 16, 4, 8);
+    cg.fillStyle = '#f2a0a8';
+    cg.fillRect(19, 10, 2, 4);
+    cg.fillRect(25, 8, 2, 4);
+    cg.fillRect(31, 12, 2, 4);
+    cg.fillStyle = '#c75a64';
+    cg.fillRect(14, 30, 8, 2);
+    g.drawImage(cc, CORAL_COL * ICON_CELL, 0);
+  }
+  {
+    // shell: scallop with radiating ridges
+    const hc = document.createElement('canvas');
+    hc.width = hc.height = ICON_CELL;
+    const hg = hc.getContext('2d');
+    hg.imageSmoothingEnabled = false;
+    hg.fillStyle = '#c98aa4';
+    hg.fillRect(18, 20, 12, 12);
+    hg.fillRect(15, 26, 18, 8);
+    hg.fillRect(12, 30, 24, 6);
+    hg.fillStyle = '#f0c8d8';
+    hg.fillRect(19, 21, 10, 9);
+    hg.fillRect(16, 27, 16, 6);
+    hg.fillStyle = '#a05a7a';
+    for (let i = 0; i < 7; i++) hg.fillRect(14 + i * 3, 21, 1, 15);
+    g.drawImage(hc, SHELL_COL * ICON_CELL, 0);
+  }
   if (!iconAtlasTex) {
     iconAtlasTex = new THREE.CanvasTexture(iconAtlasCanvas);
     iconAtlasTex.magFilter = THREE.NearestFilter;
@@ -3713,36 +3832,74 @@ function rebuildFishIconLayer(force = false) {
       nextId++;
     }
   }
-  // one marker per (water body, species) at the first school's anchor
-  const groups = new Map();
+  // a handful of spread markers per water body instead of exactly one: thin
+  // the schools onto a coarse grid so a big ocean shows a few fish dots per
+  // body, each carrying its species chip, never a single lonely pixel
+  const MARKER_GRID = 40; // world units between neighbouring fish markers
+  const MAX_PER_BODY = 14;
+  const bodies = new Map(); // bid -> array of [x, z, sp]
   for (const [x, z, sp] of schools) {
     const gx = Math.floor(x / FISH_BODY_GRID);
     const gz = Math.floor(z / FISH_BODY_GRID);
     if (gx < x0 || gx > x1 || gz < z0 || gz > z1) continue;
     const bid = body[(gz - z0) * W + (gx - x0)];
     if (bid < 0) continue;
-    const key = bid + ':' + sp;
-    if (!groups.has(key)) groups.set(key, [x, z]);
+    if (!bodies.has(bid)) bodies.set(bid, []);
+    const arr = bodies.get(bid);
+    if (arr.length >= MAX_PER_BODY) continue;
+    // keep anchors at least MARKER_GRID apart so the dots stay readable
+    let ok = true;
+    for (const [mx, mz] of arr) {
+      if (Math.abs(mx - x) < MARKER_GRID && Math.abs(mz - z) < MARKER_GRID) { ok = false; break; }
+    }
+    if (ok) arr.push([x, z, sp]);
   }
-  if (!groups.size) return;
-  const pos = new Float32Array(groups.size * 3);
-  const col = new Float32Array(groups.size);
-  let w = 0;
-  for (const [key, v] of groups) {
-    const sp = +key.slice(key.indexOf(':') + 1);
-    pos[w * 3] = v[0];
-    pos[w * 3 + 1] = SEA_LEVEL + 0.6;
-    pos[w * 3 + 2] = v[1];
-    col[w] = FISH_COL + sp;
-    w++;
+  // collect spread fish markers + all sea-floor decor markers
+  const mk = [];
+  for (const arr of bodies.values()) for (const [x, z, sp] of arr) mk.push([x, SEA_LEVEL + 0.6, z, FISH_COL + sp]);
+  const DECOR_GRID = 64;
+  const decorSeen = new Set();
+  for (const ch of chunks.values()) {
+    const ud = ch.fish && ch.fish.userData.iconData;
+    if (!ud || !ud.decorPos) continue;
+    const dp = ud.decorPos, dc = ud.decorCol;
+    for (let i = 0; i < dp.length; i += 3) {
+      const x = dp[i], z = dp[i + 2];
+      const key = Math.round(x / DECOR_GRID) + ':' + Math.round(z / DECOR_GRID);
+      if (decorSeen.has(key)) continue;
+      decorSeen.add(key);
+      mk.push([x, SEA_LEVEL + 0.6, z, dc[i / 3]]);
+    }
+  }
+  if (!mk.length) return;
+  const pos = new Float32Array(mk.length * 3);
+  const col = new Float32Array(mk.length);
+  for (let i = 0; i < mk.length; i++) {
+    pos[i * 3] = mk[i][0];
+    pos[i * 3 + 1] = mk[i][1];
+    pos[i * 3 + 2] = mk[i][2];
+    col[i] = mk[i][3];
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   g.setAttribute('aCol', new THREE.BufferAttribute(col, 1));
-  const pts = new THREE.Points(g, ICON_MAT);
+  // sea markers always float on top of the water — this layer renders with
+  // depth test off so no wave or shoreline can ever swallow a fish or a rock
+  const seaIconMat = fishIconMatRef();
+  const pts = new THREE.Points(g, seaIconMat);
   pts.visible = true;
   scene.add(pts);
   fishIconPts = pts;
+}
+// one shared depth-less material for sea markers (fish + decor): a clone of
+// the tree-icon shader with depth testing off so markers never drown
+let _fishIconMat = null;
+function fishIconMatRef() {
+  if (!_fishIconMat) {
+    _fishIconMat = ICON_MAT.clone();
+    _fishIconMat.depthTest = false;
+  }
+  return _fishIconMat;
 }
 
 // --- icon sprites (placed trees / fires / people) -------------------------
@@ -4924,6 +5081,7 @@ function reapElders() {
     toast('🪦 ' + cm.stats.name + ' passed away at ' + Math.floor(yrs));
     if (cm.carrying) putDownVillager(cm.carrying);
     else if (cm.carriedBy) putDownVillager(cm);
+    if (menuTarget === cm || cm.pickUpTarget || (menuTarget && menuTarget.pickUpTarget === cm)) closeActionMenu(true);
     if (selectedCm === cm) selectCaveman(null);
     else if (followCm === cm) followCm = null;
     squad.delete(cm);
@@ -5732,6 +5890,12 @@ function updateCavemen(dt, t) {
           if (cm.actionMove) { cm.actionMove = null; hideMoveFlag(); }
           continue;
         }
+        // Move mode armed, or the options menu open on them: nobody strolls
+        // off randomly — the pick, the party and the target all hold still
+        if (inFreezeHold(cm)) {
+          cm.moving = false;
+          continue;
+        }
         pickWanderTarget(cm);
         continue;
       }
@@ -5896,6 +6060,20 @@ function updateCavemen(dt, t) {
 
   // settle on the ground after all movement/collision (with blast air time)
   for (const cm of cavemen) {
+    // walk-to-pickup: the carrier reaches the highlighted human and hoists
+    // them — the white highlight lifts into the carry
+    if (cm.pickUpTarget) {
+      const tgt = cm.pickUpTarget;
+      const d = Math.hypot(
+        cm.spr.position.x - tgt.spr.position.x,
+        cm.spr.position.z - tgt.spr.position.z
+      );
+      if (d < 1.7) {
+        cm.pickUpTarget = null;
+        pickUpVillager(cm, tgt);
+        closeActionMenu(true);
+      }
+    }
     // hoisted: dangle over the carrier's head and ride along wherever they go
     if (cm.carriedBy) {
       const ca = cm.carriedBy;
@@ -6096,6 +6274,7 @@ function selectCaveman(cm) {
     setActionMode(false); // the Move command only makes sense with a pick
     hideMoveFlag();
     dropAllCarried();  // everything being hoisted comes back down too
+    closeActionMenu(true); // …and any options popup / white highlight
   }
   // selecting never opens the sheet by itself: the panel only expands from
   // the Villager button. Tapping villagers just highlights + follows them.
@@ -6903,6 +7082,7 @@ function setActionMode(on) {
       if (c.followLead) c.followLead = null;
     }
     dropAllCarried(); // and whoever was being hoisted comes back down
+    closeActionMenu(true); // …and the options popup / white highlight closes
   }
   // idle yellow vs command green strokes on every picked human
   for (const c of cavemen) {
@@ -6995,6 +7175,99 @@ function putDownVillager(target) {
 }
 function dropAllCarried() {
   for (const cm of cavemen) if (cm.carrying) putDownVillager(cm.carrying);
+}
+
+// --- action menu: in Move mode, tapping another human highlights them in
+// white and opens a small options popup (pick up & carry, add to party).
+// The chosen action makes the selected human WALK to them first.
+let menuTarget = null; // the highlighted human the menu is about
+const actionMenuEl = (() => {
+  const el = document.createElement('div');
+  el.id = 'action-menu';
+  el.className = 'hidden';
+  el.setAttribute('role', 'menu');
+  document.body.appendChild(el);
+  return el;
+})();
+
+function openActionMenu(cm, clientX, clientY) {
+  if (!cm) return;
+  closeActionMenu(true);
+  menuTarget = cm;
+  // white highlight + freeze: they stand still while you decide
+  cm.target = null;
+  cm.actionMove = null;
+  cm.followLead = null;
+  if (cm.outSpr) {
+    cm.outSpr.visible = true;
+    syncOutline(cm);
+  }
+  const w = 176;
+  const x = Math.round(Math.min(Math.max(clientX, 8), innerWidth - w - 8));
+  const y = Math.round(Math.min(Math.max(clientY - 34, 8), innerHeight - 150));
+  actionMenuEl.style.left = x + 'px';
+  actionMenuEl.style.top = y + 'px';
+  actionMenuEl.innerHTML = '<div class="am-title">👤 ' + cm.stats.name + '</div>';
+  const mk = (label, cls, fn) => {
+    const b = document.createElement('button');
+    b.className = 'am-btn' + (cls ? ' ' + cls : '');
+    b.type = 'button';
+    b.textContent = label;
+    b.addEventListener('click', (e) => { e.stopPropagation(); fn(); });
+    actionMenuEl.appendChild(b);
+  };
+  mk('🫳 Pick up & carry', '', () => pickUpWalk(selectedCm, cm));
+  if (!squad.has(cm)) mk('➕ Add to party', '', () => addToParty(cm));
+  mk('🚫 Cancel', 'danger', () => closeActionMenu(true));
+  actionMenuEl.classList.remove('hidden');
+}
+function closeActionMenu(clearTarget) {
+  actionMenuEl.classList.add('hidden');
+  actionMenuEl.innerHTML = '';
+  if (clearTarget) {
+    for (const cm of cavemen) cm.pickUpTarget = null;
+    if (menuTarget) {
+      if (menuTarget.outSpr) syncOutline(menuTarget);
+      if (menuTarget.outSpr && !(menuTarget === selectedCm || squad.has(menuTarget))) {
+        menuTarget.outSpr.visible = false;
+      }
+      menuTarget = null;
+    }
+  }
+}
+
+// the selected human walks over to the highlighted human, then hoists them
+function pickUpWalk(carrier, target) {
+  if (!carrier || !target || target === carrier) { closeActionMenu(true); return; }
+  carrier.pickUpTarget = target;
+  commandMoveTo(target.spr.position.x, target.spr.position.z);
+  toast('🚶 ' + carrier.stats.name + ' heads over to ' + target.stats.name);
+  // keep the white highlight while they walk over; the popup just hides
+  actionMenuEl.classList.add('hidden');
+  actionMenuEl.innerHTML = '';
+}
+
+function addToParty(cm) {
+  if (!cm) return;
+  squad.add(cm);
+  cm.hold = false;
+  cm.followLead = null;
+  cm.actionMove = null;
+  if (cm.outSpr) {
+    cm.outSpr.visible = true;
+    syncOutline(cm);
+  }
+  toast('👥 ' + cm.stats.name + ' joins the party');
+  renderSquadList();
+  renderRoster();
+  closeActionMenu(true);
+}
+
+// nobody moves on their own while Move mode is armed (or the options menu is
+// open on them): no random wandering for the selected human, the squad or the
+// highlighted target — everyone holds until the player decides
+function inFreezeHold(cm) {
+  return (actionMode && (cm === selectedCm || squad.has(cm))) || cm === menuTarget;
 }
 
 // send the picked human (and the whole squad) walking to a spot on the map
@@ -7188,43 +7461,64 @@ function renderRoster() {
   rosterEl.classList.toggle('visible', mems.length > 0);
   rosterEl.innerHTML =
     '<div class="roster-head">👥 Party \u00B7 ' + mems.length + '</div>';
+  const list = document.createElement('div');
+  list.className = 'roster-list';
   for (const cm of mems) {
     const row = document.createElement('div');
     row.className = 'roster-row' + (cm === selectedCm ? ' lead' : '');
     const th = document.createElement('canvas');
-    th.width = th.height = 28;
+    th.width = th.height = 26;
     th.className = 'roster-face';
     const meta = document.createElement('div');
     meta.className = 'roster-meta';
     const nm = document.createElement('span');
     nm.className = 'roster-name';
-    const sub = document.createElement('span');
-    sub.className = 'roster-sub';
+    const age = document.createElement('span');
+    age.className = 'roster-age';
+    const hp = document.createElement('div');
+    hp.className = 'roster-bar hp';
+    const hpI = document.createElement('i');
+    hp.appendChild(hpI);
+    const en = document.createElement('div');
+    en.className = 'roster-bar en';
+    const enI = document.createElement('i');
+    en.appendChild(enI);
     cm._roThumb = th;
     cm._roName = nm;
-    cm._roSub = sub;
+    cm._roAge = age;
+    cm._roHp = hpI;
+    cm._roEn = enI;
     meta.appendChild(nm);
-    meta.appendChild(sub);
+    meta.appendChild(age);
+    meta.appendChild(hp);
+    meta.appendChild(en);
     row.appendChild(th);
     row.appendChild(meta);
-    const badges = [];
-    if (cm === selectedCm) badges.push('<span class="roster-badge">YOU</span>');
-    if (cm.carrying) badges.push('<span class="roster-badge carry">🫳 carry</span>');
-    if (cm.carriedBy) badges.push('<span class="roster-badge carry">lifted</span>');
-    if (badges.length) {
-      const bd = document.createElement('div');
-      bd.className = 'roster-badges';
-      bd.innerHTML = badges.join('');
-      row.appendChild(bd);
-    }
     row.addEventListener('click', () => {
       selectCaveman(cm); // make them the one you steer
       for (const c of squad) if (c.outSpr) c.outSpr.visible = true;
       renderSquadList();
       renderRoster();
     });
-    rosterEl.appendChild(row);
+    list.appendChild(row);
   }
+  rosterEl.appendChild(list);
+  // classic party window footer: cycle to the next human
+  const next = document.createElement('button');
+  next.type = 'button';
+  next.className = 'roster-next';
+  next.textContent = 'Next ▸';
+  next.title = 'Control the next party member';
+  next.addEventListener('click', () => {
+    const m = rosterMembers();
+    if (!m.length) return;
+    const i = m.indexOf(selectedCm);
+    selectCaveman(m[(i + 1) % m.length]);
+    for (const c of squad) if (c.outSpr) c.outSpr.visible = true;
+    renderSquadList();
+    renderRoster();
+  });
+  rosterEl.appendChild(next);
   refreshRosterThumbs();
 }
 function refreshRosterThumbs() {
@@ -7239,8 +7533,9 @@ function refreshRosterThumbs() {
     if (cm._roName) {
       const vit = villagerVitals(cm);
       cm._roName.textContent = cm.stats.name;
-      cm._roSub.textContent =
-        vit.yrs + ' yrs \u00B7 ' + vit.cond + (cm.sleeping ? ' \u00B7 \uD83D\uDCA4' : '');
+      cm._roAge.textContent = vit.yrs + ' yrs' + (cm.sleeping ? ' \u00B7 \uD83D\uDCA4' : '');
+      cm._roHp.style.width = Math.max(0, Math.min(100, cm.stats.health)) + '%';
+      cm._roEn.style.width = Math.max(0, Math.min(100, cm.energy || 0)) + '%';
     }
   }
 }
@@ -7358,14 +7653,17 @@ renderer.domElement.addEventListener('pointerup', (e) => {
     pickObjs.push(c.spr);
     if (c.iconSpr && c.iconSpr.visible) pickObjs.push(c.iconSpr);
   }
+  closeActionMenu(true); // any tap away closes the options popup
   const sprHits = raycaster.intersectObjects(pickObjs, false);
   if (sprHits.length) {
     const hitCm = sprHits[0].object.userData.cm || null;
-    // Move mode: tapping another human hoists them over your head (tap the
-    // one you're carrying to set them back down). Otherwise it's a plain pick.
+    // Move mode: tapping another human highlights them in white and opens
+    // the options popup (pick up & carry / add to party). Tap the one you're
+    // carrying to set them back down; tap a party member to lead them.
     if (actionMode && selectedCm && hitCm && hitCm !== selectedCm) {
       if (hitCm.carriedBy === selectedCm) putDownVillager(hitCm);
-      else pickUpVillager(selectedCm, hitCm);
+      else if (squad.has(hitCm)) selectCaveman(hitCm);
+      else openActionMenu(hitCm, e.clientX, e.clientY);
       return;
     }
     selectCaveman(hitCm);
@@ -8245,8 +8543,12 @@ function animate() {
   fishMat.uniforms.uFogNear.value = scene.fog.near;
   fishMat.uniforms.uFogFar.value = scene.fog.far;
   // fish: skip drawing schools too far from the camera (they'd be sub-pixel
-  // blobs anyway), and rebuild the zoomed-out marker layer as chunks stream
-  const fishVis2 = FISH_VIS_DIST * FISH_VIS_DIST;
+  // blobs anyway), and rebuild the zoomed-out marker layer as chunks stream.
+  // The visible radius shrinks with zoom: close-up you only see the fish near
+  // you (small lively radius); pulling back spreads the whole sea's schools.
+  const zoomD = camera.position.distanceTo(controls.target);
+  const fishRad = THREE.MathUtils.clamp(zoomD * 0.55, 42, FISH_VIS_DIST);
+  const fishVis2 = fishRad * fishRad;
   for (const ch of chunks.values()) {
     if (!ch.fish) continue;
     const dx = ch.cx * CHUNK + CHUNK / 2 - camera.position.x;
@@ -8654,7 +8956,7 @@ window.__DBG = {
   rebuildIconAtlas: () => { buildTreeAtlas(); buildIconAtlas(); return iconAtlasCanvas; },
   fishShaderSrc: () => fishMat.vertexShader,
   state: () => ({ iconMode, spaceMode, fishVisDist: FISH_VIS_DIST }),
-  version: 23,
+  version: 24,
   selectCaveman: (cm) => selectCaveman(cm),
   action: (on) => setActionMode(on),
   move: (x, z) => commandMoveTo(x, z),
@@ -8668,6 +8970,16 @@ window.__DBG = {
     if (c && c.carriedBy) putDownVillager(c);
     return !!(c && c.carriedBy);
   },
+  openMenu: (i) => {
+    const cm = cavemen[i || 0];
+    if (cm && selectedCm && selectedCm !== cm) {
+      openActionMenu(cm, innerWidth / 2, innerHeight / 2);
+      return menuTarget ? menuTarget.stats.name : null;
+    }
+    return null;
+  },
+  menuClose: () => closeActionMenu(true),
+  get menuTarget() { return menuTarget ? menuTarget.stats.name : null; },
   get actionMode() { return actionMode; },
   get flagVisible() { return moveFlag.visible; },
   squadAdd: (cm) => {

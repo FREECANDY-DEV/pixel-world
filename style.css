@@ -1343,30 +1343,33 @@ body.sheet-open #char-toggle {
 
 #squad-list.has { display: flex; }
 
-/* ---- floating party roster: scrollable list, bottom-right ---- */
-/* lists every selected human; click a row to make them the one you control */
+/* ---- classic party window: right-edge scrollable roster ---- */
+/* every picked human as a classic RPG party row: face, name, age, HP + energy
+   bars; click a row to control them, or use Next ▸ to cycle through the party */
 #roster {
   position: fixed;
-  right: calc(16px + env(safe-area-inset-right, 0px));
-  bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+  right: calc(10px + env(safe-area-inset-right, 0px));
+  top: calc(64px + env(safe-area-inset-top, 0px));
   z-index: 26;
   display: none;
   flex-direction: column;
-  width: 200px;
-  max-height: 216px;
-  overflow-y: auto;
+  width: 214px;
+  max-height: min(58vh, 440px);
   border: 1px solid #6b5327;
   outline: 1px solid rgba(0, 0, 0, 0.65);
   box-shadow: inset 0 0 0 1px rgba(255, 224, 130, 0.12), 0 3px 10px rgba(0, 0, 0, 0.35);
   border-radius: 8px;
-  background: linear-gradient(180deg, rgba(38, 30, 18, 0.92), rgba(24, 20, 13, 0.94));
+  background: linear-gradient(180deg, rgba(38, 30, 18, 0.93), rgba(24, 20, 13, 0.95));
+}
+#roster.visible { display: flex; }
+.roster-list {
+  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #8a6d35 rgba(0, 0, 0, 0.3);
 }
-#roster.visible { display: flex; }
-#roster::-webkit-scrollbar { width: 8px; }
-#roster::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.35); }
-#roster::-webkit-scrollbar-thumb {
+.roster-list::-webkit-scrollbar { width: 8px; }
+.roster-list::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.35); }
+.roster-list::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #a9852f, #6b5327);
   border-radius: 4px;
 }
@@ -1401,8 +1404,8 @@ body.sheet-open #char-toggle {
   box-shadow: inset 2px 0 0 #58d95e;
 }
 .roster-face {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   image-rendering: pixelated;
   border: 1px solid #6b5327;
   border-radius: 3px;
@@ -1423,39 +1426,97 @@ body.sheet-open #char-toggle {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.roster-sub {
+.roster-age {
   font: 400 8.5px/1.1 'Segoe UI', system-ui, sans-serif;
   color: #cbb27e;
 }
-.roster-badges {
+.roster-bar {
+  height: 4px;
+  margin-top: 1px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+.roster-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+}
+.roster-bar.hp i {
+  background: linear-gradient(180deg, #7ed27e, #3f9e45);
+}
+.roster-bar.en i {
+  background: linear-gradient(180deg, #ffe08a, #d9a13c);
+}
+.roster-next {
+  flex: none;
+  margin: 5px 6px 6px;
+  padding: 4px 0;
+  border: 1px solid #6b5327;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #3a2d16, #241c0e);
+  color: #ffe9a8;
+  font: 700 9px/1 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.roster-next:hover {
+  background: linear-gradient(180deg, #4a3a1d, #2e2412);
+}
+
+/* ---- action options menu (Move mode -> tap another human) ---- */
+#action-menu {
+  position: fixed;
+  z-index: 45;
+  width: 176px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  align-items: flex-end;
-  flex: none;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid #6b5327;
+  outline: 1px solid rgba(0, 0, 0, 0.7);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(38, 30, 18, 0.97), rgba(24, 20, 13, 0.98));
 }
-.roster-badge {
-  font-size: 8.5px;
-  line-height: 1;
-  padding: 2px 5px;
-  border-radius: 999px;
-  border: 1px solid rgba(88, 217, 94, 0.5);
-  color: #d8ffd8;
-  background: rgba(30, 64, 34, 0.55);
+#action-menu.hidden { display: none; }
+.am-title {
+  font: 700 11px/1.2 'Segoe UI', system-ui, sans-serif;
+  color: #ffe9a8;
+  text-align: center;
+  padding: 3px 4px 5px;
+  border-bottom: 1px solid rgba(107, 83, 39, 0.5);
+  margin-bottom: 3px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.roster-badge.carry {
-  border-color: rgba(255, 213, 74, 0.5);
-  color: #ffe08a;
-  background: rgba(64, 52, 30, 0.6);
+.am-btn {
+  border: 1px solid #6b5327;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(64, 52, 30, 0.9), rgba(34, 28, 17, 0.95));
+  color: #ffe9a8;
+  font: 600 11px/1 'Segoe UI', system-ui, sans-serif;
+  padding: 6px 8px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.am-btn:hover {
+  background: linear-gradient(180deg, rgba(88, 217, 94, 0.28), rgba(34, 50, 28, 0.95));
+}
+.am-btn.danger:hover {
+  background: linear-gradient(180deg, rgba(190, 70, 60, 0.30), rgba(50, 26, 22, 0.95));
 }
 
 @media (max-width: 640px) {
   #roster {
-    right: calc(10px + env(safe-area-inset-right, 0px));
-    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
-    width: 174px;
-    max-height: 176px;
+    right: calc(8px + env(safe-area-inset-right, 0px));
+    top: calc(54px + env(safe-area-inset-top, 0px));
+    width: 180px;
+    max-height: 40vh;
   }
 }
 
