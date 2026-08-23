@@ -8548,15 +8548,18 @@ function initDemoMode() {
   if (!DEMO_MODE) return;
   // --- DEMO MODE: simplify the UI for social-only experience ---
   document.body.classList.add('demo-mode');
-  // Hide creator tools so demo players only use joystick + chat
+  // Hide ALL creator tools — demo players only use joystick + chat + camera orbit
   const hideIds = [
-    'assets-toggle', 'assets-panel', 'book-toggle', 'book-panel',
-    'timebar', 'rail', 'ui', 'char-toggle', 'char-panel',
+    'assets-toggle', 'assets-panel', 'assets-header',
+    'book-toggle', 'book-panel',
+    'timebar', 'rail', 'ui',
+    'char-toggle', 'char-panel',
     'vert-pad', 'globe-pop',
+    'toggle-ui', 'action-btn',
+    'regenerate', 'autorotate', 'topview', 'home', 'box-select',
+    'place-hint', 'roster', 'char-panel',
   ];
   hideIds.forEach((id) => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-  // Also hide the place-hint and assets-header
-  const ph = document.getElementById('place-hint'); if (ph) ph.style.display = 'none';
 
   // --- RESTRICT CONTROLS: only joystick + chat + camera orbit ---
   // Freeze time at normal speed
@@ -9189,7 +9192,9 @@ function updateDemo(dt, t) {
 
 buildBeacon();
 goHome(); // spawn on the home view, fixed height above the campfire
-spawnDefaultCamp();
+if (!DEMO_MODE) {
+  spawnDefaultCamp(); // founding couple only in the full game
+}
 initDemoMode(); // (?demo=1) multiplayer campfire chat — see the demo module above
 syncChunks(true);
 resizeGame();

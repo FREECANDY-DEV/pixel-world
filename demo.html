@@ -8,15 +8,18 @@
   <style>
     :root { color-scheme: dark; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; overflow: hidden; }
+    html { height: 100%; }
     body {
+      min-height: 100%; overflow-x: hidden; overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       background: radial-gradient(1400px 700px at 50% -12%, #16202c 0%, #0b1018 48%, #05070c 100%);
       color: #e8eef4;
       font-family: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: safe center;
+      padding-bottom: 40px;
       transition: opacity 0.5s ease;
     }
     body.zooming { opacity: 0; pointer-events: none; }
@@ -29,10 +32,17 @@
     /* ============ solar system ============ */
     .system {
       position: relative;
-      width: min(520px, 90vw);
+      width: min(420px, 85vw);
       aspect-ratio: 1 / 1;
       z-index: 1;
+      flex-shrink: 0;
       transition: transform 0.8s cubic-bezier(0.22, 0.9, 0.32, 1), opacity 0.6s ease;
+    }
+    @media (max-width: 480px) {
+      .system { width: min(320px, 88vw); }
+      .o3 { width: 260px; height: 260px; margin: -130px 0 0 -130px; }
+      .o4 { width: 340px; height: 340px; margin: -170px 0 0 -170px; }
+      .o5 { width: 420px; height: 420px; margin: -210px 0 0 -210px; }
     }
     .system.zoom-target {
       transform: scale(3);
@@ -113,7 +123,13 @@
     .content {
       position: relative; z-index: 2;
       text-align: center; padding: 0 20px 20px;
+      width: 100%; max-width: 700px;
       transition: opacity 0.4s ease;
+    }
+    @media (max-width: 480px) {
+      .content { padding: 0 12px 16px; }
+      h1 { font-size: 22px !important; }
+      .tag { font-size: 12px !important; }
     }
     .content.hidden { opacity: 0; pointer-events: none; }
     h1 { margin: 8px 0 4px; font-size: clamp(22px, 4.5vw, 36px); letter-spacing: 1px; }
@@ -123,12 +139,15 @@
     /* ============ spawn card ============ */
     .spawn-card {
       display: flex; flex-direction: column; align-items: center; gap: 12px;
-      max-width: 360px; margin: 0 auto 20px;
+      max-width: 360px; width: calc(100% - 32px); margin: 0 auto 20px;
       padding: 18px 20px 20px;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 14px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    @media (max-width: 480px) {
+      .spawn-card { padding: 14px 16px 16px; }
     }
     .human-preview { display: flex; align-items: center; gap: 14px; }
     #human {
@@ -167,8 +186,15 @@
     /* ============ info cards ============ */
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 10px; width: 100%; max-width: 700px; margin-bottom: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px; width: 100%; max-width: 700px; margin-bottom: 16px;
+      padding: 0 12px;
+    }
+    @media (max-width: 480px) {
+      .cards { grid-template-columns: 1fr 1fr; gap: 6px; }
+      .card { padding: 10px 12px; }
+      .card h3 { font-size: 12px; }
+      .card p { font-size: 10px; }
     }
     .card {
       background: rgba(255,255,255,0.035);
