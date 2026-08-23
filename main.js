@@ -7493,15 +7493,37 @@ boxBtn.addEventListener('click', () => {
   else beginBoxSelect(true);
 });
 
+// Paint a villager's pixel-art face (their exact variant art + palette) into
+// a thumbnail canvas. Paints straight from the art rows instead of copying the
+// WebGL sprite texture: deterministic, crisp, always the upright face (the
+// sprite shows the lying pose while asleep), and mirrored to their facing.
+function paintFaceCanvas(th, cm) {
+  const cfg = cm.mats[cm.stage] || cm.mats.adult;
+  if (!cfg || !cfg.art) return;
+  const art = cfg.art, pal = cfg.pal;
+  const cols = art[0].length, rows = art.length;
+  const scale = Math.max(1, Math.floor(Math.min(th.width / cols, th.height / rows)));
+  const ox = Math.floor((th.width - cols * scale) / 2);
+  const oy = Math.floor((th.height - rows * scale) / 2);
+  const g = th.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  g.clearRect(0, 0, th.width, th.height);
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const c = pal[art[y][x]];
+      if (!c) continue;
+      const px = cm.faceL ? cols - 1 - x : x;
+      g.fillStyle = c;
+      g.fillRect(ox + px * scale, oy + y * scale, scale, scale);
+    }
+  }
+}
+
 function refreshSquadThumbs() {
   for (const cm of squad) {
     const th = cm._sqThumb;
     if (!th) continue;
-    const g = th.getContext('2d');
-    g.imageSmoothingEnabled = false;
-    g.clearRect(0, 0, th.width, th.height);
-    const img = cm.spr.material.map && cm.spr.material.map.image;
-    if (img) g.drawImage(img, 0, 0, th.width, th.height);
+    paintFaceCanvas(th, cm);
     if (cm._sqName) {
       const vit = villagerVitals(cm);
       cm._sqName.textContent = cm.stats.name + ' · ' + vit.yrs + ' · ' + vit.cond;
@@ -7537,94 +7559,60 @@ function renderSquadList() {
   refreshSquadThumbs();
 }
 
-// --- floating party roster (bottom-right): the humans you've picked, with a
-// tap-to-switch lead. Shows the squad when one exists, else the solo pick. ---
+// --- floating party chip (above the joystick): just the human you control
+// — their pixel face and name — with a tiny ▸ to cycle to the next party
+// member. No background, no bars: the whole chip is the control.
 const rosterEl = document.getElementById('roster');
 function rosterMembers() {
   return squad.size ? [...squad] : selectedCm ? [selectedCm] : [];
+}
+function rosterCycle() {
+  const m = rosterMembers();
+  if (m.length < 2) return;
+  const i = m.indexOf(selectedCm);
+  selectCaveman(m[(i + 1) % m.length]);
+  for (const c of squad) if (c.outSpr) c.outSpr.visible = true;
+  renderSquadList();
+  renderRoster();
 }
 function renderRoster() {
   if (!rosterEl) return;
   const mems = rosterMembers();
   rosterEl.classList.toggle('visible', mems.length > 0);
-  rosterEl.innerHTML =
-    '<div class="roster-head">👥 Party \u00B7 ' + mems.length + '</div>';
-  const list = document.createElement('div');
-  list.className = 'roster-list';
-  for (const cm of mems) {
-    const row = document.createElement('div');
-    row.className = 'roster-row' + (cm === selectedCm ? ' lead' : '');
-    const th = document.createElement('canvas');
-    th.width = th.height = 26;
-    th.className = 'roster-face';
-    const meta = document.createElement('div');
-    meta.className = 'roster-meta';
-    const nm = document.createElement('span');
-    nm.className = 'roster-name';
-    const age = document.createElement('span');
-    age.className = 'roster-age';
-    const hp = document.createElement('div');
-    hp.className = 'roster-bar hp';
-    const hpI = document.createElement('i');
-    hp.appendChild(hpI);
-    const en = document.createElement('div');
-    en.className = 'roster-bar en';
-    const enI = document.createElement('i');
-    en.appendChild(enI);
-    cm._roThumb = th;
-    cm._roName = nm;
-    cm._roAge = age;
-    cm._roHp = hpI;
-    cm._roEn = enI;
-    meta.appendChild(nm);
-    meta.appendChild(age);
-    meta.appendChild(hp);
-    meta.appendChild(en);
-    row.appendChild(th);
-    row.appendChild(meta);
-    row.addEventListener('click', () => {
-      selectCaveman(cm); // make them the one you steer
-      for (const c of squad) if (c.outSpr) c.outSpr.visible = true;
-      renderSquadList();
-      renderRoster();
-    });
-    list.appendChild(row);
-  }
-  rosterEl.appendChild(list);
-  // classic party window footer: cycle to the next human
+  rosterEl.innerHTML = '';
+  if (!mems.length) return;
+  const lead = mems.includes(selectedCm) ? selectedCm : mems[0];
+  const chip = document.createElement('div');
+  chip.className = 'roster-chip';
+  const th = document.createElement('canvas');
+  th.width = th.height = 26;
+  th.className = 'roster-face';
+  const nm = document.createElement('span');
+  nm.className = 'roster-name';
   const next = document.createElement('button');
   next.type = 'button';
   next.className = 'roster-next';
-  next.textContent = 'Next ▸';
-  next.title = 'Control the next party member';
-  next.addEventListener('click', () => {
-    const m = rosterMembers();
-    if (!m.length) return;
-    const i = m.indexOf(selectedCm);
-    selectCaveman(m[(i + 1) % m.length]);
-    for (const c of squad) if (c.outSpr) c.outSpr.visible = true;
-    renderSquadList();
-    renderRoster();
+  next.textContent = '▸';
+  next.title = mems.length > 1 ? 'Control the next party member' : 'Party of one';
+  next.addEventListener('click', (e) => {
+    e.stopPropagation();
+    rosterCycle();
   });
-  rosterEl.appendChild(next);
+  chip.appendChild(th);
+  chip.appendChild(nm);
+  chip.appendChild(next);
+  chip.addEventListener('click', rosterCycle); // tap the chip to cycle
+  rosterEl.appendChild(chip);
+  lead._roThumb = th;
+  lead._roName = nm;
   refreshRosterThumbs();
 }
 function refreshRosterThumbs() {
   for (const cm of cavemen) {
     const th = cm._roThumb;
     if (!th) continue;
-    const g = th.getContext('2d');
-    g.imageSmoothingEnabled = false;
-    g.clearRect(0, 0, th.width, th.height);
-    const img = cm.spr.material.map && cm.spr.material.map.image;
-    if (img) g.drawImage(img, 0, 0, th.width, th.height);
-    if (cm._roName) {
-      const vit = villagerVitals(cm);
-      cm._roName.textContent = cm.stats.name;
-      cm._roAge.textContent = vit.yrs + ' yrs' + (cm.sleeping ? ' \u00B7 \uD83D\uDCA4' : '');
-      cm._roHp.style.width = Math.max(0, Math.min(100, cm.stats.health)) + '%';
-      cm._roEn.style.width = Math.max(0, Math.min(100, cm.energy || 0)) + '%';
-    }
+    paintFaceCanvas(th, cm);
+    if (cm._roName) cm._roName.textContent = cm.stats.name;
   }
 }
 
@@ -9040,6 +9028,16 @@ function animate() {
       snapZoom(); // an external system teleported the camera — resync intent
     }
   }
+
+  // the camera may never sink under the world: clamp it (and the look
+  // target) above the terrain they stand over. groundYAt is the real ground
+  // — including the seabed — so diving under the sea still works right down
+  // to the ocean floor, but flying or orbiting into a hillside stops at the
+  // surface instead of clipping into the void under the map.
+  const camFloor = groundYAt(camera.position.x, camera.position.z) + 0.5;
+  if (camera.position.y < camFloor) camera.position.y = camFloor;
+  const tgtFloor = groundYAt(controls.target.x, controls.target.z) + 0.35;
+  if (controls.target.y < tgtFloor) controls.target.y = tgtFloor;
 
   syncChunks();
   processApplyQueue();

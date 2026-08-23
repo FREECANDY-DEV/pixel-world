@@ -1051,6 +1051,10 @@ body.sheet-open #char-toggle {
     height: 36px;
   }
 
+  #roster {
+    bottom: calc(106px + env(safe-area-inset-bottom, 0px)); /* above the 84px joystick */
+  }
+
   #vert-pad {
     bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   }
@@ -1348,123 +1352,61 @@ body.sheet-open #char-toggle {
    bars; click a row to control them, or use Next ▸ to cycle through the party */
 #roster {
   position: fixed;
-  right: calc(10px + env(safe-area-inset-right, 0px));
-  top: calc(64px + env(safe-area-inset-top, 0px));
+  left: calc(18px + env(safe-area-inset-left, 0px));
+  bottom: calc(144px + env(safe-area-inset-bottom, 0px)); /* just above the joystick */
   z-index: 26;
   display: none;
-  flex-direction: column;
-  width: 214px;
-  max-height: min(58vh, 440px);
-  border: 1px solid #6b5327;
-  outline: 1px solid rgba(0, 0, 0, 0.65);
-  box-shadow: inset 0 0 0 1px rgba(255, 224, 130, 0.12), 0 3px 10px rgba(0, 0, 0, 0.35);
-  border-radius: 8px;
-  background: linear-gradient(180deg, rgba(38, 30, 18, 0.93), rgba(24, 20, 13, 0.95));
+  background: none;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
-#roster.visible { display: flex; }
-.roster-list {
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #8a6d35 rgba(0, 0, 0, 0.3);
-}
-.roster-list::-webkit-scrollbar { width: 8px; }
-.roster-list::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.35); }
-.roster-list::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #a9852f, #6b5327);
-  border-radius: 4px;
-}
-.roster-head {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  text-align: center;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #ffe08a;
-  padding: 5px 0 4px;
-  background: linear-gradient(180deg, #3a2d16, #241c0e);
-  border-bottom: 1px solid #6b5327;
-  text-shadow: 0 1px 0 #000;
-}
-.roster-row {
+#roster.visible { display: block; }
+.roster-chip {
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 5px 8px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(107, 83, 39, 0.35);
-  transition: background 0.15s ease;
-}
-.roster-row:last-child { border-bottom: none; }
-.roster-row:hover { background: rgba(255, 224, 138, 0.08); }
-.roster-row.lead {
-  background: rgba(88, 217, 94, 0.10);
-  box-shadow: inset 2px 0 0 #58d95e;
 }
 .roster-face {
   width: 26px;
   height: 26px;
   image-rendering: pixelated;
-  border: 1px solid #6b5327;
+  border: 1px solid rgba(255, 224, 138, 0.55);
   border-radius: 3px;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.28);
   flex: none;
-}
-.roster-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-  flex: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 .roster-name {
-  font: 600 10.5px/1.1 'Segoe UI', system-ui, sans-serif;
+  font: 600 12px/1 'Segoe UI', system-ui, sans-serif;
   color: #ffe9a8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.roster-age {
-  font: 400 8.5px/1.1 'Segoe UI', system-ui, sans-serif;
-  color: #cbb27e;
-}
-.roster-bar {
-  height: 4px;
-  margin-top: 1px;
-  border-radius: 2px;
-  background: rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-}
-.roster-bar i {
-  display: block;
-  height: 100%;
-  border-radius: 2px;
-}
-.roster-bar.hp i {
-  background: linear-gradient(180deg, #7ed27e, #3f9e45);
-}
-.roster-bar.en i {
-  background: linear-gradient(180deg, #ffe08a, #d9a13c);
+  max-width: 110px;
 }
 .roster-next {
   flex: none;
-  margin: 5px 6px 6px;
-  padding: 4px 0;
-  border: 1px solid #6b5327;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #3a2d16, #241c0e);
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 224, 138, 0.55);
+  border-radius: 50%;
+  background: rgba(20, 16, 8, 0.35);
   color: #ffe9a8;
-  font: 700 9px/1 'Segoe UI', system-ui, sans-serif;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font: 700 11px/1 'Segoe UI', system-ui, sans-serif;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.1s ease;
 }
-.roster-next:hover {
-  background: linear-gradient(180deg, #4a3a1d, #2e2412);
-}
+.roster-next:hover { background: rgba(255, 224, 138, 0.22); }
+.roster-next:active { transform: scale(0.9); }
 
 /* ---- action options menu (Move mode -> tap another human) ---- */
 #action-menu {
@@ -1513,10 +1455,7 @@ body.sheet-open #char-toggle {
 
 @media (max-width: 640px) {
   #roster {
-    right: calc(8px + env(safe-area-inset-right, 0px));
-    top: calc(54px + env(safe-area-inset-top, 0px));
-    width: 180px;
-    max-height: 40vh;
+    bottom: calc(126px + env(safe-area-inset-bottom, 0px)); /* above the 92px joystick */
   }
 }
 
