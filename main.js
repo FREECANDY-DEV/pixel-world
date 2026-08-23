@@ -3689,6 +3689,10 @@ function buildIconAtlas() {
   } else {
     iconAtlasTex.needsUpdate = true;
   }
+  if (_fishIconMat) {
+    _fishIconMat.uniforms.uTex.value = iconAtlasTex;
+    _fishIconMat.uniforms.uCell.value = 1 / ICON_COLS;
+  }
   // per-sprite clones (placed trees / fires / people) must re-read the atlas
   for (const t of Object.values(kindIconTexCache)) t.needsUpdate = true;
   iconAtlasBuilt = true;
@@ -3889,21 +3893,74 @@ function rebuildFishIconLayer(force = false) {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   g.setAttribute('aCol', new THREE.BufferAttribute(col, 1));
-  // sea markers always float on top of the water — this layer renders with
-  // depth test off so no wave or shoreline can ever swallow a fish or a rock
+  // sea markers: depth-tested against the terrain (a hill closer to the
+  // camera hides a farther chip in sideways views) — the water plane writes
+  // no depth, so waves and flood can never drown them
   const seaIconMat = fishIconMatRef();
   const pts = new THREE.Points(g, seaIconMat);
   pts.visible = true;
   scene.add(pts);
   fishIconPts = pts;
 }
-// one shared depth-less material for sea markers (fish + decor): a clone of
-// the tree-icon shader with depth testing off so markers never drown
+// one shared material for sea markers (fish + decor). Unlike the tree
+// icons it keeps depth TESTING on, so in a sideways view a block that is
+// actually closer to the camera occludes the chip instead of the chip
+// floating over it; and there is no camera-pull depth bias (the tree shader
+// yanks markers up to 40u toward the camera, which is exactly what makes
+// them appear to sit on closer ground). Size shrinks with distance.
 let _fishIconMat = null;
 function fishIconMatRef() {
   if (!_fishIconMat) {
-    _fishIconMat = ICON_MAT.clone();
-    _fishIconMat.depthTest = false;
+    _fishIconMat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      depthTest: true,
+      renderOrder: 4,
+      uniforms: {
+        uTex: { value: null },
+        uCell: { value: 1 / ICON_COLS },
+        uPx: { value: Math.min(window.devicePixelRatio || 1, 2) },
+        uInvW: { value: 1 / (ICON_CELL * ICON_COLS) },
+        uInvH: { value: 1 / ICON_CELL },
+        uDay: { value: 1 },
+      },
+      vertexShader: `
+        attribute float aCol;
+        varying float vCol;
+        uniform float uPx;
+        void main() {
+          vCol = aCol;
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          float d = max(-mv.z, 1.0);
+          // no depth bias: a sea chip belongs to the water it marks, so a
+          // block closer to the camera must occlude it, never float under it
+          // size scales with distance — near markers read bigger than far
+          gl_PointSize = clamp(6800.0 / d, 14.0, 84.0) * uPx;
+          gl_Position = projectionMatrix * mv;
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D uTex;
+        uniform float uCell;
+        uniform float uInvW;
+        uniform float uInvH;
+        uniform float uDay;
+        varying float vCol;
+        void main() {
+          // inset by half a texel so the marker samples its own chip's pixels
+          // only — the exact boundary texels can otherwise bleed the neighbour
+          // chip's art into this one's edges
+          vec2 uv = vec2(
+            vCol * uCell + (0.5 + gl_PointCoord.x * (48.0 - 1.0)) * uInvW,
+            1.0 - (0.5 + gl_PointCoord.y * (48.0 - 1.0)) * uInvH
+          );
+          vec4 c = texture2D(uTex, uv);
+          if (c.a < 0.35) discard;
+          c.rgb *= mix(vec3(0.45, 0.50, 0.68), vec3(1.0), uDay);
+          gl_FragColor = vec4(c.rgb, 1.0);
+        }
+      `,
+    });
   }
   return _fishIconMat;
 }
