@@ -58,8 +58,11 @@ The sea's cast of six, each 32×32 px with a two-frame swim cycle.
 
 - 6 species × 32px cells, two rows: row 0 tail-left, row 1 tail-right (swim animation).
 - Painted by `paintFish(g, ox, oy, k, frameB)` directly into card thumbs / map chips too.
-- Schools only spawn in **deep water** (≥ 3 blocks), each school at its own depth,
-  with `DoubleSide` billboards so they're visible from above *and* below the surface.
+- **Sparse & deep**: schools are rare (one per ~7.5-unit cell, ~45% of cells) and
+  cruise fully submerged (1.8–4+ blocks below the surface, never scraping the seabed),
+  so the sea reads as occasional passing shoals — not a constant rain of pixels.
+- `DoubleSide` billboards so they're visible from above *and* below the surface.
+- **Distance-culled**: schools farther than 320 units from the camera aren't drawn.
 
 | Art | Cell | Species | Body | Belly | Fin | Stripe |
 |-----|------|---------|------|-------|-----|--------|
@@ -79,12 +82,17 @@ chips are **1:1 copies of the summer vegetation row** (`ICON_CELL = ATLAS_CELL`)
 so zoomed-out markers show the exact same art as the in-world trees — just fewer
 and bigger (each marker represents a whole grove).
 
-- Tree chips (per species): 1:1 summer art, one representative marker per ~64u area.
+- Tree chips (per species): **1:1 copy of the tree's exact current season art** —
+  the same two atlas rows the wind-shader blends, mixed with the same weight, so
+  a zoomed-out marker shows the tree exactly as it looks in-world (spring
+  blossoms, autumn gold, winter snow included). The icon atlas rebuilds whenever
+  the season changes. One representative marker per ~64u area.
 - Campfire chip (`FIRE_COL`): log teepee + flame overlay.
 - Face chip (`FACE_COL`): villager head icon for people markers.
-- Fish chip (`FISH_COL`, painted straight via `paintFish`, clownfish): school marker —
-  one chip clusters many fish within a ~200u grid, so the open sea shows a handful
-  of markers instead of hundreds.
+- Fish chips (`FISH_COL + i`, one per species, painted straight via `paintFish`):
+  the sea floor is flood-filled into connected **water bodies** (deep water, 3+
+  blocks) and ONE marker is emitted per (body, species) — a whole ocean shows at
+  most six spots, one per fish type, instead of a scatter of clones.
 
 ![Icon atlas](docs/assets/spritesheet/icon-atlas.png)
 

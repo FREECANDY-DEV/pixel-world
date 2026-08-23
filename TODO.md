@@ -1,6 +1,6 @@
 # Pixel World — Project TODO
 
-Last updated: 2026-08-22 (v34)
+Last updated: 2026-08-23 (v35)
 
 ---
 
@@ -19,9 +19,13 @@ Last updated: 2026-08-22 (v34)
 - [x] **v34 occlusion hardening**: eye-level (grazing-angle) view-depth advantage for
   rocks/bushes — up to 16 units of view-Z at horizontal views, fading to zero top-down,
   so neighbouring terrain rows can never swallow them
+- [x] **v35 late transparent render pass**: vegetation and map icons now render in the
+  late transparent pass (depth-TEST on, depth-WRITE off, `renderOrder` 2 / 4), so sprites
+  and markers are never overwritten by the terrain they stand on, while real hills still
+  occlude things behind them
 
 ### Flora & assets
-- [x] 26 plant/rock species incl. Blossom Bush + Bramble Tangle
+- [x] 25 plant/rock species incl. Blossom Bush + Bramble Tangle
 - [x] **Professional tree art pass**: shaded bark (`ttrunk`: lit edge, knots, root flare),
   volumetric canopies (`tcanopy`: AO under-layer, lit cap, dithered shine, depth holes)
   applied to Oak, Pine, Birch, Maple, Spruce, Snow Pine
@@ -29,7 +33,24 @@ Last updated: 2026-08-22 (v34)
 - [x] **v34 fish visibility**: schools now break the water surface (y = sea level +0.02),
   render above the water plane (renderOrder 6), depth-biased against the floor,
   brighter tint + frustumCulled off so border schools always draw
+- [x] **v35 fish overhaul**: schools are now *sparse & deep* — one per ~7.5-unit cell at
+  ~45% fill, cruising fully submerged 1.8–4+ blocks below the surface (never scraping the
+  seabed), distance-culled beyond 320 units, so the sea reads as occasional passing shoals
+  instead of a constant rain of pixels
 - [x] Map icon system: tree icons + clustered fish-school markers (12u grid dedupe)
+
+### Map icons (v35 — seasonal & per-species)
+- [x] **Seasonal tree chips**: zoomed-out tree markers show the *exact* art the in-world
+  tree shows right now — the same two season atlas rows the wind shader blends, mixed at
+  the same weight (icon atlas rebuilds whenever the season or its quantised blend changes).
+  Spring blossoms, autumn gold and winter snow all appear on the map.
+- [x] Markers float just above the tallest tree in their cluster (top + 1.6u), so no
+  canopy or block face can hide them from any camera angle
+- [x] **Per-species fish chips**: one swimmer chip per fish species (6 columns)
+- [x] **Water-body flood-fill markers**: the loaded sea floor is flood-filled into
+  connected deep-water bodies (3+ blocks) and ONE marker is emitted per (water body,
+  species) — a whole ocean shows at most six spots, one per fish type, instead of a
+  scatter of clone icons
 
 ### Villagers (humans)
 - [x] Unique looks per villager (skin/hair/eyes/style/beard), aging stages, anatomy view
@@ -39,6 +60,23 @@ Last updated: 2026-08-22 (v34)
 - [x] Sleep system: lying pose art (closed eyes), ZZZ rising glyphs, wake-on-select/steer hop
 - [x] Campfire gathering (golden-angle ring slots, excitement decay, reaction bubbles)
 - [x] Lightning strikes, shockwave physics, world-edge safety
+
+### Move command + squad follow (v35)
+- [x] **Move command (⛳)**: a floating button rides above the selected human — arm it
+  (turns green, label reads "Go…") and a tap on the world sends the picked human walking
+  there; a little green pixel flag marks the destination. Disarming cancels the order.
+- [x] Commands rouse sleepers, cancel gathering, and commanded humans *hold position* if
+  the target turns out unreachable instead of drifting back into idle wandering
+- [x] **Squad follow AI**: squad mates trail the lead human at personal random offsets —
+  fanning out *behind* a walking leader (2.2–4.6u back, ±2.5u sideways), spreading around
+  a standing one (1.6–4.2u ring), and converging on the leader itself if they fall more
+  than 6.5u behind or get blocked by terrain
+- [x] Followers hustle up to +65% faster the further they lag, so the pack never strings
+  out behind the leader; offsets re-roll only when caught up or lost, so they trail
+  smoothly instead of zig-zagging
+- [x] **Command-green highlight**: the selection stroke turns green while the Move command
+  is armed, yellow otherwise; the stroke now hugs the *lying* pose of a sleeping pick
+  (built from the baked sleep art instead of the standing ghost)
 
 ### Knowledge book 📖 (new in v28)
 - [x] Book button (top-left, under Assets) opening a right-side panel
@@ -63,7 +101,9 @@ Last updated: 2026-08-22 (v34)
 - [x] Assets panel (biome tabs incl. Sea Life showcase), character panel, anatomy view
 - [x] Toast chat stream, time controls ×1–×25 + pause, globe camp stats popup
 - [x] Debug hooks `window.__DBG` for headless testing (strike/know/unlock/energy/setHour/
-  tpVillager/setStick/day/depthAt/fishState/icon mode…)
+  tpVillager/setStick/day/depthAt/fishState/icon mode…). **v19** adds `action()` /
+  `move(x, z)` / `squadAdd(cm)` for the Move command, plus `fishIconLayer`,
+  `rebuildIconAtlas()`, `seasonNow()` and `state()` for the icon & fish systems
 
 ---
 

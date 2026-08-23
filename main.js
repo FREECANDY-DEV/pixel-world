@@ -568,6 +568,10 @@ const WEATHER_ALERT_LEAD = 20 * 60000; // warn 20 in-game minutes ahead
 const weather = { cur: 'clear', endAt: Infinity };
 let nextWeather = null;
 let curSeasonIdx = -1;
+// zoomed-out tree markers must track the exact seasonal art the in-world
+// trees show; the icon atlas is rebuilt whenever the season (or its blend
+// weight, quantised) changes
+let lastIconSeasonKey = '';
 
 function pickWeatherType(si) {
   const entries = Object.entries(WEATHERS);
@@ -926,7 +930,7 @@ function disposeChunk(key) {
     scene.remove(ch.icons);
     ch.icons.geometry.dispose();
   }
-  releaseChunkFishIcons(ch);
+  markFishIconsDirty(); // global fish-icon layer needs a rebuild
   if (ch.fish) {
     scene.remove(ch.fish);
     ch.fish.geometry.dispose();
@@ -985,7 +989,7 @@ function tryApplyChunk(cx, cz, lod, seed, data) {
     scene.add(trees);
     if (trees.userData.shadow) scene.add(trees.userData.shadow);
   }
-  const ch = { mesh, lod, trees, icons: null, fish: null, fishIcons: null, cx, cz };
+  const ch = { mesh, lod, trees, icons: null, fish: null, cx, cz };
   // chunks streamed in while zoomed far out appear as icons immediately
   if (trees && iconMode) {
     trees.visible = false;
@@ -998,8 +1002,7 @@ function tryApplyChunk(cx, cz, lod, seed, data) {
   ch.fish = fish;
   if (fish && iconMode) {
     fish.visible = false;
-    ensureChunkFishIcons(ch);
-    if (ch.fishIcons) ch.fishIcons.visible = true;
+    markFishIconsDirty();
   }
   // planet view active: this piece belongs to the hidden map — park it out
   // of sight so no terrain edges peek around the globe; restoreFromSpace
@@ -1012,7 +1015,6 @@ function tryApplyChunk(cx, cz, lod, seed, data) {
     }
     if (fish) fish.visible = false;
     if (ch.icons) ch.icons.visible = false;
-    if (ch.fishIcons) ch.fishIcons.visible = false;
   }
   chunks.set(key, ch);
   return true;
@@ -1833,7 +1835,8 @@ const campStats = { births: 0, deaths: 0, foundedGameMs: null };
 let placingKind = null;
 
 // --- selection highlight: a 1px stroke hugging the character silhouette ---
-function makeOutlineMat(srcMat) {
+// color: idle yellow, or green while the Move command is armed (action mode)
+function makeOutlineMat(srcMat, color) {
   const src = srcMat.map.image; // the pixel-art canvas behind the material
   const w = src.width, h = src.height;
   const o = document.createElement('canvas');
@@ -1852,7 +1855,7 @@ function makeOutlineMat(srcMat) {
       tc.clearRect(0, 0, w + 4, h + 4);
       tc.drawImage(src, dx + 2, dy + 2);
       tc.globalCompositeOperation = 'source-in';
-      tc.fillStyle = '#ffe066';
+      tc.fillStyle = color;
       tc.fillRect(0, 0, w + 4, h + 4);
       ctx.drawImage(tmp, 0, 0);
     }
@@ -1863,21 +1866,29 @@ function makeOutlineMat(srcMat) {
   t.colorSpace = THREE.SRGBColorSpace;
   return new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false });
 }
+const OUTLINE_YELLOW = '#ffe066';
+const OUTLINE_GREEN = '#58d95e';
 const OUTLINE_CACHE = new Map();
-function outlineMatFor(cm, faceL) {
+function outlineMatFor(cm, faceL, color) {
   const cfg = cm.mats[cm.stage];
-  const srcMat = faceL ? cfg.matL : cfg.matR; // unique per person now
-  if (!OUTLINE_CACHE.has(srcMat)) OUTLINE_CACHE.set(srcMat, makeOutlineMat(srcMat));
-  return OUTLINE_CACHE.get(srcMat);
+  // sleeping people get the stroke from their baked lying-down art so the
+  // highlight hugs the body instead of floating beside a standing ghost
+  const sleeping = !!(cm.sleepApplied || cm.sleeping);
+  const srcMat = sleeping ? cfg.matSleep : (faceL ? cfg.matL : cfg.matR);
+  const col = color || OUTLINE_YELLOW;
+  const key = srcMat.uuid + '|' + col;
+  if (!OUTLINE_CACHE.has(key)) OUTLINE_CACHE.set(key, makeOutlineMat(srcMat, col));
+  return OUTLINE_CACHE.get(key);
 }
-// keep outline geometry in sync with the current stage art
+// keep outline geometry in sync with the current stage art — dims are read
+// from whatever art the material uses, so the lying pose lines up too
 function syncOutline(cm) {
   if (!cm.outSpr) return;
-  cm.outSpr.material = outlineMatFor(cm, cm.faceL);
-  const cfg = cm.mats[cm.stage];
-  const ah = cfg.art.length, aw = cfg.art[0].length;
-  cm.outSpr.scale.set((aw + 4) / aw, (ah + 4) / ah, 1);
-  cm.outSpr.position.y = -2 / ah; // stroke adds two art px below the base
+  cm.outSpr.material = outlineMatFor(cm, cm.faceL, actionMode ? OUTLINE_GREEN : OUTLINE_YELLOW);
+  const img = cm.outSpr.material.map.image;
+  const iw = img.width, ih = img.height;
+  cm.outSpr.scale.set((iw + 4) / iw, (ih + 4) / ih, 1);
+  cm.outSpr.position.y = -2 / ih; // stroke adds two art px below the base
 }
 // swap a villager between standing art and their baked lying-down pose
 function applySleepPose(cm, on) {
@@ -1890,7 +1901,11 @@ function applySleepPose(cm, on) {
     cm.spr.material = cfg.matSleep;
     // lying down: the body's length runs along the ground
     cm.spr.scale.set(cfg.h, wWorld, 1);
-    if (cm.outSpr) cm.outSpr.visible = false; // no silhouette stroke asleep
+    // the stroke follows the lying pose whenever this human is picked
+    if (cm.outSpr) {
+      cm.outSpr.visible = cm === selectedCm || squad.has(cm);
+      if (cm.outSpr.visible) syncOutline(cm);
+    }
   } else {
     cm.spr.scale.set(wWorld, cfg.h, 1);
     setCmFace(cm); // restores facing material + outline sync
@@ -2628,7 +2643,16 @@ const treeAtlasTex = new THREE.CanvasTexture(treeAtlasCanvas);
 treeAtlasTex.magFilter = THREE.NearestFilter;
 treeAtlasTex.minFilter = THREE.NearestFilter;
 
+// Sprites render in the late transparent pass (after all opaque terrain),
+// with depth TESTING on but depth WRITING off: the terrain can never
+// overwrite a sprite it rendered before, sprites can't wrongly occlude
+// each other through their depth bias, and real hills still hide sprites
+// behind them. renderOrder 2 = after terrain (0) and blob shadows (1),
+// before the water plane and overlays.
 const treeMat = new THREE.ShaderMaterial({
+  transparent: true,
+  depthWrite: false,
+  renderOrder: 2,
   uniforms: {
     uTex: { value: treeAtlasTex },
     uFogColor: { value: new THREE.Color(0x8fb7d9) },
@@ -2709,6 +2733,11 @@ const treeMat = new THREE.ShaderMaterial({
       // low sprites (bushes, rocks): tilt/rise toward the camera like the
       // tall trees do, so steep angles never sink them into the block
       basePos.y += aLift * vertK * vertK * (0.75 + iH * 0.16);
+      // low sprites also get a small permanent rise (a touch more when the
+      // view goes grazing) so their base always clears the block edge
+      // they stand on, instead of hiding behind it at eye level
+      float horizK = 1.0 - vertK;
+      basePos.y += aLift * (0.14 + 0.12 * horizK * horizK);
       float cta = cos(tiltA), sta = sin(tiltA);
       vec3 rightA = vec3(dirXZ.y, 0.0, -dirXZ.x);
       vec3 upA = vec3(-dirXZ.x * sta, cta, -dirXZ.y * sta);
@@ -2731,9 +2760,9 @@ const treeMat = new THREE.ShaderMaterial({
       // eye-level guarantee for low sprites (rocks, bushes): at grazing
       // angles the next terrain row over can sit several units closer to
       // the camera and swallow them entirely — subtract view depth that
-      // scales with how horizontal the view is (zero when looking down)
-      float horizK = 1.0 - vertK;
-      mv.z -= aLift * horizK * horizK * min(safeD * 0.14, 16.0);
+      // scales with how horizontal the view is (zero when looking down),
+      // with a floor so even point-blank ground can never cover them
+      mv.z -= aLift * horizK * horizK * max(min(safeD * 0.20, 22.0), 1.1);
       mv.z = min(mv.z, -0.35); // stay in front of the near plane
       vDist = max(-mv.z, 1.0);
       vWorldY = wpq.y;
@@ -2917,7 +2946,9 @@ function buildChunkTrees(cx, cz, lod = 0) {
   const mesh = new THREE.Mesh(g, treeMat);
   mesh.userData.cols = cols;
   mesh.userData.sampleTree = sample;
-  mesh.userData.iconData = { pos: iPos, col: iCol };
+  // h = per-tree sprite height, so zoomed-out markers can float above
+  // the tallest tree in their cluster instead of sitting at ground level
+  mesh.userData.iconData = { pos: iPos, col: iCol, h: iH };
   if (lod === 0) mesh.userData.shadow = buildChunkShadows(items, startX, startZ);
   return mesh;
 }
@@ -3220,12 +3251,13 @@ const fishMat = new THREE.ShaderMaterial({
       float flip = step(0.0, rightDot);
       vRowBlend = flip;
       vec3 right = normalize(vec3(-toCam.z, 0.0, toCam.x));
-      vec3 wpq = p + right * position.x * 1.7
-                   + vec3(0.0, 1.0, 0.0) * position.y * 1.7;
+      vec3 wpq = p + right * position.x * 1.05
+                   + vec3(0.0, 1.0, 0.0) * position.y * 1.05;
       vec4 mv = viewMatrix * vec4(wpq, 1.0);
-      mv.z += 0.03; // hug the underside of the water plane
-      // never let the water plane or nearby floor swallow the school
-      mv.z -= min(max(-mv.z, 1.0) * 0.05, 4.0);
+      mv.z += 0.03; // tiny nudge so the plane never z-fights the sprite
+      // gentle pull toward the camera only when truly close (never drags the
+      // school up out of the water column at distance)
+      mv.z -= min(max(-mv.z, 1.0) * 0.015, 0.8);
       vDist = max(-mv.z, 1.0);
       gl_Position = projectionMatrix * mv;
     }
@@ -3259,7 +3291,9 @@ const fishMat = new THREE.ShaderMaterial({
 });
 
 // --- scatter & lifecycle -----------------------------------------------------
-const FISH_CELL_WORLD = 5.5;
+// sparse schools: one per ~7.5-unit cell, ~45% of cells, so the sea reads as
+// occasional passing shoals rather than a constant rain of pixels
+const FISH_CELL_WORLD = 7.5;
 function buildChunkFish(cx, cz) {
   const startX = cx * CHUNK, startZ = cz * CHUNK;
   const i0 = Math.floor(startX / FISH_CELL_WORLD);
@@ -3273,7 +3307,7 @@ function buildChunkFish(cx, cz) {
   const anchors = []; // one per school: feeds the zoomed-out map icon
   for (let ix = i0; ix <= i1; ix++) {
     for (let iz = k0; iz <= k1; iz++) {
-      if (hash3(ix, 3, iz, SEED + 551) > 0.42) continue;
+      if (hash3(ix, 3, iz, SEED + 551) > 0.55) continue;
       const fx = ix * FISH_CELL_WORLD + hash3(ix, 5, iz, SEED + 552) * FISH_CELL_WORLD;
       const fz = iz * FISH_CELL_WORLD + hash3(ix, 6, iz, SEED + 553) * FISH_CELL_WORLD;
       const depth = SEA_LEVEL - terrainHeight(Math.round(fx), Math.round(fz), SEED);
@@ -3281,9 +3315,9 @@ function buildChunkFish(cx, cz) {
       // single ownership by cell centre, same trick as trees
       if (Math.floor((ix * FISH_CELL_WORLD + FISH_CELL_WORLD / 2) / CHUNK) !== cx) continue;
       if (Math.floor((iz * FISH_CELL_WORLD + FISH_CELL_WORLD / 2) / CHUNK) !== cz) continue;
-      // schools swim a little below the surface so divers see them in the
-      // water column; each school picks its own depth (0.4–1.8 blocks)
-      const fy = SEA_LEVEL - (0.4 + hash3(ix, 11, iz, SEED + 557) * 1.4);
+      // schools cruise deep in the water column, fully submerged (1.8–4+ blocks
+      // down, never closer than ~0.4 above the seabed)
+      const fy = SEA_LEVEL - (1.8 + hash3(ix, 11, iz, SEED + 557) * Math.max(0.8, depth - 3.4));
       pos.push(fx, fy, fz);
       col.push(Math.floor(hash3(ix, 8, iz, SEED + 554) * FISH_COLS));
       phase.push(hash3(ix, 9, iz, SEED + 555));
@@ -3312,10 +3346,10 @@ function buildChunkFish(cx, cz) {
   const mesh = new THREE.Mesh(g, fishMat);
   mesh.renderOrder = 6; // composite after the water plane, never under it
   mesh.frustumCulled = false; // schools swim near chunk borders too
-  // school anchors for the zoomed-out map (one icon per school)
+  // school anchors + species for the zoomed-out map
   mesh.userData.iconData = {
     pos: new Float32Array(anchors),
-    col: new Float32Array(n).fill(-1), // resolved to FISH_COL at icon build
+    col: Float32Array.from(col), // species index per school (0..FISH_COLS-1)
   };
   return mesh;
 }
@@ -3342,8 +3376,8 @@ const FACE_PALETTE = { H: '#4a3020', F: '#f0c090', e: '#26201a', m: '#a05a3c' };
 
 const FIRE_COL = ATLAS_COLS;      // campfire chip column (after all species)
 const FACE_COL = ATLAS_COLS + 1;  // human face chip column
-const FISH_COL = ATLAS_COLS + 2;  // fish-school chip for the sea
-const ICON_COLS = ATLAS_COLS + 3;
+const FISH_COL = ATLAS_COLS + 2;  // fish-school chips: one column per species
+const ICON_COLS = ATLAS_COLS + 2 + FISH_COLS; // campfire + face + 6 fish species
 // icon cells match the tree atlas cell exactly so zoomed-out markers reuse
 // the same 48px art 1:1 — a downscaled icon never needs to invent pixels
 const ICON_CELL = ATLAS_CELL; // 48, same as the vegetation atlas
@@ -3355,7 +3389,13 @@ let iconAtlasBuilt = false;
 let iconAtlasTex = null;
 
 // one shared points material: every wild tree icon renders through this
+// Late transparent pass (depth-write off, renderOrder after terrain and
+// vegetation) so markers are never hidden by the ground they stand on,
+// while depth TESTING keeps real hills occluding markers behind them.
 const ICON_MAT = new THREE.ShaderMaterial({
+  transparent: true,
+  depthWrite: false,
+  renderOrder: 4,
   uniforms: {
     uTex: { value: null },
     uCell: { value: 1 / ICON_COLS },
@@ -3370,6 +3410,11 @@ const ICON_MAT = new THREE.ShaderMaterial({
       vCol = aCol;
       vec4 mv = modelViewMatrix * vec4(position, 1.0);
       float d = max(-mv.z, 1.0);
+      // depth bias: pull the marker toward the camera so the block it
+      // stands on (and the grove it marks) can never swallow it at
+      // grazing angles; sizing still uses the true distance
+      mv.z -= min(d * 0.06, 30.0);
+      mv.z = min(mv.z, -0.5);
       gl_PointSize = clamp(430.0 / d, 44.0, 110.0) * uPx;
       gl_Position = projectionMatrix * mv;
     }
@@ -3389,17 +3434,37 @@ const ICON_MAT = new THREE.ShaderMaterial({
   `,
 });
 
+// the icon chips must show the EXACT art the in-world trees show right now:
+// the same two season rows the wind-shader blends, mixed with the same weight,
+// so a zoomed-out marker is pixel-identical to the tree standing there
+function paintSeasonalTreeChips(g) {
+  const b = seasonInfo();
+  KIND_ORDER.forEach((kind, i) => {
+    const sx = i * ATLAS_CELL;
+    g.drawImage(
+      treeAtlasCanvas,
+      sx, b.i * ATLAS_CELL, ATLAS_CELL, ATLAS_CELL,
+      i * ICON_CELL, 0, ICON_CELL, ICON_CELL
+    );
+    // blend the next season row over the current one at the same weight the
+    // shader uses — source-over reproduces mix(a, b, w) for this pixel art
+    if (b.w > 0.001) {
+      g.globalAlpha = b.w;
+      g.drawImage(
+        treeAtlasCanvas,
+        sx, b.next * ATLAS_CELL, ATLAS_CELL, ATLAS_CELL,
+        i * ICON_CELL, 0, ICON_CELL, ICON_CELL
+      );
+      g.globalAlpha = 1;
+    }
+  });
+}
+
 function buildIconAtlas() {
   const g = iconAtlasCanvas.getContext('2d');
   g.imageSmoothingEnabled = false;
   g.clearRect(0, 0, iconAtlasCanvas.width, ICON_CELL);
-  KIND_ORDER.forEach((kind, i) => {
-    g.drawImage(
-      treeAtlasCanvas,
-      i * ATLAS_CELL, ATLAS_CELL, ATLAS_CELL, ATLAS_CELL,
-      i * ICON_CELL, 0, ICON_CELL, ICON_CELL
-    );
-  });
+  paintSeasonalTreeChips(g);
   // campfire chip: log teepee + a small flame licking over it (scaled to
   // match the bigger 48px tree chips)
   const fc = document.createElement('canvas');
@@ -3412,18 +3477,21 @@ function buildIconAtlas() {
   const hc = document.createElement('canvas');
   drawPixelArt(hc, FACE_ICON, FACE_PALETTE, 5);
   g.drawImage(hc, FACE_COL * ICON_CELL + 4, 4);
-  // fish chip: a swimmer painted straight from the species painter
-  const fic = document.createElement('canvas');
-  fic.width = ICON_CELL;
-  fic.height = ICON_CELL;
-  const fig = fic.getContext('2d');
-  fig.imageSmoothingEnabled = false;
-  fig.save();
-  fig.translate(9, 14);
-  fig.scale(1.5, 1.5);
-  paintFish(fig, 0, 0, FISH_KINDS[1], false);
-  fig.restore();
-  g.drawImage(fic, FISH_COL * ICON_CELL, 0);
+  // fish chips: one swimmer per species, so the zoomed-out map can mark
+  // "this body of water holds sardines" vs "...holds tuna"
+  FISH_KINDS.forEach((k, i) => {
+    const fic = document.createElement('canvas');
+    fic.width = ICON_CELL;
+    fic.height = ICON_CELL;
+    const fig = fic.getContext('2d');
+    fig.imageSmoothingEnabled = false;
+    fig.save();
+    fig.translate(9, 14);
+    fig.scale(1.5, 1.5);
+    paintFish(fig, 0, 0, k, false);
+    fig.restore();
+    g.drawImage(fic, (FISH_COL + i) * ICON_CELL, 0);
+  });
   if (!iconAtlasTex) {
     iconAtlasTex = new THREE.CanvasTexture(iconAtlasCanvas);
     iconAtlasTex.magFilter = THREE.NearestFilter;
@@ -3434,6 +3502,8 @@ function buildIconAtlas() {
   } else {
     iconAtlasTex.needsUpdate = true;
   }
+  // per-sprite clones (placed trees / fires / people) must re-read the atlas
+  for (const t of Object.values(kindIconTexCache)) t.needsUpdate = true;
   iconAtlasBuilt = true;
 }
 
@@ -3445,14 +3515,18 @@ function ensureChunkIcons(ch) {
   if (ch.icons || !ch.trees || !ch.trees.userData.iconData) return;
   const ud = ch.trees.userData.iconData;
   const pos = ud.pos, col = ud.col;
+  const hasH = !!ud.h;
   const cells = new Map();
   for (let i = 0; i < col.length; i++) {
     const x = pos[i * 3], z = pos[i * 3 + 2];
     const key = Math.round(x / TREE_ICON_GRID) + ':' + Math.round(z / TREE_ICON_GRID);
     let cell = cells.get(key);
+    const treeTop = pos[i * 3 + 1] + (hasH ? ud.h[i] : 0);
     if (!cell) {
-      cell = { x, y: pos[i * 3 + 1], z, counts: new Map(), best: col[i] };
+      cell = { x, y: pos[i * 3 + 1], z, top: treeTop, counts: new Map(), best: col[i] };
       cells.set(key, cell);
+    } else if (treeTop > cell.top) {
+      cell.top = treeTop;
     }
     const k = col[i];
     cell.counts.set(k, (cell.counts.get(k) || 0) + 1);
@@ -3463,7 +3537,9 @@ function ensureChunkIcons(ch) {
   let w = 0;
   for (const cell of cells.values()) {
     ppos[w * 3] = cell.x;
-    ppos[w * 3 + 1] = cell.y;
+    // float the marker just above the tallest tree in its cluster so no
+    // block face or canopy can hide it from any camera angle
+    ppos[w * 3 + 1] = cell.top + 1.6;
     ppos[w * 3 + 2] = cell.z;
     pcol[w] = cell.best;
     w++;
@@ -3485,39 +3561,126 @@ function releaseChunkIcons(ch) {
   ch.icons = null;
 }
 
-// fish schools get map icons too — but clustered: nearby schools merge
-// into a few "there be fish here" group markers per area
-// fish-school markers: same idea as the tree icons — one bigger marker per
-// area, so the open sea reads as scattered "there be fish" spots
-const FISH_ICON_GRID = 200; // world units per marker cell — the open sea shows only a few "there be fish" spots
-function ensureChunkFishIcons(ch) {
-  if (ch.fishIcons || !ch.fish || !ch.fish.userData.iconData) return;
-  const src = ch.fish.userData.iconData.pos;
-  const seen = new Map();
-  for (let i = 0; i < src.length; i += 3) {
-    // snap to a coarse grid so adjacent schools share one marker
-    const key = Math.round(src[i] / FISH_ICON_GRID) + ':' + Math.round(src[i + 2] / FISH_ICON_GRID);
-    if (!seen.has(key)) seen.set(key, [src[i], SEA_LEVEL + 0.6, src[i + 2]]);
+// fish schools get map icons too — but computed GLOBALLY, not per chunk:
+// the loaded sea floor is flood-filled into connected "water bodies" (deep
+// water, 3+ blocks) and ONE marker is emitted per (body, species). A whole
+// ocean therefore shows at most six spots — one per fish type — instead of
+// a scatter of clone icons.
+const FISH_BODY_GRID = 24;    // world units per flood-fill cell (~1.5 chunks)
+const FISH_VIS_DIST = 320;    // 3D schools farther than this aren't drawn
+let fishIconPts = null;       // single global Points layer for fish markers
+let fishIconDirty = false;    // chunks streamed while icon mode is on
+let lastFishIconRebuild = 0;
+
+function markFishIconsDirty() { fishIconDirty = true; }
+
+function releaseFishIconLayer() {
+  if (!fishIconPts) return;
+  scene.remove(fishIconPts);
+  fishIconPts.geometry.dispose();
+  fishIconPts = null;
+}
+
+function rebuildFishIconLayer(force = false) {
+  if (!iconMode) return;
+  const now = performance.now();
+  if (!force && now - lastFishIconRebuild < 500) return; // throttle streaming rebuilds
+  lastFishIconRebuild = now;
+  fishIconDirty = false;
+
+  // collect every school anchor + species from all loaded chunks
+  const schools = [];
+  let minX = Infinity, minZ = Infinity, maxX = -Infinity, maxZ = -Infinity;
+  for (const ch of chunks.values()) {
+    const ud = ch.fish && ch.fish.userData.iconData;
+    if (!ud) continue;
+    const p = ud.pos, c = ud.col;
+    for (let i = 0; i < p.length; i += 3) {
+      const x = p[i], z = p[i + 2];
+      schools.push([x, z, c[i / 3]]);
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (z < minZ) minZ = z;
+      if (z > maxZ) maxZ = z;
+    }
   }
-  const pos = new Float32Array(seen.size * 3);
+  releaseFishIconLayer();
+  if (!schools.length) return;
+
+  // flood-fill deep water into connected bodies over the loaded extent.
+  // Cells are water if their centre is deep — AND any cell holding a school
+  // is forced to water too, because schools only spawn in 3+ blocks of water:
+  // a coarse cell centre can sit on a shallow patch while the school's own
+  // anchor is out in the deep.
+  const PAD = 48;
+  const x0 = Math.floor((minX - PAD) / FISH_BODY_GRID);
+  const x1 = Math.floor((maxX + PAD) / FISH_BODY_GRID);
+  const z0 = Math.floor((minZ - PAD) / FISH_BODY_GRID);
+  const z1 = Math.floor((maxZ + PAD) / FISH_BODY_GRID);
+  const W = x1 - x0 + 1, H = z1 - z0 + 1;
+  const body = new Int32Array(W * H); // -1 land, -2 water unlabelled, >=0 body id
+  const isWater = (x, z) => terrainHeight(x, z, SEED) < SEA_LEVEL - 3;
+  for (let j = 0; j < H; j++) {
+    for (let i = 0; i < W; i++) {
+      body[j * W + i] = isWater((x0 + i + 0.5) * FISH_BODY_GRID, (z0 + j + 0.5) * FISH_BODY_GRID) ? -2 : -1;
+    }
+  }
+  for (const [x, z] of schools) {
+    const gx = Math.floor(x / FISH_BODY_GRID) - x0;
+    const gz = Math.floor(z / FISH_BODY_GRID) - z0;
+    if (gx >= 0 && gz >= 0 && gx < W && gz < H && body[gz * W + gx] === -1) {
+      body[gz * W + gx] = -2;
+    }
+  }
+  let nextId = 0;
+  const stack = [];
+  for (let j = 0; j < H; j++) {
+    for (let i = 0; i < W; i++) {
+      const idx = j * W + i;
+      if (body[idx] !== -2) continue;
+      body[idx] = nextId;
+      stack.push(idx);
+      while (stack.length) {
+        const c = stack.pop();
+        const cx = c % W, cz = (c / W) | 0;
+        if (cx > 0 && body[c - 1] === -2) { body[c - 1] = nextId; stack.push(c - 1); }
+        if (cx < W - 1 && body[c + 1] === -2) { body[c + 1] = nextId; stack.push(c + 1); }
+        if (cz > 0 && body[c - W] === -2) { body[c - W] = nextId; stack.push(c - W); }
+        if (cz < H - 1 && body[c + W] === -2) { body[c + W] = nextId; stack.push(c + W); }
+      }
+      nextId++;
+    }
+  }
+  // one marker per (water body, species) at the first school's anchor
+  const groups = new Map();
+  for (const [x, z, sp] of schools) {
+    const gx = Math.floor(x / FISH_BODY_GRID);
+    const gz = Math.floor(z / FISH_BODY_GRID);
+    if (gx < x0 || gx > x1 || gz < z0 || gz > z1) continue;
+    const bid = body[(gz - z0) * W + (gx - x0)];
+    if (bid < 0) continue;
+    const key = bid + ':' + sp;
+    if (!groups.has(key)) groups.set(key, [x, z]);
+  }
+  if (!groups.size) return;
+  const pos = new Float32Array(groups.size * 3);
+  const col = new Float32Array(groups.size);
   let w = 0;
-  for (const v of seen.values()) { pos[w++] = v[0]; pos[w++] = v[1]; pos[w++] = v[2]; }
-  const col = new Float32Array(seen.size).fill(FISH_COL);
+  for (const [key, v] of groups) {
+    const sp = +key.slice(key.indexOf(':') + 1);
+    pos[w * 3] = v[0];
+    pos[w * 3 + 1] = SEA_LEVEL + 0.6;
+    pos[w * 3 + 2] = v[1];
+    col[w] = FISH_COL + sp;
+    w++;
+  }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   g.setAttribute('aCol', new THREE.BufferAttribute(col, 1));
-  g.boundingSphere = ch.fish.geometry.boundingSphere.clone();
   const pts = new THREE.Points(g, ICON_MAT);
-  pts.visible = false;
+  pts.visible = true;
   scene.add(pts);
-  ch.fishIcons = pts;
-}
-
-function releaseChunkFishIcons(ch) {
-  if (!ch.fishIcons) return;
-  scene.remove(ch.fishIcons);
-  ch.fishIcons.geometry.dispose();
-  ch.fishIcons = null;
+  fishIconPts = pts;
 }
 
 // --- icon sprites (placed trees / fires / people) -------------------------
@@ -3616,13 +3779,16 @@ function setIconMode(on) {
     if (on) {
       ensureChunkIcons(ch);
       if (ch.icons) ch.icons.visible = true;
-      ensureChunkFishIcons(ch);
-      if (ch.fishIcons) ch.fishIcons.visible = true;
     }
     else {
       releaseChunkIcons(ch);
-      releaseChunkFishIcons(ch);
     }
+  }
+  // fish markers are a single global layer (one per species per water body)
+  if (on) {
+    rebuildFishIconLayer(true);
+  } else {
+    releaseFishIconLayer();
   }
   if (homeFire) homeFire.visible = !on;
   if (homeFireIcon) homeFireIcon.visible = on;
@@ -4029,8 +4195,8 @@ function restoreFromSpace() {
       if (shd) shd.visible = !iconMode;
     }
     if (ch.icons) ch.icons.visible = iconMode;
-    if (ch.fishIcons) ch.fishIcons.visible = iconMode;
   }
+  if (fishIconPts) fishIconPts.visible = iconMode;
   for (const cm of cavemen) cm.spr.visible = true;
   for (const f of campfires) f.visible = !iconMode;
   if (homeFire) homeFire.visible = !iconMode;
@@ -4070,8 +4236,8 @@ function setSpaceMode(on) {
         if (shd) shd.visible = false;
       }
       if (ch.icons) ch.icons.visible = false;
-      if (ch.fishIcons) ch.fishIcons.visible = false;
     }
+    if (fishIconPts) fishIconPts.visible = false;
     if (homeFire) homeFire.visible = false;
     for (const f of homeFlames) f.visible = false;
     homeGlow.visible = false;
@@ -5321,7 +5487,9 @@ function updateCavemen(dt, t) {
 
     // while the player steers this villager NOTHING else may move them:
     // no shockwaves, no swim autopilot, no AI — only the stick
-    const steered = steerInputActive() && inSquadCmd(cm);
+    // only the picked lead human obeys the stick directly; squad mates
+    // trail behind them at their own random offsets (see followLead below)
+    const steered = steerInputActive() && cm === selectedCm;
 
     // clicked-but-not-yet-steered: total freeze (gathering, wandering,
     // swimming — everything waits for the player's first stick input)
@@ -5350,7 +5518,8 @@ function updateCavemen(dt, t) {
     // gathers or drifts on their own — they stand where they are until
     // the player moves the stick. Deep water is the one exception: even
     // a commanded villager paddles back toward land rather than drown.
-    if (!steered && inSquadCmd(cm)) {
+    // An active Move command or a follow order walks them instead.
+    if (!steered && inSquadCmd(cm) && !cm.actionMove && !cm.followLead) {
       cm.moving = false;
       cm.target = null;
       cm.gatherSlot = null;
@@ -5424,6 +5593,56 @@ function updateCavemen(dt, t) {
       cm.leaveAt = 0;
     }
 
+    // squad followers trail the lead human at a personal random offset:
+    // while the leader walks they fan out BEHIND it in a loose line; when
+    // it stands still they spread around it. The offset re-rolls only when
+    // the follower catches up to its spot or gets left far behind, so they
+    // trail smoothly instead of zig-zagging.
+    if (!steered && cm.followLead && !gathering) {
+      const ppos = cm.spr.position;
+      const lp = cm.followLead.spr.position;
+      const distToLeader = Math.hypot(lp.x - ppos.x, lp.z - ppos.z);
+      const nearTarget = !cm.target ||
+        Math.hypot(cm.target.x - ppos.x, cm.target.z - ppos.z) < 1.1;
+      const leaderMoved = !cm.followLastLead ||
+        Math.hypot(lp.x - cm.followLastLead.x, lp.z - cm.followLastLead.z) > 1.5;
+      // which way is the leader heading right now?
+      let dir = null;
+      if (cm.followLead.actionMove) {
+        const adx = cm.followLead.actionMove.x - lp.x;
+        const adz = cm.followLead.actionMove.z - lp.z;
+        const add = Math.hypot(adx, adz);
+        if (add > 0.5) dir = { x: adx / add, z: adz / add };
+      } else if (cm.followLead === selectedCm && charJoy.active) {
+        const jl = Math.hypot(charJoy.x, charJoy.z);
+        if (jl > 0.05) dir = { x: charJoy.x / jl, z: charJoy.z / jl };
+      }
+      if ((nearTarget && (leaderMoved || !dir)) || distToLeader > 6.5) {
+        let off;
+        if (dir && distToLeader <= 6.5) {
+          // walking leader, close enough: trail behind it, fanning sideways
+          const back = 2.2 + Math.random() * 2.4;
+          const side = (Math.random() - 0.5) * 5.0;
+          off = { x: lp.x - dir.x * back - dir.z * side, z: lp.z - dir.z * back + dir.x * side };
+        } else if (distToLeader > 6.5) {
+          // lost the pack (or blocked by terrain): converge on the leader
+          // itself instead of a spot behind it, so it can rejoin the trail
+          off = { x: lp.x + (Math.random() - 0.5) * 0.6, z: lp.z + (Math.random() - 0.5) * 0.6 };
+        } else {
+          // standing leader: spread around it
+          const a = Math.random() * Math.PI * 2;
+          const r = 1.6 + Math.random() * 2.6;
+          off = { x: lp.x + Math.cos(a) * r, z: lp.z + Math.sin(a) * r };
+        }
+        cm.target = off;
+        cm.followOff = off;
+        cm.followLastLead = { x: lp.x, z: lp.z };
+      }
+      cm.wait = 0;
+      cm.gatherSlot = null;
+      cm.leaveAt = 0;
+    }
+
     cm.moving = false;
     // steered villagers obey the stick unconditionally: never queued behind
     // idle waits or wander picks, so you can move them at any time
@@ -5433,6 +5652,12 @@ function updateCavemen(dt, t) {
         continue;
       }
       if (!cm.target) {
+        // a commanded human with no reachable path gives up and holds
+        // position rather than drifting back into idle wandering
+        if (cm.actionMove || cm.followLead) {
+          if (cm.actionMove) { cm.actionMove = null; hideMoveFlag(); }
+          continue;
+        }
         pickWanderTarget(cm);
         continue;
       }
@@ -5498,11 +5723,13 @@ function updateCavemen(dt, t) {
       }
       cm.target = null;
       cm.wait = 0.8 + Math.random() * 2.5;
+      if (cm.actionMove) { cm.actionMove = null; hideMoveFlag(); }
       continue;
     }
-    // excited cavemen rush to the fire
+    // excited cavemen rush to the fire; squad followers hustle up to +65%
+    // the further they lag, so the pack never strings out behind the leader
     const spd = cm.speed * (gathering ? 2.2 : 1) * (cm.swimming ? 0.45 : 1) *
-      anatMobility(cm);
+      anatMobility(cm) * (cm.followLead ? 1 + Math.min(0.65, d * 0.09) : 1);
     const step = Math.min(spd * dt, d);
     const vx = dx / d, vz = dz / d;
     const nx = pos.x + vx * step;
@@ -5752,6 +5979,12 @@ function selectCaveman(cm) {
   if (cm) {
     followPrev.copy(cm.spr.position);
     if (cm.sleeping) wakeCaveman(cm); // picking someone wakes them up
+    // squad members keep trailing whoever is now the lead human
+    if (squad.size > 1) {
+      for (const c of squad) {
+        if (c !== cm) { c.followLead = cm; c.followLastLead = null; }
+      }
+    }
     // centre the camera on them: glide BOTH target and camera by the same
     // offset so the view translates onto the villager without spinning
     const p = cm.spr.position;
@@ -5770,7 +6003,10 @@ function selectCaveman(cm) {
   if (!cm && prev) {
     prev.hold = false; // thaw on deselect
     prev.wait = 0;     // …and let normal life resume immediately
+    prev.followLead = null;
     clearSquad();      // closing the panel ends group command
+    setActionMode(false); // the Move command only makes sense with a pick
+    hideMoveFlag();
   }
   // selecting never opens the sheet by itself: the panel only expands from
   // the Villager button. Tapping villagers just highlights + follows them.
@@ -5781,7 +6017,10 @@ function selectCaveman(cm) {
     charSexEl.textContent = '';
     return;
   }
-  if (cm.outSpr) cm.outSpr.visible = true;
+  if (cm.outSpr) {
+    cm.outSpr.visible = true;
+    syncOutline(cm); // correct color + hugging the lying pose if asleep
+  }
   // little badge: who is who at a glance
   charSexEl.textContent = cm.female ? '\u2640' : '\u2642';
   charSexEl.className = cm.female ? 'female' : 'male';
@@ -6556,6 +6795,101 @@ const squadListEl = document.getElementById('squad-list');
 const boxBtn = document.getElementById('box-select');
 let lastThumbT = 0;
 
+// --- Move command: arm it and a tap on the world sends the picked human ---
+let actionMode = false;
+const actionBtn = document.getElementById('action-btn');
+const actionLbl = actionBtn.querySelector('.action-lbl');
+function setActionMode(on) {
+  if (actionMode === on) return;
+  actionMode = on;
+  actionBtn.classList.toggle('active', on);
+  if (actionLbl) actionLbl.textContent = on ? 'Go…' : 'Move';
+  if (!on) {
+    hideMoveFlag();
+    // disarming cancels any active command: no green stroke, no flag, no walk
+    for (const c of cavemen) {
+      if (c.actionMove) { c.actionMove = null; c.target = null; }
+      if (c.followLead) c.followLead = null;
+    }
+  }
+  // idle yellow vs command green strokes on every picked human
+  for (const c of cavemen) {
+    if (c === selectedCm || squad.has(c)) syncOutline(c);
+  }
+}
+actionBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  setActionMode(!actionMode);
+});
+
+// small pixel flag marking where the picked human was told to walk
+const moveFlag = (() => {
+  const c = document.createElement('canvas');
+  const paint = () => {
+    c.width = 30; c.height = 42;
+    const g = c.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    g.fillStyle = '#5d4123';
+    g.fillRect(13, 2, 4, 38); // pole
+    g.fillStyle = '#3a2a14';
+    g.fillRect(13, 36, 4, 4); // base
+    g.fillStyle = '#58d95e';
+    g.beginPath();
+    g.moveTo(16, 3); g.lineTo(29, 7); g.lineTo(16, 12); g.closePath();
+    g.fill();
+    g.fillStyle = '#2f9e44';
+    g.fillRect(16, 7, 11, 2);
+  };
+  paint();
+  const t = new THREE.CanvasTexture(c);
+  t.magFilter = THREE.NearestFilter;
+  t.minFilter = THREE.NearestFilter;
+  t.colorSpace = THREE.SRGBColorSpace;
+  const spr = new THREE.Sprite(
+    new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false })
+  );
+  spr.renderOrder = 22; // above the water plane, below name tags
+  spr.center.set(0.5, 0);
+  spr.scale.set(0.85, 1.2, 1);
+  spr.visible = false;
+  scene.add(spr);
+  return spr;
+})();
+function showMoveFlag(x, z) {
+  moveFlag.position.set(x, groundYAt(x, z) + 0.08, z);
+  moveFlag.visible = !iconMode && !spaceMode;
+}
+function hideMoveFlag() {
+  moveFlag.visible = false;
+}
+
+// send the picked human (and the whole squad) walking to a spot on the map
+function commandMoveTo(x, z) {
+  const lead = selectedCm;
+  if (!lead) return;
+  const cmd = squad.size ? [...squad] : [lead];
+  for (const cm of cmd) {
+    if (cm.sleeping) wakeCaveman(cm); // a command rouses the sleeper
+    cm.hold = false;
+    cm.wait = 0;
+    cm.gatherSlot = null;
+    cm.leaveAt = 0;
+  }
+  lead.actionMove = { x, z };
+  lead.target = { x, z };
+  lead.followLead = null;
+  // squad mates trail the leader instead of stacking on the same spot
+  if (squad.size > 1) {
+    for (const cm of squad) {
+      if (cm === lead) continue;
+      cm.followLead = lead;
+      cm.followLastLead = null;
+      cm.followOff = { x: (Math.random() - 0.5) * 4, z: (Math.random() - 0.5) * 4 };
+    }
+  }
+  showMoveFlag(x, z);
+}
+
 // who obeys the stick: the whole squad when one exists, else the solo pick
 function inSquadCmd(cm) {
   return squad.size ? squad.has(cm) : cm === selectedCm;
@@ -6567,6 +6901,8 @@ function steerInputActive() {
 function clearSquad() {
   for (const c of squad) {
     c.hold = false; // release them back to AI life
+    c.followLead = null;
+    c.actionMove = null;
     if (c !== selectedCm && c.outSpr) c.outSpr.visible = false;
   }
   squad.clear();
@@ -6626,6 +6962,8 @@ function finishMarquee(e) {
 
   for (const c of squad) {
     c.hold = false;
+    c.followLead = null;
+    c.actionMove = null;
     if (c.outSpr && c !== selectedCm) c.outSpr.visible = false;
   }
   squad.clear();
@@ -6639,6 +6977,7 @@ function finishMarquee(e) {
   for (const cm of squad) {
     cm.hold = false;
     cm.target = null;
+    cm.actionMove = null;
     if (cm.outSpr) cm.outSpr.visible = true;
   }
   // camera jumps to a random member and the panel shows them
@@ -6817,6 +7156,20 @@ renderer.domElement.addEventListener('pointerup', (e) => {
   if (sprHits.length) {
     selectCaveman(sprHits[0].object.userData.cm || null);
     return;
+  }
+
+  // Move command: while armed, a tap on the ground sends the picked human
+  // (and any squad) walking there — raycaster lands on the terrain below
+  if (actionMode && selectedCm) {
+    placeNdcFromEvent(e);
+    raycaster.setFromCamera(placeNdc, camera);
+    const meshes = [];
+    for (const ch of chunks.values()) meshes.push(ch.mesh);
+    const hits = raycaster.intersectObjects(meshes, false);
+    if (hits.length) {
+      commandMoveTo(hits[0].point.x, hits[0].point.z);
+      return;
+    }
   }
 
   // pressing the campfire calls lightning down on it: the fire is small on
@@ -7494,6 +7847,13 @@ function animate() {
       scheduleNextWeather();
     }
   }
+  // keep the zoomed-out tree chips on the same seasonal art as the real
+  // trees: rebuild the icon atlas when the season or its blend changes
+  const iconSeasonKey = b.i + ':' + Math.round(b.w * 8);
+  if (iconSeasonKey !== lastIconSeasonKey) {
+    lastIconSeasonKey = iconSeasonKey;
+    buildIconAtlas();
+  }
 
   if (nextWeather) {
     if (
@@ -7670,6 +8030,16 @@ function animate() {
   fishMat.uniforms.uFogColor.value.copy(scene.fog.color);
   fishMat.uniforms.uFogNear.value = scene.fog.near;
   fishMat.uniforms.uFogFar.value = scene.fog.far;
+  // fish: skip drawing schools too far from the camera (they'd be sub-pixel
+  // blobs anyway), and rebuild the zoomed-out marker layer as chunks stream
+  const fishVis2 = FISH_VIS_DIST * FISH_VIS_DIST;
+  for (const ch of chunks.values()) {
+    if (!ch.fish) continue;
+    const dx = ch.cx * CHUNK + CHUNK / 2 - camera.position.x;
+    const dz = ch.cz * CHUNK + CHUNK / 2 - camera.position.z;
+    ch.fish.visible = !iconMode && !spaceMode && (dx * dx + dz * dz) < fishVis2;
+  }
+  if (iconMode && fishIconDirty) rebuildFishIconLayer();
   treeMat.uniforms.uTime.value = animT;
   // wind: power only above the calm baseline, direction wanders over time
   windAng += dt * 0.06 * Math.sin(t * 0.021 + 2.3);
@@ -7817,6 +8187,22 @@ function animate() {
       drawNameTag(cm);
     }
   }
+
+  // floating Move button rides above the selected human's head
+  if (selectedCm && !iconMode && !spaceMode) {
+    const sp = selectedCm.spr.position;
+    _sqv.set(sp.x, sp.y + selectedCm.spr.scale.y + 1.15, sp.z).project(camera);
+    if (_sqv.z > 1) {
+      actionBtn.classList.add('hidden');
+    } else {
+      actionBtn.classList.remove('hidden');
+      actionBtn.style.left = ((_sqv.x * 0.5 + 0.5) * innerWidth) + 'px';
+      actionBtn.style.top = ((-_sqv.y * 0.5 + 0.5) * innerHeight) + 'px';
+    }
+  } else {
+    actionBtn.classList.add('hidden');
+  }
+  if (moveFlag.visible && (iconMode || spaceMode)) moveFlag.visible = false;
 
   // sleeper zzz: keep each sleeping villager's z-stream above their head
   for (const cm of cavemen) {
@@ -7985,7 +8371,7 @@ function animate() {
         force(ch.mesh, true);   // real terrain, not void
         force(ch.trees, true);  // real trees, not point icons
         force(ch.icons, false);
-        force(ch.fishIcons, false);
+        force(fishIconPts, false);
       }
       for (const s of placedTrees) {
         if (!near(s.sprA.position.x, s.sprA.position.z)) continue;
@@ -8042,8 +8428,29 @@ window.__DBG = {
   get cameraPos() { return camera.position; },
   get camTarget() { return controls.target; },
   get chunks() { return chunks; },
-  version: 18,
+  get fishIconLayer() { return fishIconPts; },
+  get iconMode() { return iconMode; },
+  seasonNow: () => seasonInfo(),
+  chunkList: () => [...chunks.values()],
+  iconAtlasCvs: () => iconAtlasCanvas,
+  treeAtlasCvs: () => treeAtlasCanvas,
+  rebuildIconAtlas: () => { buildTreeAtlas(); buildIconAtlas(); return iconAtlasCanvas; },
+  fishShaderSrc: () => fishMat.vertexShader,
+  state: () => ({ iconMode, spaceMode, fishVisDist: FISH_VIS_DIST }),
+  version: 19,
   selectCaveman: (cm) => selectCaveman(cm),
+  action: (on) => setActionMode(on),
+  move: (x, z) => commandMoveTo(x, z),
+  get actionMode() { return actionMode; },
+  get flagVisible() { return moveFlag.visible; },
+  squadAdd: (cm) => {
+    squad.add(cm);
+    cm.hold = false;
+    cm.followLead = null;
+    cm.actionMove = null;
+    if (cm.outSpr) cm.outSpr.visible = true;
+    renderSquadList();
+  },
   strike: () => strikeCampfire(),
   know: () => ({ ...KNOW }),
   unlock: (k) => unlockKnowledge(k),

@@ -1265,6 +1265,43 @@ body.sheet-open #char-toggle {
 }
 
 /* ---- box-select marquee ---- */
+/* floating Move-command button: rides above the selected human, turns
+   green while armed and the highlight follows suit */
+#action-btn {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid #6b5327;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(46, 38, 24, 0.94), rgba(26, 22, 14, 0.96));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 224, 130, 0.14);
+  color: #ffe9a8;
+  font: 600 12px/1 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  z-index: 18;
+  pointer-events: auto;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+#action-btn:hover {
+  background: linear-gradient(180deg, rgba(64, 52, 30, 0.96), rgba(34, 28, 17, 0.98));
+}
+#action-btn .action-ico {
+  font-size: 13px;
+}
+#action-btn.active {
+  border-color: #58d95e;
+  color: #d8ffd8;
+  background: linear-gradient(180deg, rgba(30, 64, 34, 0.95), rgba(18, 40, 22, 0.97));
+  box-shadow: 0 0 12px rgba(88, 217, 94, 0.45), inset 0 0 0 1px rgba(88, 217, 94, 0.35);
+}
+#action-btn.hidden {
+  display: none;
+}
+
 #marquee {
   position: fixed;
   display: none;
