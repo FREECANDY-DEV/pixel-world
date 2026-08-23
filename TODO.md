@@ -1,10 +1,78 @@
 # Pixel World — Project TODO
 
-Last updated: 2026-08-23 (v38)
+Last updated: 2026-08-23 (v42)
 
 ---
 
 ## ✅ Completed
+
+### Anti-blocky terrain: AO, smooth normals & edge softening (v42)
+- [x] **Ambient Occlusion (AO)**: per-vertex AO calculated in `buildChunkData` by
+  checking 3 neighbours per corner of each face; standard side+corner formula
+  with quad-diagonal flip for correct interpolation. Corners where blocks meet
+  are darkened, making edges look soft and rounded instead of hard.
+- [x] **Smooth normals**: all face normals per vertex are accumulated and
+  normalized in a pre-pass, so adjacent faces share averaged lighting — the
+  terrain reads as gentle curves, not sharp cube edges.
+- [x] **Edge softening in shader**: fragment shader darkens pixels near the UV
+  border of each face using `smoothstep`, creating a subtle shadow falloff
+  at every block boundary — hills roll instead of stair-stepping.
+- [x] **AO passed to workers**: the `aos` attribute is serialized and transferred
+  from web workers back to the main thread alongside positions/normals/UVs.
+- [x] **AO vertex attribute**: `ao` attribute (float, 0..1) added to chunk geometry;
+  the shader mixes between 0.55× and 1.0× brightness based on AO value.
+
+### Demo landing page & control restrictions (v41)
+- [x] **Interactive solar system globe**: landing page shows orbiting planets with
+  Earth (the game) as the central focus, glowing with player count badge
+- [x] **Zoom-in spawn animation**: clicking "Enter the world" zooms the Earth globe
+  to fill the screen, then transitions to the loading overlay and game
+- [x] **Joystick-only movement**: WASD/R/F keyboard shortcuts are blocked in demo
+  mode — only the on-screen joystick moves the human
+- [x] **Camera orbit preserved**: drag-to-rotate works, but all creator tools are
+  hidden (assets, time, book, top-view, regen, box-select, vert-pad, char panel)
+- [x] **Chat-only communication**: the campfire chat panel is the only way to talk
+  to other players; no knowledge book, no move command
+- [x] **Online counter on Earth**: live player count displayed prominently on the
+  orbiting Earth badge; MQTT presence channel for real-time count
+- [x] **Controls hint overlay**: after spawning, a subtle hint bar shows
+  "Joystick to walk · Drag to rotate · Chat to talk"
+
+### Block texture atlas & natural terrain (v40)
+- [x] **Pixel-art block texture atlas**: 16 procedurally-painted tiles (16×16 px each)
+  for every block type — grass-lush, grass-dry, sand, snow, grass-side, dirt, stone,
+  rock-cliff, ocean-floor, clay, gravel, cave-stone, snow-side, sand-side,
+  dry-grass-side, gravel-side. No image files needed — generated at runtime.
+- [x] **UV-mapped chunk faces**: `buildChunkData` now emits UV coordinates per face;
+  top/side/bottom faces each sample the correct atlas tile. Vertex colours still
+  provide biome tinting (lush vs dry vs snowy) on top of the texture detail.
+- [x] **classifyBlock()** maps (biome, depth) → atlas tile: surface gets the biome
+  tile, sides get the side-variant, deep underground gets cave-stone.
+- [x] **Lake basins**: noise-driven depressions in the midlands carve inland lakes
+  filled with water; the ocean floor texture appears on lake beds.
+- [x] **River valleys**: a wandering noise path cuts gentle grooves across the
+  landscape; the terrain naturally slopes into the channel.
+- [x] **Rolling hills**: subtle fbm undulation in the grassland belt for smoother,
+  more organic-looking terrain.
+- [x] **Waterfall spray particles**: where steep terrain drops into water, 24-particle
+  spray systems add splashy foam; detected automatically per chunk load.
+- [x] **Worker source updated**: classifyBlock + ATLAS_COLS transferred to web workers
+  so texture classification happens off-main-thread.
+
+### Demo mode UI optimization (v39)
+- [x] **Demo mode hides creator tools**: assets panel, timebar, knowledge book, top-view,
+  regenerate, box-select, vert-pad, char panel — demo players only see joystick + chat
+- [x] **Larger demo joystick**: 140px touch target with gold-tinted styling for better
+  mobile touch UX; move button centered prominently above the joystick
+- [x] **Demo-mode loading spinner**: loading overlay on the landing page before entering
+  the world, with smooth fade-in transition
+- [x] **Ghost name tag readability**: pill-shaped background, larger font (28px), stronger
+  outline stroke — ghost names are now readable from further away
+- [x] **Improved chat bubbles**: better rounded corners, subtle color-tinted border,
+  slightly smaller font for denser text
+- [x] **Demo body class**: `demo-mode` class on `<body>` for targeted CSS overrides
+- [x] **Unique player identity**: landing page passes human look params (skin, hair, cloth,
+  eyes, style, beard) via URL so the preview matches the spawn exactly
 
 ### Online demo mode — multiplayer campfire chat (v38)
 - [x] **Demo entry** (`?demo=1`, landing at `demo.html`): spawns your own caveman on dry

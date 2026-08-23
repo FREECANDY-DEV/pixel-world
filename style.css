@@ -2068,3 +2068,62 @@ body.panel-open #book-toggle {
   cursor: pointer;
 }
 #demo-chat-send:hover { background: #ffe08a; }
+
+/* ========================================================================
+   Demo mode: simplified UI for social-only experience (joystick + chat)
+   ======================================================================== */
+
+/* Larger joystick for demo players — easier touch target on mobile */
+body.demo-mode #joystick {
+  width: 140px;
+  height: 140px;
+  opacity: 0.85;
+}
+body.demo-mode #joystick-base {
+  background: rgba(15, 23, 42, 0.28);
+  border-color: rgba(255, 210, 63, 0.35);
+  backdrop-filter: blur(12px);
+}
+body.demo-mode #joystick-knob {
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 210, 63, 0.25);
+  border-color: rgba(255, 210, 63, 0.5);
+}
+
+/* Demo mode: move button floats prominently bottom-center */
+body.demo-mode #action-btn {
+  bottom: 180px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  font-size: 15px;
+  padding: 10px 22px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(255, 210, 63, 0.4);
+  backdrop-filter: blur(8px);
+}
+body.demo-mode #action-btn.active {
+  background: rgba(88, 217, 94, 0.35);
+  border-color: rgba(88, 217, 94, 0.7);
+}
+
+/* Demo mode: chat panel takes more screen space */
+body.demo-mode #demo-chat {
+  max-height: 55vh;
+}
+body.demo-mode #demo-chat-toggle {
+  font-size: 18px;
+  width: 50px;
+  height: 50px;
+}
+
+/* Smooth loading transition for demo entry */
+body.demo-mode {
+  animation: demo-fadein 0.6s ease-out;
+}
+@keyframes demo-fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

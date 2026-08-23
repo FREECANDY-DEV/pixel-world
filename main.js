@@ -97,16 +97,47 @@ let SEED = Math.floor(Math.random() * 1e9);
 
 // Terrain elevation in blocks (y). Deterministic for every world column.
 function terrainHeight(x, z, seed) {
+  // --- base continent shape ---
   const continent = fbm2(x * 0.005, z * 0.005, seed, 4);
   const hills = fbm2(x * 0.03, z * 0.03, seed + 999, 4);
+  const microDetail = fbm2(x * 0.08, z * 0.08, seed + 1111, 3);
   const mtnMask = fbm2(x * 0.008, z * 0.008, seed + 555, 3);
   const ridge = ridgedNoise2(x * 0.009, z * 0.009, seed + 777);
   const peaks = ridgedNoise2(x * 0.02, z * 0.02, seed + 313);
 
   let e = (continent - 0.5) * 2.0;       // -1..1  (ocean < 0 < land)
   e += (hills - 0.5) * 0.35;             // gentle hills
+  e += (microDetail - 0.5) * 0.08;       // tiny boulders and pebbles
   const m = Math.max(0, (mtnMask - 0.46) / 0.54);
   e += Math.pow(m, 1.4) * ridge * 3.4 + m * peaks * 0.9; // mountain ranges
+
+  // --- lake basins: smooth circular depressions in the midlands ---
+  const lakeMask = valueNoise2(x * 0.012, z * 0.012, seed + 2000);
+  const lakeDetail = valueNoise2(x * 0.035, z * 0.035, seed + 2001);
+  if (lakeMask > 0.62 && lakeDetail > 0.48) {
+    const lakeStrength = (lakeMask - 0.62) * 4.5 * (lakeDetail - 0.48) * 3.5;
+    const lakeDepth = Math.min(lakeStrength, 0.7);
+    // carve a basin — only in the midlands (not in ocean or on mountain peaks)
+    if (e > -0.1 && e < 1.2) {
+      e -= lakeDepth * 0.8;
+    }
+  }
+
+  // --- river valleys: long carved grooves following a noise curve ---
+  const riverNoise = valueNoise2(x * 0.004, z * 0.004, seed + 3000);
+  const riverPath = fbm2(x * 0.015, z * 0.015, seed + 3001, 3);
+  const riverWidth = 0.025 + riverNoise * 0.02;
+  const riverDist = Math.abs(riverPath - 0.5);
+  if (riverDist < riverWidth && e > 0.1 && e < 1.5) {
+    const riverCarve = (1 - riverDist / riverWidth) * 0.6;
+    e -= riverCarve;
+  }
+
+  // --- rolling hills: softer undulation in grassland ---
+  const roll = fbm2(x * 0.02, z * 0.02, seed + 4000, 2);
+  if (e > -0.3 && e < 0.8) {
+    e += (roll - 0.5) * 0.12;
+  }
 
   return Math.max(1, Math.min(MAX_HEIGHT, Math.round(SEA_LEVEL + e * 22)));
 }
@@ -158,6 +189,414 @@ function colorFor(wx, y, wz, surfY, seed) {
   return [r / 255 * k, g / 255 * k, b / 255 * k];
 }
 
+// ============================================================================
+// Block type classification — maps (biome, depth) to a texture tile index
+// in the atlas.  The chunk builder emits UV coordinates for each face;
+// the shader samples the atlas and multiplies by vertex colour (biome tint).
+// ============================================================================
+//
+// Atlas layout: 16 columns × 1 row of 16×16 px tiles = 256×16 texture.
+// Each tile is a procedurally-painted pixel-art surface pattern.
+//
+//   0 grass-lush    1 grass-dry     2 sand          3 snow
+//   4 grass-side    5 dirt          6 stone         7 rock-cliff
+//   8 ocean-floor   9 clay         10 gravel       11 cave-stone
+//  12 snow-side    13 sand-side    14 grass-dry-side 15 gravel-side
+
+const ATLAS_COLS = 16;   // tiles across
+const ATLAS_CELL = 16;   // px per tile side
+const ATLAS_W = ATLAS_COLS * ATLAS_CELL; // 256 px
+const ATLAS_H = ATLAS_CELL;              // 16 px
+
+// Block type constants (must match atlas column indices)
+const BT = {
+  GRASS: 0, DRY_GRASS: 1, SAND: 2, SNOW: 3,
+  GRASS_SIDE: 4, DIRT: 5, STONE: 6, ROCK: 7,
+  OCEAN_FLOOR: 8, CLAY: 9, GRAVEL: 10, CAVE_STONE: 11,
+  SNOW_SIDE: 12, SAND_SIDE: 13, DRY_GRASS_SIDE: 14, GRAVEL_SIDE: 15,
+};
+
+// classifyBlock(wx, y, wz, surfY, seed) → { top, side, bottom } tile ids
+// top = surface face, side = horizontal faces, bottom = underground faces
+function classifyBlock(wx, y, wz, surfY, seed) {
+  const depth = surfY - y;
+  const moist = fbm2(wx * 0.01, wz * 0.01, seed + 333, 2);
+
+  // surface tile
+  let top, side;
+  if (surfY <= SEA_LEVEL) {
+    top = BT.OCEAN_FLOOR; side = BT.CLAY;
+  } else if (surfY <= SEA_LEVEL + 1) {
+    top = BT.SAND; side = BT.SAND_SIDE;
+  } else if (surfY > 58) {
+    top = BT.SNOW; side = BT.SNOW_SIDE;
+  } else if (surfY > 44) {
+    top = BT.ROCK; side = BT.ROCK;
+  } else if (moist > 0.58) {
+    top = BT.GRASS; side = BT.GRASS_SIDE;
+  } else if (moist < 0.34) {
+    top = BT.DRY_GRASS; side = BT.DRY_GRASS_SIDE;
+  } else {
+    top = BT.GRASS; side = BT.GRASS_SIDE;
+  }
+
+  // sub-surface layers
+  let bottom;
+  if (depth >= 5) { bottom = BT.CAVE_STONE; }
+  else if (depth >= 3) { bottom = BT.STONE; }
+  else if (depth >= 1) { bottom = BT.DIRT; }
+  else { bottom = top; }
+
+  return { top, side, bottom };
+}
+
+// Generate the block texture atlas at runtime (no image files needed)
+function buildBlockAtlas() {
+  const c = document.createElement('canvas');
+  c.width = ATLAS_W; c.height = ATLAS_H;
+  const g = c.getContext('2d');
+  g.imageSmoothingEnabled = false;
+
+  // helper: fill a tile at column col with a procedural pattern
+  function tile(col, paintFn) {
+    g.save();
+    g.translate(col * ATLAS_CELL, 0);
+    paintFn(g);
+    g.restore();
+  }
+  // helper: pseudo-random per-pixel jitter
+  function jit(x, y, s) { return ((x * 374761 + y * 668265 + s) >>> 0) / 4294967296; }
+
+  // 0 — grass lush: green with random darker/lighter blades
+  tile(BT.GRASS, (g) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 0);
+        if (j < 0.12) g.fillStyle = '#2b6e30';
+        else if (j < 0.28) g.fillStyle = '#3d8b42';
+        else if (j < 0.42) g.fillStyle = '#4fa050';
+        else if (j < 0.58) g.fillStyle = '#56b856';
+        else if (j < 0.75) g.fillStyle = '#62c262';
+        else g.fillStyle = '#48944c';
+        g.fillRect(x, y, 1, 1);
+      }
+    // small dirt speckles
+    for (let i = 0; i < 6; i++) {
+      const x = (jit(i, 7, 99) * 14 + 1) | 0;
+      const y = (jit(i, 3, 88) * 14 + 1) | 0;
+      g.fillStyle = '#6b4a2a';
+      g.fillRect(x, y, 1, 1);
+    }
+  });
+
+  // 1 — grass dry: yellow-brown with sparse green
+  tile(BT.DRY_GRASS, (g) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 1);
+        if (j < 0.15) g.fillStyle = '#8a7838';
+        else if (j < 0.35) g.fillStyle = '#a09044';
+        else if (j < 0.55) g.fillStyle = '#b8a450';
+        else if (j < 0.7) g.fillStyle = '#c4b060';
+        else if (j < 0.85) g.fillStyle = '#7a9a3c';
+        else g.fillStyle = '#6d8a34';
+        g.fillRect(x, y, 1, 1);
+      }
+  });
+
+  // 2 — sand: warm beige with shell speckles
+  tile(BT.SAND, (g) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 2);
+        if (j < 0.2) g.fillStyle = '#d4c08a';
+        else if (j < 0.45) g.fillStyle = '#ddc896';
+        else if (j < 0.7) g.fillStyle = '#e4d0a0';
+        else if (j < 0.88) g.fillStyle = '#c8b478';
+        else g.fillStyle = '#bca86c';
+        g.fillRect(x, y, 1, 1);
+      }
+    // tiny shell fragments
+    for (let i = 0; i < 3; i++) {
+      const x = (jit(i, 5, 77) * 14 + 1) | 0;
+      const y = (jit(i, 2, 66) * 14 + 1) | 0;
+      g.fillStyle = '#f0e8d8';
+      g.fillRect(x, y, 2, 1);
+    }
+  });
+
+  // 3 — snow: white with subtle blue shadows
+  tile(BT.SNOW, (g) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 3);
+        if (j < 0.1) g.fillStyle = '#d8e4f0';
+        else if (j < 0.3) g.fillStyle = '#e8eef4';
+        else if (j < 0.55) g.fillStyle = '#f0f4f8';
+        else if (j < 0.78) g.fillStyle = '#f4f8fc';
+        else if (j < 0.92) g.fillStyle = '#e0eaf2';
+        else g.fillStyle = '#d0dce8';
+        g.fillRect(x, y, 1, 1);
+      }
+  });
+
+  // 4 — grass side: green top 2px, brown body with dirt texture
+  tile(BT.GRASS_SIDE, (g) => {
+    // dirt body
+    for (let y = 2; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 4);
+        if (j < 0.2) g.fillStyle = '#7a5830';
+        else if (j < 0.45) g.fillStyle = '#8a6838';
+        else if (j < 0.7) g.fillStyle = '#967440';
+        else if (j < 0.88) g.fillStyle = '#6e4c28';
+        else g.fillStyle = '#7e5c34';
+        g.fillRect(x, y, 1, 1);
+      }
+    // green grass top edge
+    for (let x = 0; x < 16; x++) {
+      const j = jit(x, 0, 40);
+      g.fillStyle = j < 0.5 ? '#3d8b42' : '#4fa050';
+      g.fillRect(x, 0, 1, 2);
+    }
+    // hanging grass strands
+    for (let i = 0; i < 4; i++) {
+      const x = (jit(i, 8, 44) * 14 + 1) | 0;
+      g.fillStyle = '#48944c';
+      g.fillRect(x, 2, 1, 2);
+    }
+  });
+
+  // 5 — dirt: rich brown with rock speckles
+  tile(BT.DIRT, (g) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 5);
+        if (j < 0.15) g.fillStyle = '#5a3c20';
+        else if (j < 0.35) g.fillStyle = '#6b4a2a';
+        else if (j < 0.55) g.fillStyle = '#7a5830';
+        else if (j < 0.75) g.fillStyle = '#8a6838';
+        else if (j < 0.9) g.fillStyle = '#6e4c28';
+        else g.fillStyle = '#5e3e22';
+        g.fillRect(x, y, 1, 1);
+      }
+    // small stones
+    for (let i = 0; i < 3; i++) {
+      const x = (jit(i, 4, 55) * 13 + 1) | 0;
+      const y = (jit(i, 9, 56) * 12 + 2) | 0;
+      g.fillStyle = '#8a8a80';
+      g.fillRect(x, y, 2, 2);
+      g.fillStyle = '#a0a098';
+      g.fillRect(x, y, 1, 1);
+    }
+  });
+
+  // 6 — stone: grey with cracks and veins
+  tile(BT.STONE, (g) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 6);
+        if (j < 0.12) g.fillStyle = '#6a6a66';
+        else if (j < 0.3) g.fillStyle = '#7a7a74';
+        else if (j < 0.5) g.fillStyle = '#8a8a84';
+        else if (j < 0.7) g.fillStyle = '#949490';
+        else if (j < 0.88) g.fillStyle = '#787870';
+        else g.fillStyle = '#6e6e68';
+        g.fillRect(x, y, 1, 1);
+      }
+    // crack lines
+    g.fillStyle = '#585854';
+    g.fillRect(3, 4, 1, 3);
+    g.fillRect(4, 6, 1, 2);
+    g.fillRect(10, 8, 1, 4);
+    g.fillRect(11, 11, 1, 2);
+    g.fillRect(6, 12, 2, 1);
+    // mineral vein
+    g.fillStyle = '#a8a090';
+    g.fillRect(7, 2, 2, 1);
+    g.fillRect(8, 3, 1, 1);
+  });
+
+  // 7 — rock cliff: darker grey with vertical striations
+  tile(BT.ROCK, (g) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 7);
+        if (j < 0.15) g.fillStyle = '#5a5a5c';
+        else if (j < 0.35) g.fillStyle = '#66666a';
+        else if (j < 0.55) g.fillStyle = '#70707a';
+        else if (j < 0.75) g.fillStyle = '#7a7a82';
+        else if (j < 0.9) g.fillStyle = '#646468';
+        else g.fillStyle = '#58585e';
+        g.fillRect(x, y, 1, 1);
+      }
+    // vertical striations
+    for (let i = 0; i < 5; i++) {
+      const x = (jit(i, 1, 77) * 14 + 1) | 0;
+      g.fillStyle = '#4a4a50';
+      for (let y = 0; y < 16; y += 2) g.fillRect(x, y, 1, 1);
+    }
+  });
+
+  // 8 — ocean floor: dark sandy with scattered pebbles
+  tile(BT.OCEAN_FLOOR, (g) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 8);
+        if (j < 0.15) g.fillStyle = '#6a6048';
+        else if (j < 0.35) g.fillStyle = '#7a7050';
+        else if (j < 0.55) g.fillStyle = '#8a7a58';
+        else if (j < 0.75) g.fillStyle = '#706844';
+        else if (j < 0.9) g.fillStyle = '#847450';
+        else g.fillStyle = '#645c40';
+        g.fillRect(x, y, 1, 1);
+      }
+    // pebbles
+    for (let i = 0; i < 4; i++) {
+      const x = (jit(i, 6, 88) * 13 + 1) | 0;
+      const y = (jit(i, 2, 89) * 13 + 1) | 0;
+      g.fillStyle = '#949080';
+      g.fillRect(x, y, 2, 1);
+    }
+  });
+
+  // 9 — clay: reddish-brown with smooth texture
+  tile(BT.CLAY, (g) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 9);
+        if (j < 0.2) g.fillStyle = '#8a5a3a';
+        else if (j < 0.45) g.fillStyle = '#966840';
+        else if (j < 0.7) g.fillStyle = '#a07448';
+        else if (j < 0.88) g.fillStyle = '#8c5c3c';
+        else g.fillStyle = '#7a4e30';
+        g.fillRect(x, y, 1, 1);
+      }
+  });
+
+  // 10 — gravel: mixed grey pebbles
+  tile(BT.GRAVEL, (g) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 10);
+        if (j < 0.15) g.fillStyle = '#6a6a68';
+        else if (j < 0.3) g.fillStyle = '#7a7a78';
+        else if (j < 0.5) g.fillStyle = '#8a8a86';
+        else if (j < 0.7) g.fillStyle = '#70706c';
+        else if (j < 0.88) g.fillStyle = '#888884';
+        else g.fillStyle = '#646460';
+        g.fillRect(x, y, 1, 1);
+      }
+    // individual pebble highlights
+    for (let i = 0; i < 5; i++) {
+      const x = (jit(i, 3, 100) * 13 + 1) | 0;
+      const y = (jit(i, 7, 101) * 13 + 1) | 0;
+      g.fillStyle = '#a0a098';
+      g.fillRect(x, y, 2, 2);
+      g.fillStyle = '#b0b0a8';
+      g.fillRect(x, y, 1, 1);
+    }
+  });
+
+  // 11 — cave stone: dark with stalactite hints
+  tile(BT.CAVE_STONE, (g) => {
+    for (let y = 0; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 11);
+        if (j < 0.15) g.fillStyle = '#4a4a48';
+        else if (j < 0.35) g.fillStyle = '#555552';
+        else if (j < 0.55) g.fillStyle = '#606060';
+        else if (j < 0.75) g.fillStyle = '#58585a';
+        else if (j < 0.9) g.fillStyle = '#4e4e4c';
+        else g.fillStyle = '#444444';
+        g.fillRect(x, y, 1, 1);
+      }
+    // tiny stalactite drip hints
+    g.fillStyle = '#808078';
+    g.fillRect(5, 0, 1, 2);
+    g.fillRect(11, 0, 1, 3);
+    g.fillStyle = '#3a3a38';
+    g.fillRect(5, 2, 1, 1);
+    g.fillRect(11, 3, 1, 1);
+  });
+
+  // 12 — snow side: white top, grey-blue body
+  tile(BT.SNOW_SIDE, (g) => {
+    for (let y = 2; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 12);
+        if (j < 0.2) g.fillStyle = '#6a6e78';
+        else if (j < 0.45) g.fillStyle = '#787c86';
+        else if (j < 0.7) g.fillStyle = '#84888e';
+        else if (j < 0.88) g.fillStyle = '#6e727c';
+        else g.fillStyle = '#74787e';
+        g.fillRect(x, y, 1, 1);
+      }
+    for (let x = 0; x < 16; x++) {
+      const j = jit(x, 0, 120);
+      g.fillStyle = j < 0.5 ? '#e0eaf2' : '#f0f4f8';
+      g.fillRect(x, 0, 1, 2);
+    }
+  });
+
+  // 13 — sand side: sandy top, darker sand body
+  tile(BT.SAND_SIDE, (g) => {
+    for (let y = 2; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 13);
+        if (j < 0.2) g.fillStyle = '#9a8858';
+        else if (j < 0.45) g.fillStyle = '#a89460';
+        else if (j < 0.7) g.fillStyle = '#b4a068';
+        else if (j < 0.88) g.fillStyle = '#908050';
+        else g.fillStyle = '#9c8c5c';
+        g.fillRect(x, y, 1, 1);
+      }
+    for (let x = 0; x < 16; x++) {
+      const j = jit(x, 0, 130);
+      g.fillStyle = j < 0.5 ? '#d4c08a' : '#ddc896';
+      g.fillRect(x, 0, 1, 2);
+    }
+  });
+
+  // 14 — dry grass side: yellow-green top, brown body
+  tile(BT.DRY_GRASS_SIDE, (g) => {
+    for (let y = 2; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 14);
+        if (j < 0.2) g.fillStyle = '#7a5830';
+        else if (j < 0.45) g.fillStyle = '#8a6838';
+        else if (j < 0.7) g.fillStyle = '#7e5c34';
+        else g.fillStyle = '#6e4c28';
+        g.fillRect(x, y, 1, 1);
+      }
+    for (let x = 0; x < 16; x++) {
+      const j = jit(x, 0, 140);
+      g.fillStyle = j < 0.5 ? '#a09044' : '#8a7838';
+      g.fillRect(x, 0, 1, 2);
+    }
+  });
+
+  // 15 — gravel side: grey gravel top, darker body
+  tile(BT.GRAVEL_SIDE, (g) => {
+    for (let y = 2; y < 16; y++)
+      for (let x = 0; x < 16; x++) {
+        const j = jit(x, y, 15);
+        if (j < 0.2) g.fillStyle = '#5a5a58';
+        else if (j < 0.5) g.fillStyle = '#686868';
+        else if (j < 0.8) g.fillStyle = '#747474';
+        else g.fillStyle = '#5e5e5c';
+        g.fillRect(x, y, 1, 1);
+      }
+    for (let x = 0; x < 16; x++) {
+      const j = jit(x, 0, 150);
+      g.fillStyle = j < 0.5 ? '#8a8a86' : '#7a7a78';
+      g.fillRect(x, 0, 1, 2);
+    }
+  });
+
+  return c;
+}
+
 // Flat clearing around the home campfire (set by buildBeacon, sent to workers)
 let HOME_FLAT = null;
 
@@ -178,12 +617,13 @@ function homeFlatten(wx, wz, h) {
 // ============================================================================
 
 const FACES = [
-  { n: [1, 0, 0], v: [[1, 0, 1], [1, 0, 0], [1, 1, 0], [1, 1, 1]] },
-  { n: [-1, 0, 0], v: [[0, 0, 0], [0, 0, 1], [0, 1, 1], [0, 1, 0]] },
-  { n: [0, 1, 0], v: [[0, 1, 1], [1, 1, 1], [1, 1, 0], [0, 1, 0]] },
-  { n: [0, -1, 0], v: [[0, 0, 0], [1, 0, 0], [1, 0, 1], [0, 0, 1]] },
-  { n: [0, 0, 1], v: [[0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]] },
-  { n: [0, 0, -1], v: [[1, 0, 0], [0, 0, 0], [0, 1, 0], [1, 1, 0]] },
+  // n = outward normal, v = 4 corner verts, uv = matching UV coords, faceType: 0=side 1=top 2=bottom
+  { n: [1, 0, 0], v: [[1, 0, 1], [1, 0, 0], [1, 1, 0], [1, 1, 1]], uv: [[0, 0], [1, 0], [1, 1], [0, 1]], ft: 0 },
+  { n: [-1, 0, 0], v: [[0, 0, 0], [0, 0, 1], [0, 1, 1], [0, 1, 0]], uv: [[0, 0], [1, 0], [1, 1], [0, 1]], ft: 0 },
+  { n: [0, 1, 0], v: [[0, 1, 1], [1, 1, 1], [1, 1, 0], [0, 1, 0]], uv: [[0, 0], [1, 0], [1, 1], [0, 1]], ft: 1 },
+  { n: [0, -1, 0], v: [[0, 0, 0], [1, 0, 0], [1, 0, 1], [0, 0, 1]], uv: [[0, 0], [1, 0], [1, 1], [0, 1]], ft: 2 },
+  { n: [0, 0, 1], v: [[0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]], uv: [[0, 0], [1, 0], [1, 1], [0, 1]], ft: 0 },
+  { n: [0, 0, -1], v: [[1, 0, 0], [0, 0, 0], [0, 1, 0], [1, 1, 0]], uv: [[0, 0], [1, 0], [1, 1], [0, 1]], ft: 0 },
 ];
 
 function buildChunkData(cx, cz, seed, lod) {
@@ -217,9 +657,61 @@ function buildChunkData(cx, cz, seed, lod) {
     return caveCache ? !caveAt(wx, wy, wz) : true;
   };
 
+  // --- Ambient Occlusion: check neighbours per corner of each face ---
+  // ao count = 0 (fully occluded, dark) .. 3 (no occlusion, bright)
+  const aoEdge = (wx, wy, wz, dx, dy, dz) => {
+    return solidAt(wx + dx, wy + dy, wz + dz) ? 1 : 0;
+  };
+  const calcAO = (wx, wy, wz, face, k) => {
+    const v = face.v[k];
+    const n = face.n;
+    // tangent dirs depend on face normal
+    let t1x, t1y, t1z, t2x, t2y, t2z;
+    if (n[0] !== 0) { t1x = 0; t1y = 1; t1z = 0; t2x = 0; t2y = 0; t2z = 1; }
+    else if (n[1] !== 0) { t1x = 1; t1y = 0; t1z = 0; t2x = 0; t2y = 0; t2z = 1; }
+    else { t1x = 1; t1y = 0; t1z = 0; t2x = 0; t2y = 1; t2z = 0; }
+    const sx = v[0] > 0.5 ? 1 : v[0] < 0.5 ? -1 : 0;
+    const sy = v[1] > 0.5 ? 1 : v[1] < 0.5 ? -1 : 0;
+    const sz = v[2] > 0.5 ? 1 : v[2] < 0.5 ? -1 : 0;
+    const side1 = aoEdge(wx, wy, wz, n[0] + t1x * sx, n[1] + t1y * sy, n[2] + t1z * sz);
+    const side2 = aoEdge(wx, wy, wz, n[0] + t2x * sx, n[1] + t2y * sy, n[2] + t2z * sz);
+    const corner = aoEdge(wx, wy, wz, n[0] + t1x * sx + t2x * sx, n[1] + t1y * sy + t2y * sy, n[2] + t1z * sz + t2z * sz);
+    if (side1 && side2) return 0;
+    return 3 - (side1 + side2 + corner);
+  };
+
+  // --- Smooth normals: accumulate face normals per vertex, then normalize ---
+  const normMap = new Map();
+  for (let lx = 0; lx < CHUNK; lx++) {
+    for (let lz = 0; lz < CHUNK; lz++) {
+      const wx = startX + lx, wz = startZ + lz;
+      const s = surfAt(wx, wz);
+      for (let wy = 1; wy <= s; wy++) {
+        if (caveCache && caveAt(wx, wy, wz)) continue;
+        for (let f = 0; f < 6; f++) {
+          const face = FACES[f];
+          if (solidAt(wx + face.n[0], wy + face.n[1], wz + face.n[2])) continue;
+          for (let k = 0; k < 4; k++) {
+            const vx = wx + face.v[k][0], vy = wy + face.v[k][1], vz = wz + face.v[k][2];
+            const key = vx + ',' + vy + ',' + vz;
+            let acc = normMap.get(key);
+            if (!acc) { acc = [0, 0, 0]; normMap.set(key, acc); }
+            acc[0] += face.n[0]; acc[1] += face.n[1]; acc[2] += face.n[2];
+          }
+        }
+      }
+    }
+  }
+  for (const [, acc] of normMap) {
+    const len = Math.sqrt(acc[0] * acc[0] + acc[1] * acc[1] + acc[2] * acc[2]);
+    if (len > 0) { acc[0] /= len; acc[1] /= len; acc[2] /= len; }
+  }
+
   const positions = [];
   const normals = [];
   const colors = [];
+  const uvs = [];
+  const aos = [];
   const indices = [];
   let vc = 0;
 
@@ -227,18 +719,40 @@ function buildChunkData(cx, cz, seed, lod) {
     for (let lz = 0; lz < CHUNK; lz++) {
       const wx = startX + lx, wz = startZ + lz;
       const s = surfAt(wx, wz);
+
       for (let wy = 1; wy <= s; wy++) {
         if (caveCache && caveAt(wx, wy, wz)) continue;
         const col = colorFor(wx, wy, wz, s, seed);
+        const bt = classifyBlock(wx, wy, wz, s, seed);
         for (let f = 0; f < 6; f++) {
           const face = FACES[f];
           if (solidAt(wx + face.n[0], wy + face.n[1], wz + face.n[2])) continue;
+          const tileIdx = face.ft === 1 ? bt.top : face.ft === 2 ? bt.bottom : bt.side;
+          const u0 = tileIdx / ATLAS_COLS;
           for (let k = 0; k < 4; k++) {
             positions.push(wx + face.v[k][0], wy + face.v[k][1], wz + face.v[k][2]);
           }
-          for (let k = 0; k < 4; k++) normals.push(face.n[0], face.n[1], face.n[2]);
+          for (let k = 0; k < 4; k++) {
+            const vx = wx + face.v[k][0], vy = wy + face.v[k][1], vz = wz + face.v[k][2];
+            const sn = normMap.get(vx + ',' + vy + ',' + vz) || face.n;
+            normals.push(sn[0], sn[1], sn[2]);
+          }
           for (let k = 0; k < 4; k++) colors.push(col[0], col[1], col[2]);
-          indices.push(vc, vc + 1, vc + 2, vc, vc + 2, vc + 3);
+          for (let k = 0; k < 4; k++) {
+            uvs.push(u0 + face.uv[k][0] / ATLAS_COLS, face.uv[k][1]);
+          }
+          for (let k = 0; k < 4; k++) {
+            const ao = calcAO(wx, wy, wz, face, k);
+            aos.push(ao / 3);
+          }
+          // flip quad diagonal so AO interpolation looks correct
+          const ao0 = calcAO(wx, wy, wz, face, 0);
+          const ao2 = calcAO(wx, wy, wz, face, 2);
+          if (ao0 + ao2 > calcAO(wx, wy, wz, face, 1) + calcAO(wx, wy, wz, face, 3)) {
+            indices.push(vc, vc + 1, vc + 2, vc, vc + 2, vc + 3);
+          } else {
+            indices.push(vc + 1, vc + 2, vc + 3, vc + 1, vc + 3, vc);
+          }
           vc += 4;
         }
       }
@@ -249,6 +763,8 @@ function buildChunkData(cx, cz, seed, lod) {
     positions: Float32Array.from(positions),
     normals: Float32Array.from(normals),
     colors: Float32Array.from(colors),
+    uvs: Float32Array.from(uvs),
+    aos: Float32Array.from(aos),
     indices: Uint32Array.from(indices),
   };
 }
@@ -259,6 +775,7 @@ function buildChunkData(cx, cz, seed, lod) {
 
 const WORKER_SRC = [
   'const CHUNK=' + CHUNK + ',SEA_LEVEL=' + SEA_LEVEL + ',MAX_HEIGHT=' + MAX_HEIGHT + ';',
+  'const ATLAS_COLS=' + ATLAS_COLS + ';',
   'var HOME_FLAT=null;',
   hash3.toString(),
   'const sstep=' + sstep.toString() + ';',
@@ -271,6 +788,7 @@ const WORKER_SRC = [
   terrainHeight.toString(),
   isCave.toString(),
   colorFor.toString(),
+  classifyBlock.toString(),
   homeFlatten.toString(),
   'const FACES=' + JSON.stringify(FACES) + ';',
   buildChunkData.toString(),
@@ -281,8 +799,8 @@ const WORKER_SRC = [
     'self.postMessage({' +
       'cx: d.cx, cz: d.cz, lod: d.lod, seed: d.seed,' +
       'positions: r.positions, normals: r.normals,' +
-      'colors: r.colors, indices: r.indices' +
-    '}, [r.positions.buffer, r.normals.buffer, r.colors.buffer, r.indices.buffer]);' +
+      'colors: r.colors, uvs: r.uvs, aos: r.aos, indices: r.indices' +
+    '}, [r.positions.buffer, r.normals.buffer, r.colors.buffer, r.uvs.buffer, r.aos.buffer, r.indices.buffer]);' +
   '};',
 ].join('\n');
 
@@ -837,6 +1355,84 @@ const snowFx = makeParticles(1100, { size: 0.34, color: 0xffffff, tex: circleTex
 const dustFx = makeParticles(1000, { size: 0.22, color: 0xd9b078, tex: circleTex, fall: 0.4, driftX: 20, driftZ: 9, sway: 2.4, targetOp: 0.5 });
 const allFx = [rainFx, snowFx, dustFx];
 
+// --- Waterfall spray particles ---
+// Spawned near terrain drops that meet water; lightweight splashy dots
+const sprayTex = (() => {
+  const c = document.createElement('canvas');
+  c.width = c.height = 32;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(16, 16, 2, 16, 16, 14);
+  grad.addColorStop(0, 'rgba(200,230,255,1)');
+  grad.addColorStop(0.5, 'rgba(180,220,250,0.8)');
+  grad.addColorStop(1, 'rgba(160,210,245,0)');
+  g.fillStyle = grad;
+  g.beginPath(); g.arc(16, 16, 14, 0, Math.PI * 2); g.fill();
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+})();
+
+const waterfallSprays = []; // { pos: Vector3, particles: Float32Array, n: number, pts: Points }
+
+function spawnWaterfallSpray(wx, wz) {
+  const gy = groundYAt(wx, wz);
+  if (gy > SEA_LEVEL - 0.5) return; // only where water meets terrain
+  const n = 24;
+  const pos = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    pos[i * 3] = wx + (Math.random() - 0.5) * 2;
+    pos[i * 3 + 1] = gy + Math.random() * 1.5;
+    pos[i * 3 + 2] = wz + (Math.random() - 0.5) * 2;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const pts = new THREE.Points(geo, new THREE.PointsMaterial({
+    size: 0.55, color: 0xd0eaff, map: sprayTex, transparent: true,
+    opacity: 0.7, depthWrite: false,
+  }));
+  pts.frustumCulled = false;
+  scene.add(pts);
+  waterfallSprays.push({ pos: new THREE.Vector3(wx, gy, wz), particles: pos, n, pts, t: 0 });
+}
+
+function updateWaterfallSprays(dt, t) {
+  for (const s of waterfallSprays) {
+    s.t += dt;
+    const p = s.particles;
+    for (let i = 0; i < s.n; i++) {
+      // spray upward in an arc, then fall
+      const phase = (s.t * 2.5 + i * 0.3) % 1.5;
+      const up = Math.max(0, 1 - phase) * 1.8;
+      const spread = phase * 0.6;
+      p[i * 3 + 1] = s.pos.y + up + Math.sin(i * 1.7) * 0.15;
+      p[i * 3] += (Math.sin(s.t * 3 + i * 2.1) * 0.02) * dt * 60;
+      p[i * 3 + 2] += (Math.cos(s.t * 2.7 + i * 1.9) * 0.02) * dt * 60;
+    }
+    s.pts.geometry.attributes.position.needsUpdate = true;
+    s.pts.material.opacity = 0.5 + Math.sin(t * 4) * 0.2;
+  }
+}
+
+// detect waterfalls on chunk load: steep drops near water
+function detectWaterfalls(cx, cz) {
+  const startX = cx * CHUNK, startZ = cz * CHUNK;
+  for (let lx = 0; lx < CHUNK; lx += 3) {
+    for (let lz = 0; lz < CHUNK; lz += 3) {
+      const wx = startX + lx, wz = startZ + lz;
+      const gy = groundYAt(wx, wz);
+      // check if there's a steep drop into water nearby
+      for (const [dx, dz] of [[3,0],[-3,0],[0,3],[0,-3]]) {
+        const ngy = groundYAt(wx + dx, wz + dz);
+        if (gy - ngy > 3 && ngy <= SEA_LEVEL - 0.5) {
+          // this is a waterfall edge
+          spawnWaterfallSpray(wx + dx / 2, wz + dz / 2);
+          break;
+        }
+      }
+    }
+  }
+}
+
 function updateParticles(sys, dt, t, wind) {
   const hw = FX_BOX.w / 2;
   const hd = FX_BOX.d / 2;
@@ -863,35 +1459,77 @@ function updateParticles(sys, dt, t, wind) {
 
 // ============================================================================
 // Chunked voxel terrain: streaming, LOD and mesh management
-// ============================================================================
+// ============================================================================// Build block atlas texture at runtime (no image files)
+const blockAtlasCanvas = buildBlockAtlas();
+const blockAtlasTex = new THREE.CanvasTexture(blockAtlasCanvas);
+blockAtlasTex.magFilter = THREE.NearestFilter;
+blockAtlasTex.minFilter = THREE.NearestFilter;
+blockAtlasTex.colorSpace = THREE.SRGBColorSpace;
 
 const chunkMat = new THREE.MeshStandardMaterial({
   vertexColors: true,
-  roughness: 0.9,
+  map: blockAtlasTex,
+  roughness: 0.85,
   metalness: 0,
 });
 
 // Far terrain sinks into shadow, darkest at low ground — depth cueing
+// + ambient occlusion + edge softening for rounder, less blocky look
 chunkMat.onBeforeCompile = (shader) => {
   shader.uniforms.uShadeNear = { value: VIEW_DIST * 0.22 };
   shader.uniforms.uShadeFar = { value: VIEW_DIST * 0.98 };
   shader.uniforms.uSnow = { value: 0 };
   shader.uniforms.uParched = { value: 0 };
+  shader.uniforms.uAtlasW = { value: 1 / ATLAS_COLS };
   chunkMat.userData.shader = shader;
+  // --- vertex shader: pass AO + worldY + smooth normal to fragment ---
   shader.vertexShader = shader.vertexShader
-    .replace('#include <common>', '#include <common>\nvarying float vWorldY;\nvarying vec3 vNy;')
+    .replace('#include <common>', [
+      '#include <common>',
+      'attribute float ao;',
+      'varying float vAO;',
+      'varying float vWorldY;',
+      'varying vec3 vNy;',
+      'varying vec2 vUV;',
+    ].join('\n'))
     .replace(
       '#include <begin_vertex>',
-      '#include <begin_vertex>\nvWorldY = transformed.y;\nvNy = normal;'
+      '#include <begin_vertex>',
     );
+  // inject after begin_vertex to capture transformed + uv
+  shader.vertexShader = shader.vertexShader.replace(
+    '#include <project_vertex>',
+    'vAO = ao;\n' +
+    'vWorldY = (modelMatrix * vec4(position, 1.0)).y;\n' +
+    'vNy = normalize((modelMatrix * vec4(normal, 0.0)).xyz);\n' +
+    'vUV = uv;\n' +
+    '#include <project_vertex>'
+  );
+  // --- fragment shader: AO darkening + edge softening + existing effects ---
   shader.fragmentShader = shader.fragmentShader
-    .replace(
+    .replace('#include <common>', [
       '#include <common>',
-      '#include <common>\nvarying float vWorldY;\nvarying vec3 vNy;\nuniform float uShadeNear;\nuniform float uShadeFar;\nuniform float uSnow;\nuniform float uParched;'
-    )
-    .replace(
-      '#include <fog_fragment>',
-      [
+      'varying float vAO;',
+      'varying float vWorldY;',
+      'varying vec3 vNy;',
+      'varying vec2 vUV;',
+      'uniform float uShadeNear;',
+      'uniform float uShadeFar;',
+      'uniform float uSnow;',
+      'uniform float uParched;',
+    ].join('\n'))
+    .replace('#include <fog_fragment>', [
+        // ambient occlusion: smoothstep so the transition from dark corners
+        // to bright centres looks like rounded block edges, not a hard line
+        'float aoK = smoothstep(0.0, 1.0, vAO);',
+        'gl_FragColor.rgb *= mix(0.55, 1.0, aoK);',
+        // edge softening: darken pixels near the UV border of each face
+        // so the hard 1-block boundary fades into a gentle shadow
+        'float edgeX = smoothstep(0.0, 0.12, vUV.x) * smoothstep(0.0, 0.12, 1.0 - vUV.x);',
+        'float edgeY = smoothstep(0.0, 0.12, vUV.y) * smoothstep(0.0, 0.12, 1.0 - vUV.y);',
+        'float edgeK = edgeX * edgeY;',
+        'gl_FragColor.rgb *= mix(0.7, 1.0, edgeK);',
+        // distance fog
         'float shadeDistK = smoothstep(uShadeNear, uShadeFar, vFogDepth);',
         'float shadeLowK = clamp(1.0 - (vWorldY - 6.0) / 30.0, 0.0, 1.0);',
         'gl_FragColor.rgb *= mix(1.0, mix(0.72, 0.42, shadeLowK), shadeDistK);',
@@ -980,6 +1618,8 @@ function tryApplyChunk(cx, cz, lod, seed, data) {
   geo.setAttribute('position', new THREE.BufferAttribute(data.positions, 3));
   geo.setAttribute('normal', new THREE.BufferAttribute(data.normals, 3));
   geo.setAttribute('color', new THREE.BufferAttribute(data.colors, 3));
+  if (data.uvs) geo.setAttribute('uv', new THREE.BufferAttribute(data.uvs, 2));
+  if (data.aos) geo.setAttribute('ao', new THREE.BufferAttribute(data.aos, 1));
   geo.setIndex(new THREE.BufferAttribute(data.indices, 1));
   geo.computeBoundingSphere();
 
@@ -1009,6 +1649,8 @@ function tryApplyChunk(cx, cz, lod, seed, data) {
     fish.visible = false;
     markFishIconsDirty();
   }
+  // detect waterfalls in newly loaded chunks
+  detectWaterfalls(cx, cz);
   // planet view active: this piece belongs to the hidden map — park it out
   // of sight so no terrain edges peek around the globe; restoreFromSpace
   // will switch everything back on when the world returns
@@ -5071,7 +5713,7 @@ function drawNameTag(cm) {
   ns.scale.set(H * (W / c.height), H, 1);
 }
 
-function spawnCaveman(x, z, female = false, forceAge = null) {
+function spawnCaveman(x, z, female = false, forceAge = null, lookOverride = null) {
   const STAGES = female ? FEMALE_STAGES : AGE_STAGES;
   const roll = Math.random();
   const baseAge = forceAge != null ? forceAge
@@ -5085,7 +5727,7 @@ function spawnCaveman(x, z, female = false, forceAge = null) {
   scene.add(spr);
   // every person is drawn with their own palette + hairstyle variants
   const rnd = mulberry32((Math.random() * 0xffffffff) >>> 0);
-  const look = pickLook(rnd, female);
+  const look = lookOverride || pickLook(rnd, female);
   const mats = {};
   for (const [key, cfg] of Object.entries(STAGES)) {
     const vArt = artVariant(cfg.art, female, look.style, look.beard);
@@ -7904,9 +8546,57 @@ function demoEl(id) { return document.getElementById(id); }
 
 function initDemoMode() {
   if (!DEMO_MODE) return;
+  // --- DEMO MODE: simplify the UI for social-only experience ---
+  document.body.classList.add('demo-mode');
+  // Hide creator tools so demo players only use joystick + chat
+  const hideIds = [
+    'assets-toggle', 'assets-panel', 'book-toggle', 'book-panel',
+    'timebar', 'rail', 'ui', 'char-toggle', 'char-panel',
+    'vert-pad', 'globe-pop',
+  ];
+  hideIds.forEach((id) => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  // Also hide the place-hint and assets-header
+  const ph = document.getElementById('place-hint'); if (ph) ph.style.display = 'none';
+
+  // --- RESTRICT CONTROLS: only joystick + chat + camera orbit ---
+  // Freeze time at normal speed
+  timePaused = false;
+  timeSpeed = 1;
+  // Disable auto-rotate
+  controls.autoRotate = false;
+  // Disable box-select and action/move command
+  boxSelectOn = false;
+  actionMode = false;
+  if (actionBtn) actionBtn.style.display = 'none';
+  // Block WASD/R/F keyboard shortcuts — only joystick should move the human
+  window.addEventListener('keydown', (e) => {
+    if (DEMO_MODE && ['w','a','s','d','r','f','W','A','S','D','R','F'].includes(e.key)) {
+      e.stopImmediatePropagation();
+      return false;
+    }
+  }, true);
+
   demoState.id = 'p' + Math.random().toString(36).slice(2, 10);
-  demoState.name = demoPickName();
+  // the landing page can pass a picked human (?n=name&f=0/1&a=age&skin=..&hair=..
+  // &eyes=..&cloth=..&style=..&beard=..); without it, roll a fresh random one
+  const q = new URLSearchParams(location.search);
+  demoState.name = (q.get('n') || demoPickName()).slice(0, 14);
   demoState.color = DEMO_COLORS[Math.floor(Math.random() * DEMO_COLORS.length)];
+  const demoFemale = q.has('f') ? q.get('f') === '1' : Math.random() < 0.5;
+  const demoAge = q.has('a') ? Math.max(12, Math.min(65, parseInt(q.get('a')) || 30)) : 20 + Math.floor(Math.random() * 30);
+  let demoLook = null;
+  if (q.has('skin')) {
+    demoLook = {
+      skin: q.get('skin'),
+      hair: q.get('hair') || '#3b2b1e',
+      grey: q.get('grey') || '#c9c9c9',
+      cloth: q.get('cloth') || '#8a5a33',
+      dress: q.has('dress') ? q.get('dress') : (demoFemale ? '#6b8f3f' : null),
+      eyes: q.get('eyes') || '#1a1a1a',
+      style: parseInt(q.get('style')) || 0,
+      beard: demoFemale ? -1 : (parseInt(q.get('beard')) || 0),
+    };
+  }
 
   // --- the player's own caveman, spawned on dry ground near the fire ---
   let sx = homePos.x + 3, sz = homePos.z + 3;
@@ -7917,7 +8607,7 @@ function initDemoMode() {
     const z = homePos.z + Math.sin(ang) * r;
     if (isDry(x, z) && !treeHit(x, z)) { sx = x; sz = z; break; }
   }
-  spawnCaveman(sx, sz, Math.random() < 0.5, 20 + Math.floor(Math.random() * 30));
+  spawnCaveman(sx, sz, demoFemale, demoAge, demoLook);
   const me = cavemen[cavemen.length - 1];
   me.stats.name = demoState.name;
   me.homebound = true;
@@ -8253,24 +8943,40 @@ function demoDrawGhostTag(g) {
   const ns = g.nameSpr;
   const c = ns.userData.canvas;
   const ctx = c.getContext('2d');
-  ctx.font = 'bold 26px monospace';
+  ctx.font = 'bold 28px monospace';
   const tw = Math.ceil(ctx.measureText(g.name).width);
-  const W = Math.max(72, tw + 18);
+  const W = Math.max(80, tw + 22);
   c.width = W;
-  c.height = 68;
-  ctx.font = 'bold 26px monospace';
+  c.height = 74;
+  ctx.font = 'bold 28px monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  // small colored underline chip so players read as distinct
+  // pill-shaped background for better readability
+  const padX = 6, padY = 4, rr = 10;
+  ctx.beginPath();
+  ctx.moveTo(rr + padX, padY);
+  ctx.lineTo(W - rr - padX, padY);
+  ctx.quadraticCurveTo(W - padX, padY, W - padX, rr + padY);
+  ctx.lineTo(W - padX, 68 - rr - padY);
+  ctx.quadraticCurveTo(W - padX, 68 - padY, W - rr - padX, 68 - padY);
+  ctx.lineTo(rr + padX, 68 - padY);
+  ctx.quadraticCurveTo(padX, 68 - padY, padX, 68 - rr - padY);
+  ctx.lineTo(padX, rr + padY);
+  ctx.quadraticCurveTo(padX, padY, rr + padX, padY);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(10,12,20,0.78)';
+  ctx.fill();
+  // colored underline chip so players read as distinct
   ctx.fillStyle = g.color;
-  ctx.fillRect(3, 55, W - 6, 4);
-  ctx.lineWidth = 6;
-  ctx.strokeStyle = 'rgba(10,10,14,0.9)';
-  ctx.strokeText(g.name, W / 2, 34);
+  ctx.fillRect(8, 60, W - 16, 4);
+  // name text with strong outline for contrast
+  ctx.lineWidth = 7;
+  ctx.strokeStyle = 'rgba(5,5,8,0.95)';
+  ctx.strokeText(g.name, W / 2, 36);
   ctx.fillStyle = '#fff';
-  ctx.fillText(g.name, W / 2, 34);
+  ctx.fillText(g.name, W / 2, 36);
   ns.userData.tex.needsUpdate = true;
-  const H = 0.78;
+  const H = 0.82;
   ns.scale.set(H * (W / c.height), H, 1);
 }
 
@@ -8307,26 +9013,29 @@ function demoShowBubble(bubble, owner, name, color, text) {
   if (!bubble || !owner) return;
   const cvs = bubble.userData.canvas;
   const ctx = cvs.getContext('2d');
-  ctx.font = 'bold 26px monospace';
+  ctx.font = 'bold 24px monospace';
   const lines = demoWrap(ctx, text, 30);
   const nameW = ctx.measureText(name).width;
   const bodyW = Math.max(...lines.map((l) => ctx.measureText(l).width));
-  const W = Math.max(120, nameW + 26, bodyW + 30);
-  const H = 40 + lines.length * 28 + 12;
+  const W = Math.max(130, nameW + 26, bodyW + 30);
+  const H = 42 + lines.length * 28 + 14;
   cvs.width = W;
   cvs.height = H;
-  ctx.font = 'bold 26px monospace';
-  const r = 12;
+  ctx.font = 'bold 24px monospace';
+  const r = 14;
+  // rounded bubble with speech tail
   ctx.beginPath();
   ctx.moveTo(r, 0); ctx.lineTo(W - r, 0); ctx.quadraticCurveTo(W, 0, W, r);
   ctx.lineTo(W, H - r); ctx.quadraticCurveTo(W, H, W - r, H);
-  ctx.lineTo(W / 2 + 10, H); ctx.lineTo(W / 2, H + 9); ctx.lineTo(W / 2 - 10, H);
+  ctx.lineTo(W / 2 + 10, H); ctx.lineTo(W / 2, H + 10); ctx.lineTo(W / 2 - 10, H);
   ctx.lineTo(r, H); ctx.quadraticCurveTo(0, H, 0, H - r);
   ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
   ctx.closePath();
-  ctx.fillStyle = 'rgba(15,19,28,0.9)';
+  ctx.fillStyle = 'rgba(12,16,26,0.92)';
   ctx.fill();
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = color ? color + '44' : 'rgba(255,255,255,0.12)';
+  ctx.stroke();
   ctx.strokeStyle = color;
   ctx.stroke();
   ctx.textAlign = 'center';
@@ -9355,6 +10064,8 @@ function animate() {
     sys.pts.position.set(controls.target.x, controls.target.y - 8, controls.target.z);
     updateParticles(sys, dt * fxRate, animT, envWind);
   }
+  // waterfall spray particles
+  updateWaterfallSprays(dt, animT);
 
   // Placed trees: far shading + day/night light + live season crossfade
   {
