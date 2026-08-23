@@ -8579,6 +8579,18 @@ function initDemoMode() {
     }
   }, true);
 
+  // --- Remove the sleeping founding couple — only live users spawn ---
+  for (let i = cavemen.length - 1; i >= 0; i--) {
+    const c = cavemen[i];
+    if (c.founder) {
+      scene.remove(c.spr);
+      if (c.nameSpr) scene.remove(c.nameSpr);
+      if (c.outSpr) scene.remove(c.outSpr);
+      if (c.react) { scene.remove(c.react.spr); }
+      cavemen.splice(i, 1);
+    }
+  }
+
   demoState.id = 'p' + Math.random().toString(36).slice(2, 10);
   // the landing page can pass a picked human (?n=name&f=0/1&a=age&skin=..&hair=..
   // &eyes=..&cloth=..&style=..&beard=..); without it, roll a fresh random one
@@ -9192,9 +9204,7 @@ function updateDemo(dt, t) {
 
 buildBeacon();
 goHome(); // spawn on the home view, fixed height above the campfire
-if (!DEMO_MODE) {
-  spawnDefaultCamp(); // founding couple only in the full game
-}
+spawnDefaultCamp();
 initDemoMode(); // (?demo=1) multiplayer campfire chat — see the demo module above
 syncChunks(true);
 resizeGame();
