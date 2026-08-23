@@ -1749,6 +1749,12 @@ body.sheet-open #char-toggle {
   z-index: 41;
 }
 
+/* the knowledge book button sits on the assets panel's strip when the
+   panel is expanded — hide it so it never floats over the panel content */
+body.panel-open #book-toggle {
+  display: none;
+}
+
 #book-panel {
   position: fixed;
   top: 0;

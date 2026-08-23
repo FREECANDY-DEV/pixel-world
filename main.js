@@ -2611,6 +2611,11 @@ treeAtlasCanvas.height = ATLAS_CELL * ATLAS_ROWS;
 // animation frame instead of during module evaluation. Every texture and
 // panel preview that snapshots the atlas refreshes afterwards.
 let atlasBuilt = false;
+// per-kind art bounds [a0, a1, b0, b1] in atlas pixels, measured from the
+// painted summer cell. The shader samples exactly this rect, so no tree ever
+// bleeds its neighbour's pixels at the cell edges (and all four season rows
+// share the same bounds — seasons only recolour or sprinkle onto the base).
+const TREE_CELL_BOUNDS = [];
 function buildTreeAtlas() {
   const ac = treeAtlasCanvas.getContext('2d');
   KIND_ORDER.forEach((kind, col) => {
@@ -2624,6 +2629,18 @@ function buildTreeAtlas() {
     ac.restore();
     // derive the other three season rows from those exact pixels
     const summer = ac.getImageData(x0, ATLAS_CELL, ATLAS_CELL, ATLAS_CELL);
+    const sd = summer.data;
+    let a0 = ATLAS_CELL, a1 = -1, b0 = ATLAS_CELL, b1 = -1;
+    for (let y = 0; y < ATLAS_CELL; y++) {
+      for (let x = 0; x < ATLAS_CELL; x++) {
+        if (sd[(y * ATLAS_CELL + x) * 4 + 3] > 10) {
+          if (x < a0) a0 = x; if (x > a1) a1 = x;
+          if (y < b0) b0 = y; if (y > b1) b1 = y;
+        }
+      }
+    }
+    TREE_CELL_BOUNDS[col] =
+      a1 >= 0 ? [a0, a1, b0, b1] : [0, ATLAS_CELL - 1, 0, ATLAS_CELL - 1];
     const seaso = deriveSeasons(summer, TREE_KINDS[kind]);
     ac.putImageData(seaso.spring, x0, 0);
     ac.putImageData(seaso.autumn, x0, 2 * ATLAS_CELL);
@@ -2670,6 +2687,8 @@ const treeMat = new THREE.ShaderMaterial({
     uBlend: { value: 0 },
     uDay: { value: 1 },
     uDusk: { value: 0 },
+    uInvW: { value: 1 / (ATLAS_CELL * ATLAS_COLS) },
+    uInvH: { value: 1 / (ATLAS_CELL * ATLAS_ROWS) },
   },
   vertexShader: `
     attribute vec3 iPos;
@@ -2677,7 +2696,11 @@ const treeMat = new THREE.ShaderMaterial({
     attribute float iH;
     attribute float iPhase;
     attribute float aLift;
+    attribute vec2 aU;   // art x-bounds [a0, a1] in atlas pixels
+    attribute vec2 aV;   // art y-bounds [b0, b1] in atlas pixels
     varying float vU;
+    varying vec2 vAU;
+    varying vec2 vAV;
     varying vec2 vQuad;
     varying float vDist;
     varying float vWorldY;
@@ -2700,6 +2723,8 @@ const treeMat = new THREE.ShaderMaterial({
     }
     void main() {
       vU = iU;
+      vAU = aU;
+      vAV = aV;
       vQuad = position.xy;
       // regional wind field: every part of the map drifts with its own
       // direction and strength on top of the global weather wind
@@ -2778,7 +2803,11 @@ const treeMat = new THREE.ShaderMaterial({
     uniform float uShadeFar;
     uniform float uSnow;
     uniform float uParched;
+    uniform float uInvW;   // 1 / atlas width in pixels
+    uniform float uInvH;   // 1 / atlas height in pixels
     varying float vU;
+    varying vec2 vAU;
+    varying vec2 vAV;
     varying vec2 vQuad;
     varying float vDist;
     varying float vWorldY;
@@ -2789,11 +2818,18 @@ const treeMat = new THREE.ShaderMaterial({
     uniform float uDusk;
     void main() {
       // seasonal crossfade: sample the current season row and the next one,
-      // blend by the same smooth weight the sky/terrain use
+      // blend by the same smooth weight the sky/terrain use. The quad maps
+      // exactly onto this species' painted art rect, so the billboard shows
+      // the tree and only the tree — never its neighbour's edge pixels.
       float ra = uSeasonA / 4.0;
       float rb = uSeasonB / 4.0;
-      vec2 uvA = vec2(vU + (vQuad.x + 0.5) * 0.05, ra + vQuad.y * 0.25);
-      vec2 uvB = vec2(vU + (vQuad.x + 0.5) * 0.05, rb + vQuad.y * 0.25);
+      vec2 ab = vAU;
+      vec2 cd = vAV;
+      float ux = vU + (ab.x + 0.5) * uInvW + (vQuad.x + 0.5) * (ab.y - ab.x) * uInvW;
+      float uyA = ra + (cd.x + 0.5) * uInvH + vQuad.y * (cd.y - cd.x) * uInvH;
+      float uyB = rb + (cd.x + 0.5) * uInvH + vQuad.y * (cd.y - cd.x) * uInvH;
+      vec2 uvA = vec2(ux, uyA);
+      vec2 uvB = vec2(ux, uyB);
       vec4 col = mix(texture2D(uTex, uvA), texture2D(uTex, uvB), uBlend);
       if (col.a < 0.5) discard;
       // snow settles on the upper canopy; drought browns the whole tree
@@ -2907,6 +2943,8 @@ function buildChunkTrees(cx, cz, lod = 0) {
   const iPhase = new Float32Array(n);
   const iCol = new Float32Array(n); // species index for the far-zoom icons
   const iLift = new Float32Array(n); // bushes/rocks hug the ground: lift them
+  const aU = new Float32Array(n * 2); // art x-bounds per instance (atlas px)
+  const aV = new Float32Array(n * 2); // art y-bounds per instance (atlas px)
   const cols = [];
   let maxY = SEA_LEVEL;
   for (let i = 0; i < n; i++) {
@@ -2920,6 +2958,9 @@ function buildChunkTrees(cx, cz, lod = 0) {
     iLift[i] = TREE_KINDS[tr.kind].type === 'tree' ? 0 : 1;
     iH[i] = TREE_KINDS[tr.kind].h * tr.scale;
     iPhase[i] = hash3(tr.x, 4, tr.z, SEED + 914) * Math.PI * 2;
+    const b = TREE_CELL_BOUNDS[iCol[i]] || [0, ATLAS_CELL - 1, 0, ATLAS_CELL - 1];
+    aU[i * 2] = b[0]; aU[i * 2 + 1] = b[1];
+    aV[i * 2] = b[2]; aV[i * 2 + 1] = b[3];
     maxY = Math.max(maxY, gy + iH[i]);
     cols.push({ x: tr.x, z: tr.z, r: TREE_KINDS[tr.kind].r * tr.scale });
   }
@@ -2937,6 +2978,8 @@ function buildChunkTrees(cx, cz, lod = 0) {
   g.setAttribute('iH', new THREE.InstancedBufferAttribute(iH, 1));
   g.setAttribute('iPhase', new THREE.InstancedBufferAttribute(iPhase, 1));
   g.setAttribute('aLift', new THREE.InstancedBufferAttribute(iLift, 1));
+  g.setAttribute('aU', new THREE.InstancedBufferAttribute(aU, 2));
+  g.setAttribute('aV', new THREE.InstancedBufferAttribute(aV, 2));
   g.setIndex([0, 1, 2, 2, 1, 3]);
   g.instanceCount = n;
   g.boundingSphere = new THREE.Sphere(
@@ -3078,8 +3121,17 @@ function spawnPlacedTree(kind, x, z, scaleMul = 1) {
   const mk = (row) => {
     const pt = treeAtlasTex.clone();
     pt.needsUpdate = true;
-    pt.repeat.set(COL_FRAC, ROW_FRAC);
-    pt.offset.set(KIND_COL[kind], row * ROW_FRAC);
+    // sample exactly this species' painted art rect: no neighbour-cell bleed
+    // at the sprite edges, and placed trees match the wild ones pixel for pixel
+    const b = TREE_CELL_BOUNDS[KIND_ORDER.indexOf(kind)] || [0, ATLAS_CELL - 1, 0, ATLAS_CELL - 1];
+    pt.repeat.set(
+      (b[1] - b[0] + 1) / (ATLAS_CELL * ATLAS_COLS),
+      (b[3] - b[2] + 1) / (ATLAS_CELL * ATLAS_ROWS)
+    );
+    pt.offset.set(
+      (KIND_COL[kind] * ATLAS_CELL * ATLAS_COLS + b[0]) / (ATLAS_CELL * ATLAS_COLS),
+      (row * ATLAS_CELL + b[2]) / (ATLAS_CELL * ATLAS_ROWS)
+    );
     const spr = new THREE.Sprite(
       new THREE.SpriteMaterial({
         map: pt,
@@ -3400,6 +3452,8 @@ const ICON_MAT = new THREE.ShaderMaterial({
     uTex: { value: null },
     uCell: { value: 1 / ICON_COLS },
     uPx: { value: Math.min(window.devicePixelRatio || 1, 2) },
+    uInvW: { value: 1 / (ICON_CELL * ICON_COLS) }, // 1 / atlas width in px
+    uInvH: { value: 1 / ICON_CELL },               // 1 / atlas height in px
     uDay: { value: 1 },
   },
   vertexShader: `
@@ -3413,7 +3467,7 @@ const ICON_MAT = new THREE.ShaderMaterial({
       // depth bias: pull the marker toward the camera so the block it
       // stands on (and the grove it marks) can never swallow it at
       // grazing angles; sizing still uses the true distance
-      mv.z -= min(d * 0.06, 30.0);
+      mv.z -= min(d * 0.085, 40.0);
       mv.z = min(mv.z, -0.5);
       gl_PointSize = clamp(430.0 / d, 44.0, 110.0) * uPx;
       gl_Position = projectionMatrix * mv;
@@ -3422,10 +3476,18 @@ const ICON_MAT = new THREE.ShaderMaterial({
   fragmentShader: `
     uniform sampler2D uTex;
     uniform float uCell;
+    uniform float uInvW;
+    uniform float uInvH;
     uniform float uDay;
     varying float vCol;
     void main() {
-      vec2 uv = vec2(vCol * uCell + gl_PointCoord.x * uCell, 1.0 - gl_PointCoord.y);
+      // inset by half a texel so the marker samples its own chip's pixels
+      // only — the exact boundary texels can otherwise bleed the neighbour
+      // tree's art into this one's edges
+      vec2 uv = vec2(
+        vCol * uCell + (0.5 + gl_PointCoord.x * (48.0 - 1.0)) * uInvW,
+        1.0 - (0.5 + gl_PointCoord.y * (48.0 - 1.0)) * uInvH
+      );
       vec4 c = texture2D(uTex, uv);
       if (c.a < 0.35) discard;
       c.rgb *= mix(vec3(0.45, 0.50, 0.68), vec3(1.0), uDay);
@@ -3702,6 +3764,9 @@ function makeIconSprite(col) {
     map: atlasIconTexture(col),
     transparent: true,
     depthWrite: false,
+    // the map is an overview: a marker must never be swallowed by the block
+    // (or ridge) it stands on, so it renders on top of the terrain it marks
+    depthTest: false,
   }));
   s.center.set(0.5, 0);
   s.visible = false;
@@ -3813,7 +3878,10 @@ function syncDetailIcons() {
   for (const s of placedTrees) {
     const ic = ensurePlacedIcon(s);
     if (!ic) continue;
+    // float the marker just above the tree it marks — same convention as the
+    // clustered wild-tree markers — so the block below can never hide it
     ic.position.copy(s.sprA.position);
+    ic.position.y += s.sprA.scale.y + 1.6;
     ic.scale.setScalar(markerScale(camera.position.distanceTo(ic.position)));
     ic.scale.z = 1;
     ic.visible = true;
@@ -3821,7 +3889,7 @@ function syncDetailIcons() {
   const fi = ensureHomeFireIcon();
   if (fi && homeFire) {
     fi.position.copy(homeFire.position);
-    fi.position.y += 0.2;
+    fi.position.y += 0.9;
     const sc = fireIconScale(camera.position.distanceTo(fi.position));
     fi.scale.set(sc, sc, 1);
     fi.visible = true;
@@ -3834,7 +3902,7 @@ function syncDetailIcons() {
       extraFireIcons.set(f, ic);
     }
     ic.position.copy(f.position);
-    ic.position.y += 0.2;
+    ic.position.y += 0.9;
     const sc = fireIconScale(camera.position.distanceTo(ic.position));
     ic.scale.set(sc, sc, 1);
     ic.visible = true;
@@ -3843,6 +3911,7 @@ function syncDetailIcons() {
     const ic = ensureCmIcon(cm);
     if (!ic) continue;
     ic.position.copy(cm.spr.position);
+    ic.position.y += 1.7; // float above the head: never hidden by their block
     const sc = markerScale(camera.position.distanceTo(ic.position)) * 0.55;
     ic.scale.set(sc, sc, 1);
     ic.visible = true;
@@ -8585,7 +8654,7 @@ window.__DBG = {
   rebuildIconAtlas: () => { buildTreeAtlas(); buildIconAtlas(); return iconAtlasCanvas; },
   fishShaderSrc: () => fishMat.vertexShader,
   state: () => ({ iconMode, spaceMode, fishVisDist: FISH_VIS_DIST }),
-  version: 22,
+  version: 23,
   selectCaveman: (cm) => selectCaveman(cm),
   action: (on) => setActionMode(on),
   move: (x, z) => commandMoveTo(x, z),
