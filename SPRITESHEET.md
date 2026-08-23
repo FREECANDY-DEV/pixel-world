@@ -71,9 +71,14 @@ The sea's cast of six, each 32×32 px with a two-frame swim cycle.
 - `DoubleSide` billboards so they're visible from above *and* below the surface.
 - **Distance-culled**: schools farther than 320 units from the camera aren't drawn.
 
-The two-frame swim cycle in action — a clownfish, frame-for-frame from `paintFish`:
+The two-frame swim cycle in action — a clownfish doing the exact tail flap the
+shader flips, plus the swell bob, frame-for-frame from `paintFish`:
 
 ![Clownfish swim cycle](docs/assets/fish-swim.gif)
+
+…and the whole cast flapping in sync:
+
+![All six fish species](docs/assets/fish-school.gif)
 
 | Art | Cell | Species | Body | Belly | Fin | Stripe |
 |-----|------|---------|------|-------|-----|--------|

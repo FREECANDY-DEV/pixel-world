@@ -1,25 +1,28 @@
 <div align="center">
 
-<img src="docs/assets/campfire-flicker.gif" alt="The campfire" width="110">
+<img src="docs/assets/campfire-flicker.gif" alt="The campfire, flickering" width="110">
 
-# Pixel World
+# ⛰️ Pixel World
 
 ### An infinite caveman world that paints its own art.
 
 **Every sprite you see is drawn by code at runtime** — there is not a single
-image file in this game. One seed grows an endless world of deserts, jungles,
+image file inside the game. One seed grows an endless world of deserts, jungles,
 forests and snow; a little tribe sleeps by the fire until you strike it — then
 wakes, explores, discovers fire, and lives through a full day-night cycle.
 A game year is 365 days in four ~91-day seasons, ticking 60× faster than
 real time.
 
+| 🌱 1 seed | 🌳 25 species | 🐟 6 fish | 📅 365-day year | 🧵 0 image files | ⚡ 60× time |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Vanilla JS](https://img.shields.io/badge/vanilla-JS-f7df1e?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![three.js](https://img.shields.io/badge/three.js-049EF4?logo=threedotjs&logoColor=white)](https://threejs.org)
-[![Build step](https://img.shields.io/badge/build%20step-none-success)](#quick-start)
+[![No build step](https://img.shields.io/badge/build%20step-none-success)](#quick-start)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-<img src="docs/assets/hero-sprites.png" alt="Birch, oak and pine trees, the campfire and a clownfish — all painted by code" width="600">
+<img src="docs/assets/hero-sprites.png" alt="Birch, oak and pine trees, the campfire and a clownfish — all painted by code" width="620">
 
 *Left to right: birch, oak, pine, the campfire, and a clownfish — every pixel placed by `fillRect`.*
 
@@ -68,9 +71,12 @@ npx serve .                     # or Node via npx
 
 On phone? There's a joystick and touch buttons built in.
 
+---
+
 ## ✨ Features
 
 ### 🏔️ A world that generates itself
+
 - **Four biomes** — desert, jungle, forest and snow — plus beaches, a living
   sea and caves, all grown from one seed via layered noise
 - **25 plant & rock species**, each with its own painter: oaks, pines, birch,
@@ -83,7 +89,20 @@ On phone? There's a joystick and touch buttons built in.
 - **Weather that bites**: clear skies, rain, storms (with lightning strikes),
   snowfall and dust storms, each with its own wind, fog, dimming and stars
 
+<div align="center">
+
+*Eight species through a full year — the same two atlas rows the shader blends, at the same weight:*
+
+<img src="docs/assets/seasons-forest.gif" alt="Oak, pine, birch, maple, apple, berry, snow pine and blossom bush through all four seasons" width="480">
+
+*A few of the 25 painters — every species in the game:*
+
+<img src="docs/assets/tree-oak.png" alt="Oak" width="88">&nbsp;<img src="docs/assets/tree-pine.png" alt="Pine" width="76">&nbsp;<img src="docs/assets/tree-maple.png" alt="Maple" width="84">&nbsp;<img src="docs/assets/tree-jungle.png" alt="Jungle tree" width="84">&nbsp;<img src="docs/assets/tree-cactus.png" alt="Cactus" width="46">
+
+</div>
+
 ### 🌗 A rhythm of day, night and sleep
+
 - Sun and moon discs cross the sky, stars come out, dusk tints everything
 - **Daily energy**: every villager has a battery (0–100) that drains while
   awake. At zero they collapse dramatically, sleep it off, and wake at dawn —
@@ -91,7 +110,20 @@ On phone? There's a joystick and touch buttons built in.
 - Game time runs **60× faster than real life**, so you can watch a whole
   day-night cycle (and seasons turn over) in minutes
 
+<div align="center">
+
+*The sky pill through 24 hours — sunrise, noon, dusk, stars, moonrise:*
+
+<img src="docs/assets/day-night-sky.gif" alt="The sky pill through a full day-night cycle" width="140">
+
+*Out of energy? Collapse, curl up, and let the ZZZs rise:*
+
+<img src="docs/assets/villager-sleep.gif" alt="A villager who ran out of energy, asleep with rising ZZZ" width="150">
+
+</div>
+
 ### 👥 A tribe with a mind of its own
+
 - **No two villagers alike** — skin, hair, eyes, style and beard are rolled
   per person, they age through life stages, and an anatomy view shows off
   their stats
@@ -107,7 +139,22 @@ On phone? There's a joystick and touch buttons built in.
   behind a walking leader, spread around a standing one — and hustle up to 65%
   faster when they lag so the pack never strings out
 
+<div align="center">
+
+*The spawn pool, re-rolling every 3 seconds — these are real spawnable looks:*
+
+<img src="docs/assets/villagers-animated.gif" alt="Caveman & cavewoman models — the pixel art re-rolls every 3 seconds through the spawnable variant looks" width="200">
+
+<br>
+
+*Every villager is unique — skin, hair, eyes, beard. Tap 🫀 for the anatomy view:*
+
+<img src="docs/assets/villager-face.png" alt="A villager's unique face" width="96">
+
+</div>
+
 ### 📖 The knowledge book
+
 - Strike the campfire to unlock **Fire**, command a villager to wade into the
   sea to unlock **Water** — every discovery pops a golden toast and unlocks
   permanently in the 📖 tree (saved in `localStorage`)
@@ -116,7 +163,16 @@ On phone? There's a joystick and touch buttons built in.
 - Knowledge changes behaviour: until Water is known, villagers refuse to
   wander into the wet
 
+<div align="center">
+
+*It all starts with a spark:*
+
+<img src="docs/assets/campfire-flicker.gif" alt="The campfire flickering" width="130">
+
+</div>
+
 ### 🐟 A sea that's alive
+
 - Six fish species (sardine, clownfish, blue tang, tuna and friends), each
   painted with a two-frame swim cycle
 - **v35: sparse & deep** — schools cruise fully submerged 1.8–4+ blocks down,
@@ -128,7 +184,22 @@ On phone? There's a joystick and touch buttons built in.
   water bodies, with exactly **one marker per (water body, fish species)** —
   at most six spots for a whole ocean
 
+<div align="center">
+
+*The swim cycle — tail flap plus swell bob, frame-for-frame from `paintFish`:*
+
+<img src="docs/assets/fish-swim.gif" alt="Clownfish swim cycle" width="150">
+
+<br>
+
+*The whole school, flapping in sync — all six species:*
+
+<img src="docs/assets/fish-school.gif" alt="All six fish species swimming in a row" width="440">
+
+</div>
+
 ### 🗺️ Map & camera modes
+
 - **Icon mode**: zoom out and the world turns into a map — tree clusters,
   camps, people and fish markers. **v35** makes the markers *honest*: they
   show the exact seasonal art the trees have right now (blended the same way
@@ -138,9 +209,19 @@ On phone? There's a joystick and touch buttons built in.
 - **Top view**, camera tweens that frame the camp when you strike the fire,
   and a globe popup with camp stats (births, deaths, age)
 
+<div align="center">
+
+*The seasonal atlas the map icons are cut from — spring, summer, autumn, winter rows:*
+
+<img src="docs/assets/spritesheet/tree-atlas.png" alt="The seasonal tree atlas — four rows of every species" width="560">
+
+</div>
+
+---
+
 ## 🧠 How it works
 
-Pixel World is one plain JavaScript file ([`main.js`](main.js), ~8.5k lines) on top
+Pixel World is one plain JavaScript file ([`main.js`](main.js), ~8.7k lines) on top
 of [three.js](https://threejs.org). No frameworks, no bundler — open the file and
 every system is right there, behind a banner comment:
 
@@ -184,6 +265,16 @@ A few things we're proud of:
   pass (depth-tested, but never depth-written), so sprites can't be swallowed
   by the blocks beneath them while real hills still hide things behind them
 
+<div align="center">
+
+*Two atlases, baked at load time from the painters — the tree atlas (above) and the fish atlas (below):*
+
+<img src="docs/assets/spritesheet/fish-atlas.png" alt="The fish atlas — six species, two swim poses" width="380">
+
+</div>
+
+---
+
 ## 🎨 The art — all painted by code
 
 There are no PNGs inside the game. Trees, fish, fire and faces come from tiny
@@ -195,11 +286,11 @@ The images below were rendered by re-running those exact painters headlessly —
 
 | 🌳 A few of 25 species | 🐟 A few of 6 fish |
 |:---:|:---:|
-| <img src="docs/assets/tree-oak.png" width="120">&nbsp;<img src="docs/assets/tree-pine.png" width="100">&nbsp;<img src="docs/assets/tree-maple.png" width="115">&nbsp;<img src="docs/assets/tree-jungle.png" width="115">&nbsp;<img src="docs/assets/tree-cactus.png" width="60"> | <img src="docs/assets/fish-clownfish.png" width="95">&nbsp;<img src="docs/assets/fish-blue-tang.png" width="95">&nbsp;<img src="docs/assets/fish-tuna.png" width="95"> |
+| <img src="docs/assets/tree-oak.png" width="120">&nbsp;<img src="docs/assets/tree-pine.png" width="100">&nbsp;<img src="docs/assets/tree-maple.png" width="115">&nbsp;<img src="docs/assets/tree-jungle.png" width="115">&nbsp;<img src="docs/assets/tree-cactus.png" width="60"> | <img src="docs/assets/fish-clownfish.png" width="110">&nbsp;<img src="docs/assets/fish-blue-tang.png" width="110">&nbsp;<img src="docs/assets/fish-tuna.png" width="110"> |
 
 | 🔥 The campfire | 😀 A villager's face — everyone's is unique |
 |:---:|:---:|
-| <img src="docs/assets/campfire.png" width="90"> | <img src="docs/assets/villager-face.png" width="72"> |
+| <img src="docs/assets/campfire.png" width="120"> | <img src="docs/assets/villager-face.png" width="110"> |
 
 </div>
 
@@ -212,11 +303,11 @@ frames the game renders, live from the painters:
 
 | 🌳 A year in the forest | 🌗 A day & night | 👫 Villager variants |
 |:---:|:---:|:---:|
-| <img src="docs/assets/seasons-forest.gif" alt="Eight species through a full year — spring blossoms, summer green, autumn gold, winter snow" width="380"> | <img src="docs/assets/day-night-sky.gif" alt="The sky pill through a full day-night cycle" width="96"> | <img src="docs/assets/villagers-animated.gif" alt="Caveman & cavewoman models — the pixel art re-rolls every 3 seconds through the spawnable variant looks" width="150"> |
+| <img src="docs/assets/seasons-forest.gif" alt="Eight species through a full year" width="380"> | <img src="docs/assets/day-night-sky.gif" alt="The sky pill through a full day-night cycle" width="120"> | <img src="docs/assets/villagers-animated.gif" alt="Villager variant looks, re-rolling every 3 seconds" width="170"> |
 
-| 😴 Sleep it off | 🐟 Swim cycle |
-|:---:|:---:|
-| <img src="docs/assets/villager-sleep.gif" alt="A villager who ran out of energy, asleep with rising ZZZ" width="120"> | <img src="docs/assets/fish-swim.gif" alt="Clownfish swim cycle, frame-for-frame from the code" width="150"> |
+| 🐟 Swim cycle | 🐠 The whole school | 😴 Sleep it off |
+|:---:|:---:|:---:|
+| <img src="docs/assets/fish-swim.gif" alt="Clownfish swim cycle" width="150"> | <img src="docs/assets/fish-school.gif" alt="All six fish species" width="360"> | <img src="docs/assets/villager-sleep.gif" alt="A sleeping villager with rising ZZZ" width="130"> |
 
 </div>
 
@@ -227,10 +318,14 @@ frames the game renders, live from the painters:
   stars, moonrise
 - **Villager variants** — every 3 seconds a different look from the spawn
   pool: hairstyles, beards, skin, clothes
+- **Swim cycle & school** — the two-pose tail flap the shader flips between,
+  plus the swell bob, for every one of the six species
 - **Sleep it off** — collapse at zero energy, curl up, and let the ZZZs rise
 
 Want the full catalog of all 25 plant and rock species?
 [`SPRITESHEET.md`](SPRITESHEET.md) documents every painter.
+
+---
 
 ## 🧪 Testing
 
@@ -253,6 +348,8 @@ __DBG.fishIconLayer      // the global (per water-body) fish marker layer
 catches everything else. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for a
 copy-paste test harness.
 
+---
+
 ## 🤝 Contributing
 
 **First time contributing? You're exactly who we made this for.**
@@ -265,6 +362,8 @@ learn on. Good starter missions:
 
 Everything you need is in [`CONTRIBUTING.md`](CONTRIBUTING.md) — setup,
 ground rules, a test template and the species recipe.
+
+---
 
 ## 🗺️ Roadmap
 

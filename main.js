@@ -8439,7 +8439,7 @@ window.__DBG = {
   rebuildIconAtlas: () => { buildTreeAtlas(); buildIconAtlas(); return iconAtlasCanvas; },
   fishShaderSrc: () => fishMat.vertexShader,
   state: () => ({ iconMode, spaceMode, fishVisDist: FISH_VIS_DIST }),
-  version: 20,
+  version: 21,
   selectCaveman: (cm) => selectCaveman(cm),
   action: (on) => setActionMode(on),
   move: (x, z) => commandMoveTo(x, z),
@@ -8696,6 +8696,68 @@ window.__DBG = {
       g.imageSmoothingEnabled = false;
       g.drawImage(document.getElementById('celestial-icon'), 0, 0, 96, 96);
       out.push(cv.toDataURL());
+    }
+    return JSON.stringify(out);
+  },
+  // fish swim frames for the docs: 'swim' is a tight-cropped clownfish doing
+  // the exact two-pose tail flap the shader flips, plus a swell bob; 'school'
+  // is all six species in a row, flapping in sync — both straight from the
+  // same paintFish the atlas uses
+  captureFishFrames: (mode) => {
+    const cell = document.createElement('canvas');
+    cell.width = 32; cell.height = 32;
+    const cg = cell.getContext('2d');
+    const bboxOf = (k, oy) => {
+      cg.clearRect(0, 0, 32, 32);
+      paintFish(cg, 2, oy, k, false);
+      const d = cg.getImageData(0, 0, 32, 32).data;
+      let x0 = 32, y0 = 32, x1 = 0, y1 = 0;
+      for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+        if (d[(y * 32 + x) * 4 + 3] > 10) {
+          if (x < x0) x0 = x; if (x > x1) x1 = x;
+          if (y < y0) y0 = y; if (y > y1) y1 = y;
+        }
+      }
+      return [x0, y0, x1, y1];
+    };
+    const paint = (k, frameB, oy) => {
+      cg.clearRect(0, 0, 32, 32);
+      paintFish(cg, 2, oy, k, frameB);
+      return cell;
+    };
+    const toDataUrl = (cv) => cv.toDataURL();
+    if (mode === 'swim') {
+      // clownfish: tail left → tail right (+1px bob) → tail left
+      const k = FISH_KINDS[1];
+      const [x0, y0, x1, y1] = bboxOf(k, 0);
+      const S = 4, PAD = 5;
+      const w = (x1 - x0 + 1 + PAD * 2) * S;
+      const h = (y1 - y0 + 1 + PAD * 2) * S;
+      const out = [];
+      for (const [frameB, dy] of [[false, 0], [true, 1], [false, 0]]) {
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        const g = cv.getContext('2d');
+        g.imageSmoothingEnabled = false;
+        g.drawImage(paint(k, frameB, dy), x0, y0, x1 - x0 + 1, y1 - y0 + 1, PAD * S, PAD * S, (x1 - x0 + 1) * S, (y1 - y0 + 1) * S);
+        out.push(toDataUrl(cv));
+      }
+      return JSON.stringify(out);
+    }
+    // school: all six species in uniform cells, two poses in sync
+    const S = 3, GAP = 8;
+    const CELL = 32 * S;
+    const out = [];
+    for (const frameB of [false, true]) {
+      const cv = document.createElement('canvas');
+      cv.width = FISH_KINDS.length * CELL + (FISH_KINDS.length - 1) * GAP;
+      cv.height = CELL;
+      const g = cv.getContext('2d');
+      g.imageSmoothingEnabled = false;
+      FISH_KINDS.forEach((k, i) => {
+        g.drawImage(paint(k, frameB, 0), 0, 0, 32, 32, i * (CELL + GAP), 0, CELL, CELL);
+      });
+      out.push(toDataUrl(cv));
     }
     return JSON.stringify(out);
   },
