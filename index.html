@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Infinite Pixel World</title>
+    <script>
+    // GitHub Pages serves index.html at root — redirect to the landing page.
+    // On the Cloudflare tunnel, server.js maps / to demo.html so this never fires.
+    if (location.hostname.includes('github.io') && !location.search.includes('demo=1')) {
+      location.replace('demo.html');
+    }
+    </script>
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="style.css" />
   <script type="importmap">

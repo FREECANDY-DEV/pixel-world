@@ -20,7 +20,7 @@ const MIME = {
 
 http.createServer((req, res) => {
   let urlPath = decodeURIComponent(req.url.split('?')[0]);
-  if (urlPath === '/') urlPath = '/index.html';
+  if (urlPath === '/') urlPath = '/demo.html';
   const file = path.normalize(path.join(ROOT, urlPath));
   if (!file.startsWith(ROOT)) {
     res.writeHead(403);
