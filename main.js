@@ -1597,7 +1597,8 @@ function tryApplyChunk(cx, cz, lod, seed, data) {
   geo.setAttribute('normal', new THREE.BufferAttribute(data.normals, 3));
   geo.setAttribute('color', new THREE.BufferAttribute(data.colors, 3));
   if (data.uvs) geo.setAttribute('uv', new THREE.BufferAttribute(data.uvs, 2));
-  if (data.aos) geo.setAttribute('ao', new THREE.BufferAttribute(data.aos, 1));
+  const aoArr = (data.aos && data.aos.length) ? data.aos : new Float32Array(data.positions.length / 3).fill(1);
+  geo.setAttribute('ao', new THREE.BufferAttribute(aoArr, 1));
   geo.setIndex(new THREE.BufferAttribute(data.indices, 1));
   geo.computeBoundingSphere();
 
