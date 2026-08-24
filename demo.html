@@ -6,289 +6,228 @@
   <title>Pixel World — Live Demo</title>
   <link rel="icon" href="data:,?" />
   <style>
-    :root {
-      --gold: #ffd23f;
-      --bg-deep: #060a10;
-      --bg-card: rgba(255,255,255,0.04);
-      --border: rgba(255,255,255,0.08);
-      --text: #dce4ee;
-      --muted: #7a8fa6;
-    }
+    :root { --gold: #ffd23f; --bg: #060a10; --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08); --text: #dce4ee; --muted: #7a8fa6; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      height: 100%;
-      background: var(--bg-deep);
-      color: var(--text);
+    html, body { height: 100%; background: var(--bg); color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100dvh;
-      padding: 0 16px;
-    }
+      -webkit-font-smoothing: antialiased; overflow: hidden; }
+    body { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-    /* ── Header ───────────────────────────────────── */
-    .hero {
-      width: 100%; max-width: 600px;
-      text-align: center;
-      padding: 48px 0 0;
+    /* ── Globe canvas ─────────────────────────────── */
+    #globe-wrap { position: relative; width: 200px; height: 200px; flex-shrink: 0; margin-bottom: 20px; }
+    #globe-canvas { width: 200px; height: 200px; border-radius: 50%; display: block;
+      box-shadow: 0 0 50px 8px rgba(90,170,90,0.18), 0 0 120px 30px rgba(30,90,160,0.1);
     }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,210,63,0.08);
-      border: 1px solid rgba(255,210,63,0.2);
-      border-radius: 999px;
-      padding: 6px 16px;
-      font-size: 12px; font-weight: 600;
-      color: var(--gold);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 24px;
-    }
-    .hero-badge .dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: #58d95e;
-      box-shadow: 0 0 6px rgba(88,217,94,0.6);
-    }
-    .hero h1 {
-      font-size: clamp(28px, 6vw, 44px);
-      font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-    }
-    .hero h1 span { color: var(--gold); }
-    .hero p {
-      font-size: clamp(14px, 3vw, 17px);
-      color: var(--muted);
-      line-height: 1.6;
-      max-width: 440px;
-      margin: 0 auto 32px;
-    }
-
-    /* ── Globe visual ──────────────────────────────── */
-    .globe-wrap {
-      position: relative;
-      width: 200px; height: 200px;
-      margin: 0 auto 36px;
-      flex-shrink: 0;
-    }
-    .globe {
-      width: 200px; height: 200px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 35% 32%, rgba(255,255,255,0.15), transparent 50%),
-        radial-gradient(circle at 55% 65%, #1a4a7e 0%, #2a6a9e 35%, #3a8d3a 55%, #5aad5a 70%, #8fcf8a 100%);
-      box-shadow:
-        0 0 0 2px rgba(255,255,255,0.06),
-        0 0 60px 10px rgba(90,170,90,0.15),
-        inset 0 -20px 40px rgba(0,0,0,0.3);
-      animation: globe-breathe 6s ease-in-out infinite;
-    }
-    @keyframes globe-breathe {
-      0%, 100% { box-shadow: 0 0 0 2px rgba(255,255,255,0.06), 0 0 60px 10px rgba(90,170,90,0.15), inset 0 -20px 40px rgba(0,0,0,0.3); }
-      50%      { box-shadow: 0 0 0 2px rgba(255,255,255,0.08), 0 0 80px 20px rgba(90,170,90,0.22), inset 0 -20px 40px rgba(0,0,0,0.3); }
-    }
-    /* continent patches */
-    .globe::before {
-      content: '';
-      position: absolute; inset: 0;
-      border-radius: 50%;
-      background:
-        radial-gradient(ellipse 50px 35px at 30% 38%, rgba(100,180,100,0.35), transparent),
-        radial-gradient(ellipse 40px 28px at 62% 52%, rgba(80,160,80,0.3), transparent),
-        radial-gradient(ellipse 25px 20px at 45% 68%, rgba(120,190,110,0.25), transparent);
-    }
-
-    /* player counter inside globe */
     .globe-stat {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      z-index: 2;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      text-align: center; pointer-events: none; z-index: 2;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.7);
     }
-    .globe-stat .num {
-      font-size: 42px; font-weight: 800;
-      color: #fff;
-      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
-      line-height: 1;
-    }
-    .globe-stat .label {
-      font-size: 11px; font-weight: 600;
-      color: rgba(255,255,255,0.7);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-top: 2px;
-    }
+    .globe-stat .num { font-size: 36px; font-weight: 800; color: #fff; line-height: 1; }
+    .globe-stat .label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.6);
+      text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+
+    /* ── Title ────────────────────────────────────── */
+    .title { text-align: center; margin-bottom: 16px; flex-shrink: 0; }
+    .title h1 { font-size: clamp(22px, 5vw, 32px); font-weight: 800; letter-spacing: -0.02em; }
+    .title h1 span { color: var(--gold); }
+    .title p { font-size: clamp(12px, 2.5vw, 14px); color: var(--muted); margin-top: 4px; }
 
     /* ── Spawn card ────────────────────────────────── */
     .spawn-card {
-      width: 100%; max-width: 400px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 20px;
+      width: 100%; max-width: 340px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px 18px;
+      flex-shrink: 0; margin-bottom: 12px;
     }
-    .human-row {
-      display: flex; align-items: center; gap: 16px;
-      margin-bottom: 20px;
-    }
+    .human-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
     #human {
-      width: 64px; height: 74px;
-      image-rendering: pixelated;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,224,138,0.35);
-      border-radius: 8px;
-      flex-shrink: 0;
+      width: 52px; height: 60px; image-rendering: pixelated;
+      background: rgba(0,0,0,0.3); border: 1px solid rgba(255,224,138,0.3);
+      border-radius: 6px; flex-shrink: 0;
     }
-    .human-info .name {
-      font-size: 20px; font-weight: 700;
-      color: var(--gold);
-    }
-    .human-info .desc {
-      font-size: 13px; color: var(--muted);
-      margin-top: 2px;
-    }
-    .spawn-actions {
-      display: flex; gap: 10px;
-    }
+    .human-info .name { font-size: 18px; font-weight: 700; color: var(--gold); }
+    .human-info .desc { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .spawn-actions { display: flex; gap: 8px; }
     .btn-enter {
-      flex: 1;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 14px 20px;
-      border: none; border-radius: 12px;
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 12px 16px; border: none; border-radius: 10px;
       background: linear-gradient(135deg, var(--gold), #f0a63c);
-      color: #1a1205;
-      font: 700 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      cursor: pointer;
-      transition: transform 0.1s, box-shadow 0.15s;
-      box-shadow: 0 4px 20px rgba(255,180,60,0.3);
+      color: #1a1205; font: 700 14px -apple-system, BlinkMacSystemFont, sans-serif;
+      cursor: pointer; transition: transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 4px 16px rgba(255,180,60,0.3);
     }
-    .btn-enter:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(255,180,60,0.45); }
-    .btn-enter:active { transform: scale(0.98); }
+    .btn-enter:hover { transform: translateY(-1px); }
+    .btn-enter:active { transform: scale(0.97); }
     .btn-reroll {
-      padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--bg-card);
-      color: var(--text);
-      font: 600 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      cursor: pointer;
-      transition: background 0.15s;
+      padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px;
+      background: var(--card); color: var(--text);
+      font: 600 13px -apple-system, BlinkMacSystemFont, sans-serif;
+      cursor: pointer; transition: background 0.15s;
     }
     .btn-reroll:hover { background: rgba(255,255,255,0.08); }
-    .btn-reroll:active { transform: scale(0.97); }
 
     /* ── Feature pills ─────────────────────────────── */
     .features {
-      display: flex; flex-wrap: wrap;
-      justify-content: center; gap: 8px;
-      width: 100%; max-width: 500px;
-      margin-bottom: 24px;
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+      max-width: 420px; margin-bottom: 12px; flex-shrink: 0;
     }
     .pill {
-      display: flex; align-items: center; gap: 6px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 13px; color: var(--muted);
+      display: flex; align-items: center; gap: 5px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 10px;
+      font-size: 11px; color: var(--muted);
     }
-    .pill .ico { font-size: 16px; }
 
-    /* ── Footer note ──────────────────────────────── */
-    .footer-note {
-      font-size: 12px;
-      color: rgba(122,143,166,0.6);
-      text-align: center;
-      padding: 16px 0 32px;
-      max-width: 400px;
-      line-height: 1.5;
-    }
-    .footer-note b { color: rgba(122,143,166,0.8); }
+    /* ── Footer ────────────────────────────────────── */
+    .footer { font-size: 10px; color: rgba(122,143,166,0.5); text-align: center; flex-shrink: 0; }
 
     /* ── Loading overlay ───────────────────────────── */
     #loading-overlay {
-      position: fixed; inset: 0; z-index: 999;
-      background: var(--bg-deep);
-      display: none; flex-direction: column;
-      align-items: center; justify-content: center; gap: 16px;
-      transition: opacity 0.4s ease;
+      position: fixed; inset: 0; z-index: 999; background: var(--bg);
+      display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
     }
     #loading-overlay.show { display: flex; }
     .loader-ring {
-      width: 44px; height: 44px;
-      border: 3px solid rgba(255,210,63,0.15);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      width: 40px; height: 40px; border: 3px solid rgba(255,210,63,0.15);
+      border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loader-text { color: var(--muted); font-size: 14px; }
-
-    /* ── Body fade-out on spawn ────────────────────── */
+    .loader-text { color: var(--muted); font-size: 13px; }
     body.zooming { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
   </style>
 </head>
 <body>
-  <div id="loading-overlay">
-    <div class="loader-ring"></div>
-    <div class="loader-text">Entering the world…</div>
-  </div>
+  <div id="loading-overlay"><div class="loader-ring"></div><div class="loader-text">Entering the world…</div></div>
 
-  <div class="hero">
-    <div class="hero-badge">
-      <span class="dot"></span>
-      Live multiplayer demo
-    </div>
-    <h1><span>Pixel World</span></h1>
-    <p>A multiplayer pixel campfire. Walk, chat, and explore with other players — no sign-up required.</p>
-  </div>
-
-  <div class="globe-wrap">
-    <div class="globe"></div>
+  <div id="globe-wrap">
+    <canvas id="globe-canvas" width="400" height="400"></canvas>
     <div class="globe-stat">
       <div class="num" id="player-count">1</div>
       <div class="label">online</div>
     </div>
   </div>
 
+  <div class="title">
+    <h1><span>Pixel World</span></h1>
+    <p>Multiplayer pixel campfire · No sign-up required</p>
+  </div>
+
   <div class="spawn-card">
     <div class="human-row">
-      <canvas id="human" width="64" height="74"></canvas>
+      <canvas id="human" width="52" height="60"></canvas>
       <div class="human-info">
         <div class="name" id="human-name">Grok</div>
         <div class="desc" id="human-desc">caveman · adult</div>
       </div>
     </div>
     <div class="spawn-actions">
-      <button class="btn-reroll" id="reroll" title="Get a different human">🎲 Reroll</button>
+      <button class="btn-reroll" id="reroll">🎲</button>
       <button class="btn-enter" id="spawn">🌍 Enter the world</button>
     </div>
   </div>
 
   <div class="features">
-    <div class="pill"><span class="ico">🕹️</span> Joystick to walk</div>
-    <div class="pill"><span class="ico">💬</span> Chat to talk</div>
-    <div class="pill"><span class="ico">👆</span> Drag to look around</div>
-    <div class="pill"><span class="ico">👥</span> See other players live</div>
+    <div class="pill">🕹️ Joystick</div>
+    <div class="pill">💬 Chat</div>
+    <div class="pill">👆 Drag to look</div>
+    <div class="pill">👥 Live players</div>
   </div>
 
-  <div class="footer-note">
-    Powered by a <b>public MQTT broker</b> over WebSockets — zero accounts, zero tracking.
-    Works solo if the broker is offline.
-  </div>
+  <div class="footer">MQTT-powered · Zero accounts</div>
 
   <script>
     // ================================================================
-    // 1. Static online counter via MQTT presence
+    // 1. 3D Rotating Earth Globe (canvas 2D — lightweight, no THREE.js)
+    // ================================================================
+    (function () {
+      const cv = document.getElementById('globe-canvas');
+      const ctx = cv.getContext('2d');
+      const W = cv.width, H = cv.height, CX = W / 2, CY = H / 2, R = W * 0.42;
+      let angle = 0;
+
+      // procedural earth texture
+      const texW = 256, texH = 128;
+      const texC = document.createElement('canvas');
+      texC.width = texW; texC.height = texH;
+      const tg = texC.getContext('2d');
+      const imgData = tg.createImageData(texW, texH);
+      const px = imgData.data;
+      // simple continent noise via sine combinations
+      for (let y = 0; y < texH; y++) {
+        const lat = (y / texH - 0.5) * Math.PI;
+        for (let x = 0; x < texW; x++) {
+          const lon = (x / texW) * Math.PI * 2;
+          const nx = Math.cos(lat) * Math.cos(lon);
+          const ny = Math.sin(lat);
+          const nz = Math.cos(lat) * Math.sin(lon);
+          // multi-octave continental noise
+          const v = Math.sin(nx * 3.2 + 0.5) * Math.cos(ny * 2.8 - 0.3) * Math.sin(nz * 2.5 + 1.1)
+            + Math.sin(nx * 6.1 + ny * 4.3) * 0.3
+            + Math.cos(nz * 7.2 - nx * 2.1) * 0.2;
+          const land = v > 0.15;
+          let r, g, b;
+          if (Math.abs(lat) > 1.1) { r = 236; g = 241; b = 248; } // polar ice
+          else if (land) {
+            const elev = (v - 0.15) / 0.85;
+            if (elev > 0.65) { r = 130; g = 125; b = 115; }        // mountain
+            else { r = 55 + elev * 30; g = 120 + elev * 10; b = 48 + elev * 10; } // green
+          } else {
+            const deep = (0.15 - v) / 0.8;
+            r = 20 + deep * 10; g = 60 + deep * 20; b = 110 + deep * 30; // ocean
+          }
+          const i = (y * texW + x) * 4;
+          px[i] = r; px[i + 1] = g; px[i + 2] = b; px[i + 3] = 255;
+        }
+      }
+      tg.putImageData(imgData, 0, 0);
+
+      function draw() {
+        angle += 0.004;
+        ctx.clearRect(0, 0, W, H);
+        ctx.save();
+
+        // sphere rendering via scanline
+        for (let sy = -R; sy <= R; sy += 1.5) {
+          const sliceR = Math.sqrt(R * R - sy * sy);
+          if (sliceR < 1) continue;
+          // latitude on sphere
+          const lat = Math.asin(sy / R);
+          for (let sx = -sliceR; sx <= sliceR; sx += 1.5) {
+            const lon = Math.atan2(sx, Math.sqrt(sliceR * sliceR - sx * sx)) + angle;
+            // map to texture
+            const tx = ((lon / (Math.PI * 2)) % 1 + 1) % 1;
+            const ty = (lat / Math.PI) + 0.5;
+            // simple nearest-neighbor sampling from the texture
+            const px2 = Math.floor(tx * texW) % texW;
+            const py2 = Math.max(0, Math.min(texH - 1, Math.floor(ty * texH)));
+            const i = (py2 * texW + px2) * 4;
+            let r = px[i], g = px[i + 1], b = px[i + 2];
+            // shading: darken at sphere edges + top-light
+            const nx3 = sx / R, ny3 = sy / R, nz3 = Math.sqrt(Math.max(0, 1 - nx3 * nx3 - ny3 * ny3));
+            const light = Math.max(0.35, ny3 * -0.3 + nz3 * 0.85 + 0.15); // light from upper-right
+            r = Math.min(255, r * light); g = Math.min(255, g * light); b = Math.min(255, b * light);
+            ctx.fillStyle = `rgb(${r|0},${g|0},${b|0})`;
+            ctx.fillRect(CX + sx - 0.75, CY + sy - 0.75, 2, 2);
+          }
+        }
+
+        // atmosphere rim glow
+        const grad = ctx.createRadialGradient(CX, CY, R * 0.92, CX, CY, R * 1.08);
+        grad.addColorStop(0, 'rgba(100,180,255,0)');
+        grad.addColorStop(0.6, 'rgba(100,180,255,0.08)');
+        grad.addColorStop(1, 'rgba(100,180,255,0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(CX, CY, R * 1.08, 0, Math.PI * 2); ctx.fill();
+
+        ctx.restore();
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // ================================================================
+    // 2. Static online counter via MQTT
     // ================================================================
     (function () {
       const TOPIC = 'pixelworld/demo/v1';
@@ -296,17 +235,13 @@
       const TTL = 45000;
       const players = new Map();
       const countEl = document.getElementById('player-count');
-      function update() {
-        const n = Math.max(1, players.size);
-        countEl.textContent = n;
-      }
+      function update() { countEl.textContent = Math.max(1, players.size); }
       function sweep() {
         const now = Date.now();
         for (const [id, ts] of players) if (now - ts > TTL) players.delete(id);
         update();
       }
       setInterval(sweep, 5000);
-
       function connect(i) {
         if (i >= BROKERS.length || typeof mqtt === 'undefined') { update(); return; }
         const c = mqtt.connect(BROKERS[i], {
@@ -314,10 +249,7 @@
           connectTimeout: 8000, reconnectPeriod: 5000, keepalive: 30,
         });
         let once = false;
-        c.on('connect', () => {
-          once = true;
-          c.subscribe([TOPIC + '/presence/+', TOPIC + '/pos'], { qos: 0 }, () => update());
-        });
+        c.on('connect', () => { once = true; c.subscribe([TOPIC + '/presence/+', TOPIC + '/pos'], { qos: 0 }, () => update()); });
         c.on('message', (topic, payload) => {
           const txt = payload.toString();
           if (topic.startsWith(TOPIC + '/presence/')) {
@@ -338,50 +270,24 @@
     })();
 
     // ================================================================
-    // 2. Random human preview — same art as the game
+    // 3. Human pixel-art preview
     // ================================================================
     const CAVEMAN = [
-      '.....HHHHHH.....',
-      '....HHHHHHHH....',
-      '....HHHHHHHH....',
-      '....HSSSSSSH....',
-      '....HSESSESH....',
-      '....HSSSSSSH....',
-      '....HSHHHHSH....',
-      '.....HHHHH......',
-      '......SS........',
-      '.....SSSS.......',
-      '....SSSSSS......',
-      '...SSCCCCSS.....',
-      '...SSCCCCSS.....',
-      '...SSCCCCSS.....',
-      '....CCCCCC......',
-      '....SS..SS......',
-      '....SS..SS......',
-      '....SS..SS......',
-      '....SS..SS......',
+      '.....HHHHHH.....','....HHHHHHHH....','....HHHHHHHH....',
+      '....HSSSSSSH....','....HSESSESH....','....HSSSSSSH....',
+      '....HSHHHHSH....','.....HHHHH......','......SS........',
+      '.....SSSS.......','....SSSSSS......','...SSCCCCSS.....',
+      '...SSCCCCSS.....','...SSCCCCSS.....','....CCCCCC......',
+      '....SS..SS......','....SS..SS......','....SS..SS......','....SS..SS......',
     ];
     const CAVEMAN_PAL = { H:'#3b2b1e', S:'#c78d5a', E:'#1a1a1a', C:'#8a5a33' };
     const CAVEWOMAN = [
-      '.....HHHHHH.....',
-      '....HHHHHHHH....',
-      '....HHHHHHHH....',
-      '....HSSSSSSH....',
-      '....HSESSESH....',
-      '....HSSSSSSH....',
-      '....HSHHHHSH....',
-      '.....HHHHHH.....',
-      '....HH.SS.HH....',
-      '....HH.SS.HH....',
-      '.....SSSS.......',
-      '....SSSSSS......',
-      '..SSDDDDDDSS....',
-      '...SDDDDDDS.....',
-      '...DDDDDDDD.....',
-      '....DDDDDD......',
-      '....SS..SS......',
-      '....SS..SS......',
-      '....SS..SS......',
+      '.....HHHHHH.....','....HHHHHHHH....','....HHHHHHHH....',
+      '....HSSSSSSH....','....HSESSESH....','....HSSSSSSH....',
+      '....HSHHHHSH....','.....HHHHHH.....','....HH.SS.HH....',
+      '....HH.SS.HH....','.....SSSS.......','....SSSSSS......',
+      '..SSDDDDDDSS....','...SDDDDDDS.....','...DDDDDDDD.....',
+      '....DDDDDD......','....SS..SS......','....SS..SS......','....SS..SS......',
     ];
     const CAVEWOMAN_PAL = { H:'#5a3a22', S:'#d29a66', E:'#1a1a1a', C:'#9a6a3f', D:'#6b8f3f' };
     const M_NAMES = ['Grok','Uga','Zog','Bruk','Tonk','Ogg','Kru','Mog'];
@@ -393,12 +299,7 @@
     const EYES = ['#1a1a1a','#2e3a5e','#2e4a2e','#5e3a1e'];
 
     function mulberry32(a) {
-      return function () {
-        a |= 0; a = (a + 0x6d2b79f5) | 0;
-        let t = Math.imul(a ^ (a >>> 15), 1 | a);
-        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-      };
+      return function () { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
     }
     function pick(arr, rnd) { return arr[Math.floor(rnd() * arr.length)]; }
 
@@ -406,25 +307,18 @@
     function rollHuman() {
       const rnd = mulberry32((Math.random() * 0xffffffff) >>> 0);
       const female = Math.random() < 0.5;
-      const skin = pick(SKINS, rnd), hair = pick(HAIRS, rnd);
-      const cloth = pick(CLOTHS, rnd), eye = pick(EYES, rnd);
+      const skin = pick(SKINS, rnd), hair = pick(HAIRS, rnd), cloth = pick(CLOTHS, rnd), eye = pick(EYES, rnd);
       const dress = female ? pick(DRESSES, rnd) : null;
       const style = Math.floor(rnd() * (female ? 3 : 4));
       const beard = female ? -1 : Math.floor(rnd() * 3);
-      const names = female ? F_NAMES : M_NAMES;
-      const name = pick(names, rnd);
+      const name = pick(female ? F_NAMES : M_NAMES, rnd);
       const age = 18 + Math.floor(rnd() * 35);
-
       const base = female ? CAVEWOMAN : CAVEMAN;
       const pal = { ...(female ? CAVEWOMAN_PAL : CAVEMAN_PAL) };
       pal.S = skin; pal.H = hair; pal.E = eye;
       if (female) pal.D = dress; else pal.C = cloth;
-
-      // apply style variants
       const g = base.map(r => r.split(''));
-      const put = (r, c, ch) => {
-        if (r >= 0 && r < g.length && c >= 0 && c < g[0].length && g[r][c] === '.') g[r][c] = ch;
-      };
+      const put = (r, c, ch) => { if (r >= 0 && r < g.length && c >= 0 && c < g[0].length && g[r][c] === '.') g[r][c] = ch; };
       if (!female) {
         if (style === 1) for (let r = 1; r <= 4; r++) put(r, 12, 'H');
         if (style === 2) for (let r = 7; r <= 9; r++) { put(r, 3, 'H'); put(r, 12, 'H'); }
@@ -436,53 +330,37 @@
         if (style === 2) put(1, 12, 'D');
       }
       const art = g.map(r => r.join(''));
-
-      // draw to canvas
       const cv = document.getElementById('human');
       const ctx = cv.getContext('2d');
       ctx.imageSmoothingEnabled = false;
       ctx.clearRect(0, 0, cv.width, cv.height);
-      const cols = art[0].length, rows = art.length, s = 3;
+      const cols = art[0].length, rows = art.length, s = 2;
       const ox = Math.floor((cv.width - cols * s) / 2);
       const oy = Math.floor((cv.height - rows * s) / 2);
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          const c = pal[art[y][x]];
-          if (!c) continue;
-          ctx.fillStyle = c;
-          ctx.fillRect(ox + x * s, oy + y * s, s, s);
-        }
+      for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+        const c = pal[art[y][x]]; if (!c) continue;
+        ctx.fillStyle = c; ctx.fillRect(ox + x * s, oy + y * s, s, s);
       }
-
       document.getElementById('human-name').textContent = name;
-      document.getElementById('human-desc').textContent =
-        (female ? 'cavewoman' : 'caveman') + ' · ' + age + ' yrs';
-
-      currentLook = {
-        female, name, age, skin, hair, grey: '#c9c9c9', cloth, dress, eyes: eye, style, beard,
-      };
+      document.getElementById('human-desc').textContent = (female ? 'cavewoman' : 'caveman') + ' · ' + age + ' yrs';
+      currentLook = { female, name, age, skin, hair, grey: '#c9c9c9', cloth, dress, eyes: eye, style, beard };
     }
     document.getElementById('reroll').addEventListener('click', rollHuman);
     rollHuman();
 
     // ================================================================
-    // 3. Spawn — zoom globe, loading, navigate
+    // 4. Spawn → zoom + navigate
     // ================================================================
     document.getElementById('spawn').addEventListener('click', (e) => {
       e.preventDefault();
       const L = currentLook;
       const p = new URLSearchParams({
         demo: '1', n: L.name, f: L.female ? '1' : '0', a: String(L.age),
-        skin: L.skin, hair: L.hair, grey: L.grey,
-        cloth: L.cloth, eyes: L.eyes,
+        skin: L.skin, hair: L.hair, grey: L.grey, cloth: L.cloth, eyes: L.eyes,
         style: String(L.style), beard: String(Math.max(0, L.beard)),
       });
       if (L.dress) p.set('dress', L.dress);
-
-      // phase 1: fade out
       document.body.classList.add('zooming');
-
-      // phase 2: loading overlay, then navigate
       setTimeout(() => {
         document.getElementById('loading-overlay').classList.add('show');
         setTimeout(() => { window.location.href = 'index.html?' + p.toString(); }, 400);
