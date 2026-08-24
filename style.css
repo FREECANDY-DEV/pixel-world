@@ -3,6 +3,7 @@
   padding: 0;
   box-sizing: border-box;
 }
+.hidden { display: none !important; }
 
 :root {
   --panel-w: clamp(230px, 80vw, 280px);

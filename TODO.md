@@ -1,10 +1,18 @@
 # Pixel World — Project TODO
 
-Last updated: 2026-08-23 (v42)
+Last updated: 2026-08-24 (v43)
 
 ---
 
 ## ✅ Completed
+
+### Professional demo landing page + performance fixes (v43)
+- [x] **Professional landing page**: clean, minimal design with globe visual, static player count, feature pills
+- [x] **Removed smooth normals pre-pass**: eliminated expensive double-voxel-iteration Map in workers (was doubling chunk build time)
+- [x] **Worker error handling**: `tryApplyChunk` now handles worker error responses gracefully instead of crashing
+- [x] **Added global `.hidden` CSS rule**: `#demo-ui` was using class="hidden" with no CSS rule — now properly hides/shows
+- [x] **Mobile-responsive demo page**: fits all screen sizes, no overflow, proper viewport scaling
+- [x] **Demo mode hides ALL advanced buttons**: removed duplicate `char-panel` entry, verified complete coverage
 
 ### Anti-blocky terrain: AO, smooth normals & edge softening (v42)
 - [x] **Ambient Occlusion (AO)**: per-vertex AO calculated in `buildChunkData` by

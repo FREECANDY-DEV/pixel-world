@@ -680,32 +680,8 @@ function buildChunkData(cx, cz, seed, lod) {
     return 3 - (side1 + side2 + corner);
   };
 
-  // --- Smooth normals: accumulate face normals per vertex, then normalize ---
-  const normMap = new Map();
-  for (let lx = 0; lx < CHUNK; lx++) {
-    for (let lz = 0; lz < CHUNK; lz++) {
-      const wx = startX + lx, wz = startZ + lz;
-      const s = surfAt(wx, wz);
-      for (let wy = 1; wy <= s; wy++) {
-        if (caveCache && caveAt(wx, wy, wz)) continue;
-        for (let f = 0; f < 6; f++) {
-          const face = FACES[f];
-          if (solidAt(wx + face.n[0], wy + face.n[1], wz + face.n[2])) continue;
-          for (let k = 0; k < 4; k++) {
-            const vx = wx + face.v[k][0], vy = wy + face.v[k][1], vz = wz + face.v[k][2];
-            const key = vx + ',' + vy + ',' + vz;
-            let acc = normMap.get(key);
-            if (!acc) { acc = [0, 0, 0]; normMap.set(key, acc); }
-            acc[0] += face.n[0]; acc[1] += face.n[1]; acc[2] += face.n[2];
-          }
-        }
-      }
-    }
-  }
-  for (const [, acc] of normMap) {
-    const len = Math.sqrt(acc[0] * acc[0] + acc[1] * acc[1] + acc[2] * acc[2]);
-    if (len > 0) { acc[0] /= len; acc[1] /= len; acc[2] /= len; }
-  }
+  // Smooth normals removed — too expensive for web workers (doubles build time).
+  // AO + edge softening in the shader already provides the rounded look.
 
   const positions = [];
   const normals = [];
@@ -732,11 +708,7 @@ function buildChunkData(cx, cz, seed, lod) {
           for (let k = 0; k < 4; k++) {
             positions.push(wx + face.v[k][0], wy + face.v[k][1], wz + face.v[k][2]);
           }
-          for (let k = 0; k < 4; k++) {
-            const vx = wx + face.v[k][0], vy = wy + face.v[k][1], vz = wz + face.v[k][2];
-            const sn = normMap.get(vx + ',' + vy + ',' + vz) || face.n;
-            normals.push(sn[0], sn[1], sn[2]);
-          }
+          for (let k = 0; k < 4; k++) normals.push(face.n[0], face.n[1], face.n[2]);
           for (let k = 0; k < 4; k++) colors.push(col[0], col[1], col[2]);
           for (let k = 0; k < 4; k++) {
             uvs.push(u0 + face.uv[k][0] / BT_COLS, face.uv[k][1]);
@@ -1601,6 +1573,8 @@ function tryApplyChunk(cx, cz, lod, seed, data) {
   // release the in-flight mark unconditionally: rejected arrivals (stale,
   // out of range) must be re-requestable or they'd leave permanent holes
   requested.delete(key);
+  // Worker error responses have no geometry — log and let the chunk be retried later
+  if (data.error) { console.warn('Chunk worker error for', key, data.error); return false; }
   if (seed !== SEED) return false;
   const c = centerChunk();
   const d = chebDist(cx, cz, c);
@@ -8561,7 +8535,7 @@ function initDemoMode() {
     'vert-pad', 'globe-pop',
     'toggle-ui', 'action-btn',
     'regenerate', 'autorotate', 'topview', 'home', 'box-select',
-    'place-hint', 'roster', 'char-panel',
+    'place-hint', 'roster',
   ];
   hideIds.forEach((id) => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
 

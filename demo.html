@@ -2,349 +2,344 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pixel World — GitHub Earth · Live Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Pixel World — Live Demo</title>
   <link rel="icon" href="data:,?" />
   <style>
-    :root { color-scheme: dark; }
+    :root {
+      --gold: #ffd23f;
+      --bg-deep: #060a10;
+      --bg-card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+      --text: #dce4ee;
+      --muted: #7a8fa6;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { height: 100%; }
+    html, body {
+      height: 100%;
+      background: var(--bg-deep);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
     body {
-      min-height: 100vh; min-height: 100dvh;
-      overflow-x: hidden; overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      background: radial-gradient(1400px 700px at 50% -12%, #16202c 0%, #0b1018 48%, #05070c 100%);
-      color: #e8eef4;
-      font-family: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 0 40px;
-      transition: opacity 0.5s ease;
-    }
-    body.zooming { opacity: 0; pointer-events: none; }
-
-    #stars {
-      position: fixed; inset: 0; width: 100%; height: 100%;
-      z-index: 0; pointer-events: none;
+      min-height: 100dvh;
+      padding: 0 16px;
     }
 
-    /* ============ solar system ============ */
-    .system-wrap {
-      width: 100%; display: flex; justify-content: center;
-      z-index: 1; flex-shrink: 0; overflow: hidden;
+    /* ── Header ───────────────────────────────────── */
+    .hero {
+      width: 100%; max-width: 600px;
+      text-align: center;
+      padding: 48px 0 0;
     }
-    .system {
-      position: relative;
-      width: 540px; height: 540px;
-      flex-shrink: 0;
-      transition: transform 0.8s cubic-bezier(0.22, 0.9, 0.32, 1), opacity 0.6s ease;
-    }
-    @media (max-width: 600px) {
-      .system { transform: scale(calc(100vw / 580)); transform-origin: top center; }
-      .system-wrap { height: calc(100vw * 540 / 580); }
-    }
-    .system.zoom-target {
-      transform: scale(3);
-      opacity: 0;
-    }
-    .orbit {
-      position: absolute; top: 50%; left: 50%;
-      border: 1px dashed rgba(160, 190, 220, 0.12);
-      border-radius: 50%;
-      animation: orbit-spin linear infinite;
-    }
-    .orbit .planet {
-      position: absolute; top: -14px; left: 50%;
-      width: 28px; height: 28px; margin-left: -14px;
-      border-radius: 50%;
-      animation: orbit-spin linear infinite reverse;
-      image-rendering: pixelated;
-    }
-    .o1 { width: 130px; height: 130px; margin: -65px 0 0 -65px; animation-duration: 9s; }
-    .o2 { width: 220px; height: 220px; margin: -110px 0 0 -110px; animation-duration: 16s; }
-    .o3 { width: 320px; height: 320px; margin: -160px 0 0 -160px; animation-duration: 26s; }
-    .o4 { width: 420px; height: 420px; margin: -210px 0 0 -210px; animation-duration: 40s; }
-    .o5 { width: 520px; height: 520px; margin: -260px 0 0 -260px; animation-duration: 60s; }
-    @keyframes orbit-spin { to { transform: rotate(360deg); } }
-
-    .sun {
-      position: absolute; top: 50%; left: 50%;
-      width: 80px; height: 80px; margin: -40px 0 0 -40px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 38% 34%, #fff6d8, #ffd23f 38%, #f0a63c 62%, #d9711f 100%);
-      box-shadow: 0 0 30px 10px rgba(255, 190, 80, 0.55), 0 0 80px 30px rgba(255, 150, 50, 0.2);
-      animation: sun-pulse 5s ease-in-out infinite;
-    }
-    @keyframes sun-pulse {
-      0%, 100% { box-shadow: 0 0 30px 10px rgba(255,190,80,.55), 0 0 80px 30px rgba(255,150,50,.2); }
-      50% { box-shadow: 0 0 36px 14px rgba(255,200,90,.65), 0 0 100px 38px rgba(255,150,50,.28); }
-    }
-
-    .p1 { background: #c96f4a; box-shadow: inset -5px -4px 0 rgba(0,0,0,.25); }
-    .p2 { background: #e8c27a; box-shadow: inset -5px -4px 0 rgba(0,0,0,.22); }
-    /* Earth — the game world */
-    .p3 {
-      width: 36px; height: 36px; top: -18px; margin-left: -18px;
-      background: radial-gradient(circle at 35% 35%, #a8d8a0, #5aad5a 30%, #3a8d3a 55%, #2a6a9e 70%, #1a4a7e);
-      box-shadow: inset -6px -4px 0 rgba(0,0,0,.28), 0 0 18px 4px rgba(100,180,255,0.25);
-      animation: orbit-spin linear infinite reverse, earth-glow 3s ease-in-out infinite;
-    }
-    @keyframes earth-glow {
-      0%, 100% { box-shadow: inset -6px -4px 0 rgba(0,0,0,.28), 0 0 18px 4px rgba(100,180,255,0.25); }
-      50% { box-shadow: inset -6px -4px 0 rgba(0,0,0,.28), 0 0 24px 8px rgba(100,180,255,0.4); }
-    }
-    .p4 { background: #d9a06a; box-shadow: inset -5px -4px 0 rgba(0,0,0,.25), inset 3px 2px 0 rgba(255,235,200,.5); }
-    .p5 { background: #8fb0d9; box-shadow: inset -5px -4px 0 rgba(0,0,0,.25); }
-
-    /* Live badge on Earth */
-    .earth-badge {
-      position: absolute;
-      top: -50px; left: 50%; transform: translateX(-50%);
-      white-space: nowrap;
-      font-size: 11px; color: #a8d8f0;
-      background: rgba(8, 14, 22, 0.82);
-      border: 1px solid rgba(127, 208, 242, 0.4);
-      padding: 5px 12px; border-radius: 999px;
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,210,63,0.08);
+      border: 1px solid rgba(255,210,63,0.2);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 12px; font-weight: 600;
+      color: var(--gold);
       letter-spacing: 0.04em;
-      box-shadow: 0 2px 12px rgba(0,0,0,.5);
-      z-index: 5;
+      text-transform: uppercase;
+      margin-bottom: 24px;
     }
-    .earth-badge .live {
-      display: inline-block; width: 7px; height: 7px;
-      border-radius: 50%; background: #58d95e;
-      margin-right: 6px; animation: blink 2s ease-in-out infinite;
+    .hero-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #58d95e;
+      box-shadow: 0 0 6px rgba(88,217,94,0.6);
     }
-    .earth-badge .live.off { background: #5a6a7a; animation: none; }
-    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
-    #earth-count { color: #ffe9a8; font-weight: 700; }
+    .hero h1 {
+      font-size: clamp(28px, 6vw, 44px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .hero h1 span { color: var(--gold); }
+    .hero p {
+      font-size: clamp(14px, 3vw, 17px);
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 440px;
+      margin: 0 auto 32px;
+    }
 
-    /* ============ content below the system ============ */
-    .content {
-      position: relative; z-index: 2;
-      text-align: center; padding: 0 20px 20px;
-      width: 100%; max-width: 700px;
-      transition: opacity 0.4s ease;
+    /* ── Globe visual ──────────────────────────────── */
+    .globe-wrap {
+      position: relative;
+      width: 200px; height: 200px;
+      margin: 0 auto 36px;
+      flex-shrink: 0;
     }
-    @media (max-width: 480px) {
-      .content { padding: 0 12px 16px; }
-      h1 { font-size: 22px !important; }
-      .tag { font-size: 12px !important; }
-      .note { font-size: 10px; padding: 10px 8px 0; }
-      .enter { padding: 11px 22px; font-size: 14px; }
-      .roll { padding: 10px 14px; font-size: 12px; }
+    .globe {
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 32%, rgba(255,255,255,0.15), transparent 50%),
+        radial-gradient(circle at 55% 65%, #1a4a7e 0%, #2a6a9e 35%, #3a8d3a 55%, #5aad5a 70%, #8fcf8a 100%);
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,0.06),
+        0 0 60px 10px rgba(90,170,90,0.15),
+        inset 0 -20px 40px rgba(0,0,0,0.3);
+      animation: globe-breathe 6s ease-in-out infinite;
     }
-    .content.hidden { opacity: 0; pointer-events: none; }
-    h1 { margin: 8px 0 4px; font-size: clamp(22px, 4.5vw, 36px); letter-spacing: 1px; }
-    h1 .pw { color: #ffd23f; text-shadow: 0 0 20px rgba(255, 210, 63, .3); }
-    .tag { margin: 0 0 18px; color: #9fb4c8; font-size: 13px; }
+    @keyframes globe-breathe {
+      0%, 100% { box-shadow: 0 0 0 2px rgba(255,255,255,0.06), 0 0 60px 10px rgba(90,170,90,0.15), inset 0 -20px 40px rgba(0,0,0,0.3); }
+      50%      { box-shadow: 0 0 0 2px rgba(255,255,255,0.08), 0 0 80px 20px rgba(90,170,90,0.22), inset 0 -20px 40px rgba(0,0,0,0.3); }
+    }
+    /* continent patches */
+    .globe::before {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(ellipse 50px 35px at 30% 38%, rgba(100,180,100,0.35), transparent),
+        radial-gradient(ellipse 40px 28px at 62% 52%, rgba(80,160,80,0.3), transparent),
+        radial-gradient(ellipse 25px 20px at 45% 68%, rgba(120,190,110,0.25), transparent);
+    }
 
-    /* ============ spawn card ============ */
+    /* player counter inside globe */
+    .globe-stat {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 2;
+    }
+    .globe-stat .num {
+      font-size: 42px; font-weight: 800;
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      line-height: 1;
+    }
+    .globe-stat .label {
+      font-size: 11px; font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 2px;
+    }
+
+    /* ── Spawn card ────────────────────────────────── */
     .spawn-card {
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
-      max-width: 360px; width: calc(100% - 32px); margin: 0 auto 20px;
-      padding: 18px 20px 20px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 14px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      width: 100%; max-width: 400px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
     }
-    @media (max-width: 480px) {
-      .spawn-card { padding: 14px 16px 16px; }
+    .human-row {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 20px;
     }
-    .human-preview { display: flex; align-items: center; gap: 14px; }
     #human {
-      width: 56px; height: 66px;
+      width: 64px; height: 74px;
       image-rendering: pixelated;
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,224,138,0.5);
-      border-radius: 6px;
-      box-shadow: 0 0 14px rgba(255,210,63,0.12);
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,224,138,0.35);
+      border-radius: 8px;
+      flex-shrink: 0;
     }
-    .human-meta { text-align: left; }
-    .human-meta .who { color: #ffe9a8; font-weight: 700; font-size: 16px; }
-    .human-meta .what { color: #9fb4c8; font-size: 11px; margin-top: 3px; }
-    .spawn-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-    .enter {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 12px 28px; border-radius: 12px;
-      background: linear-gradient(180deg, #ffd23f, #f0a63c);
-      color: #241a05; font: bold 16px ui-monospace, monospace;
-      text-decoration: none; border: none; cursor: pointer;
-      box-shadow: 0 6px 22px rgba(255,180,60,0.35);
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    .human-info .name {
+      font-size: 20px; font-weight: 700;
+      color: var(--gold);
     }
-    .enter:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,180,60,0.5); }
-    .roll {
-      padding: 11px 16px; border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.06);
-      color: #e8eef4; font: 600 13px ui-monospace, monospace;
+    .human-info .desc {
+      font-size: 13px; color: var(--muted);
+      margin-top: 2px;
+    }
+    .spawn-actions {
+      display: flex; gap: 10px;
+    }
+    .btn-enter {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 14px 20px;
+      border: none; border-radius: 12px;
+      background: linear-gradient(135deg, var(--gold), #f0a63c);
+      color: #1a1205;
+      font: 700 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       cursor: pointer;
-      transition: background 0.15s ease, transform 0.1s ease;
+      transition: transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(255,180,60,0.3);
     }
-    .roll:hover { background: rgba(255,255,255,0.12); }
-    .roll:active { transform: scale(0.96); }
+    .btn-enter:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(255,180,60,0.45); }
+    .btn-enter:active { transform: scale(0.98); }
+    .btn-reroll {
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg-card);
+      color: var(--text);
+      font: 600 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-reroll:hover { background: rgba(255,255,255,0.08); }
+    .btn-reroll:active { transform: scale(0.97); }
 
-    /* ============ info cards ============ */
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 8px; width: 100%; max-width: 700px; margin-bottom: 16px;
-      padding: 0 12px;
+    /* ── Feature pills ─────────────────────────────── */
+    .features {
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 8px;
+      width: 100%; max-width: 500px;
+      margin-bottom: 24px;
     }
-    @media (max-width: 480px) {
-      .cards { grid-template-columns: 1fr 1fr; gap: 6px; }
-      .card { padding: 10px 12px; }
-      .card h3 { font-size: 12px; }
-      .card p { font-size: 10px; }
+    .pill {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px; color: var(--muted);
     }
-    .card {
-      background: rgba(255,255,255,0.035);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px; padding: 12px 14px; text-align: left;
-    }
-    .card .ico { font-size: 22px; }
-    .card h3 { margin: 5px 0 4px; font-size: 13px; color: #ffd23f; }
-    .card p { margin: 0; font-size: 11px; line-height: 1.55; color: #b9c6d2; }
+    .pill .ico { font-size: 16px; }
 
-    .note {
-      max-width: 580px; text-align: center; font-size: 11px;
-      color: #7f93a8; line-height: 1.6;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      padding-top: 14px;
+    /* ── Footer note ──────────────────────────────── */
+    .footer-note {
+      font-size: 12px;
+      color: rgba(122,143,166,0.6);
+      text-align: center;
+      padding: 16px 0 32px;
+      max-width: 400px;
+      line-height: 1.5;
     }
-    .note code { color: #c9d4de; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; }
+    .footer-note b { color: rgba(122,143,166,0.8); }
 
-    /* ============ loading overlay ============ */
+    /* ── Loading overlay ───────────────────────────── */
     #loading-overlay {
       position: fixed; inset: 0; z-index: 999;
-      background: rgba(5, 7, 12, 0.95);
+      background: var(--bg-deep);
       display: none; flex-direction: column;
-      align-items: center; justify-content: center; gap: 18px;
+      align-items: center; justify-content: center; gap: 16px;
       transition: opacity 0.4s ease;
     }
     #loading-overlay.show { display: flex; }
     .loader-ring {
-      width: 52px; height: 52px;
-      border: 4px solid rgba(255, 210, 63, 0.2);
-      border-top-color: #ffd23f; border-radius: 50%;
-      animation: spin 0.9s linear infinite;
+      width: 44px; height: 44px;
+      border: 3px solid rgba(255,210,63,0.15);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loader-text { color: #9fb4c8; font-size: 14px; letter-spacing: 0.06em; }
+    .loader-text { color: var(--muted); font-size: 14px; }
 
-    /* ============ controls hint (shown after spawn) ============ */
-    .controls-hint {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: rgba(10,14,22,0.85); border: 1px solid rgba(255,210,63,0.25);
-      border-radius: 12px; padding: 10px 18px;
-      font-size: 12px; color: #b9c6d2;
-      display: none; z-index: 10;
-      backdrop-filter: blur(8px);
-    }
-    .controls-hint.show { display: flex; gap: 16px; align-items: center; }
-    .controls-hint .key { color: #ffd23f; font-weight: 700; }
+    /* ── Body fade-out on spawn ────────────────────── */
+    body.zooming { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
   </style>
 </head>
 <body>
   <div id="loading-overlay">
     <div class="loader-ring"></div>
-    <div class="loader-text">Diving into the world…</div>
+    <div class="loader-text">Entering the world…</div>
   </div>
-  <canvas id="stars"></canvas>
 
-  <div class="system-wrap">
-  <div class="system" id="system" aria-hidden="true">
-    <div class="sun"></div>
-    <div class="orbit o1"><div class="planet p1"></div></div>
-    <div class="orbit o2"><div class="planet p2"></div></div>
-    <div class="orbit o3">
-      <div class="planet p3">
-        <div class="earth-badge" id="earth-badge">
-          <span class="live" id="live-dot"></span>
-          🌍 <span id="earth-count">0</span> players online
-        </div>
+  <div class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Live multiplayer demo
+    </div>
+    <h1><span>Pixel World</span></h1>
+    <p>A multiplayer pixel campfire. Walk, chat, and explore with other players — no sign-up required.</p>
+  </div>
+
+  <div class="globe-wrap">
+    <div class="globe"></div>
+    <div class="globe-stat">
+      <div class="num" id="player-count">1</div>
+      <div class="label">online</div>
+    </div>
+  </div>
+
+  <div class="spawn-card">
+    <div class="human-row">
+      <canvas id="human" width="64" height="74"></canvas>
+      <div class="human-info">
+        <div class="name" id="human-name">Grok</div>
+        <div class="desc" id="human-desc">caveman · adult</div>
       </div>
     </div>
-    <div class="orbit o4"><div class="planet p4"></div></div>
-    <div class="orbit o5"><div class="planet p5"></div></div>
-  </div>
-  </div>
-
-  <div class="content" id="content">
-    <h1><span class="pw">Pixel World</span> — GitHub Earth</h1>
-    <p class="tag">A living pixel world orbiting on GitHub Pages. Pick a human and join the tribe.</p>
-
-    <div class="spawn-card">
-      <div class="human-preview">
-        <canvas id="human" width="56" height="66"></canvas>
-        <div class="human-meta">
-          <div class="who" id="human-name">Grok</div>
-          <div class="what" id="human-desc">caveman · adult</div>
-        </div>
-      </div>
-      <div class="spawn-actions">
-        <button class="roll" id="reroll" title="Roll another human">🎲 New human</button>
-        <button class="enter" id="spawn">🌍 Enter the world</button>
-      </div>
+    <div class="spawn-actions">
+      <button class="btn-reroll" id="reroll" title="Get a different human">🎲 Reroll</button>
+      <button class="btn-enter" id="spawn">🌍 Enter the world</button>
     </div>
-
-    <div class="cards">
-      <div class="card"><div class="ico">👥</div><h3>Play together</h3><p>Everyone who enters appears beside the same campfire. Other players show up as live ghosts with name tags — no accounts needed.</p></div>
-      <div class="card"><div class="ico">💬</div><h3>Chat bubbles</h3><p>Type a message and it pops as a pixel bubble above your human — seen by everyone on the planet.</p></div>
-      <div class="card"><div class="ico">🕹️</div><h3>Joystick control</h3><p>Use the on-screen joystick to walk around. Drag to rotate the camera. It's that simple.</p></div>
-      <div class="card"><div class="ico">🧙</div><h3>Grunk the Elder</h3><p>A knowledge NPC by the fire who answers questions about the world. Ask him for help.</p></div>
-    </div>
-
-    <p class="note">
-      Multiplayer rides a <b>public MQTT broker</b> over WebSockets — zero sign-ups.
-      Keep it friendly. If the broker is unreachable the camp still works solo.
-    </p>
   </div>
 
-  <div class="controls-hint" id="controls-hint">
-    <span><span class="key">🕹️</span> Joystick to walk</span>
-    <span><span class="key">👆</span> Drag to rotate</span>
-    <span><span class="key">💬</span> Chat to talk</span>
+  <div class="features">
+    <div class="pill"><span class="ico">🕹️</span> Joystick to walk</div>
+    <div class="pill"><span class="ico">💬</span> Chat to talk</div>
+    <div class="pill"><span class="ico">👆</span> Drag to look around</div>
+    <div class="pill"><span class="ico">👥</span> See other players live</div>
+  </div>
+
+  <div class="footer-note">
+    Powered by a <b>public MQTT broker</b> over WebSockets — zero accounts, zero tracking.
+    Works solo if the broker is offline.
   </div>
 
   <script>
-    // ============================================================
-    // 1. Twinkling starfield
-    // ============================================================
-    (function stars() {
-      const cv = document.getElementById('stars');
-      const g = cv.getContext('2d');
-      let W, H, starArr = [];
-      function resize() {
-        W = cv.width = innerWidth; H = cv.height = innerHeight;
-        const n = Math.min(280, Math.floor((W * H) / 4800));
-        starArr = Array.from({ length: n }, () => ({
-          x: Math.random() * W, y: Math.random() * H,
-          r: Math.random() < 0.15 ? 1.8 : Math.random() < 0.5 ? 1.2 : 0.7,
-          tw: 0.4 + Math.random() * 0.6,
-          ph: Math.random() * Math.PI * 2,
-        }));
+    // ================================================================
+    // 1. Static online counter via MQTT presence
+    // ================================================================
+    (function () {
+      const TOPIC = 'pixelworld/demo/v1';
+      const BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
+      const TTL = 45000;
+      const players = new Map();
+      const countEl = document.getElementById('player-count');
+      function update() {
+        const n = Math.max(1, players.size);
+        countEl.textContent = n;
       }
-      resize();
-      addEventListener('resize', resize);
-      (function draw(t) {
-        g.clearRect(0, 0, W, H);
-        for (const s of starArr) {
-          const a = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(t * 0.0012 * s.tw + s.ph));
-          g.globalAlpha = a;
-          g.fillStyle = '#dfe8ff';
-          g.fillRect(s.x, s.y, s.r, s.r);
-        }
-        g.globalAlpha = 1;
-        requestAnimationFrame(draw);
-      })(0);
+      function sweep() {
+        const now = Date.now();
+        for (const [id, ts] of players) if (now - ts > TTL) players.delete(id);
+        update();
+      }
+      setInterval(sweep, 5000);
+
+      function connect(i) {
+        if (i >= BROKERS.length || typeof mqtt === 'undefined') { update(); return; }
+        const c = mqtt.connect(BROKERS[i], {
+          clientId: 'pw-page-' + Math.random().toString(36).slice(2, 10),
+          connectTimeout: 8000, reconnectPeriod: 5000, keepalive: 30,
+        });
+        let once = false;
+        c.on('connect', () => {
+          once = true;
+          c.subscribe([TOPIC + '/presence/+', TOPIC + '/pos'], { qos: 0 }, () => update());
+        });
+        c.on('message', (topic, payload) => {
+          const txt = payload.toString();
+          if (topic.startsWith(TOPIC + '/presence/')) {
+            const id = topic.slice(topic.lastIndexOf('/') + 1);
+            if (!txt) players.delete(id);
+            else try { players.set(JSON.parse(txt).id, Date.now()); } catch (e) {}
+          } else if (topic.endsWith('/pos')) {
+            try { const m = JSON.parse(txt); if (m.id) players.set(m.id, Date.now()); } catch (e) {}
+          }
+          update();
+        });
+        c.on('close', () => { if (!once) setTimeout(() => connect(i + 1), 800); });
+      }
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/mqtt@5/dist/mqtt.min.js';
+      s.onload = () => connect(0);
+      document.head.appendChild(s);
     })();
 
-    // ============================================================
-    // 2. Random human — same art rules as the game
-    // ============================================================
+    // ================================================================
+    // 2. Random human preview — same art as the game
+    // ================================================================
     const CAVEMAN = [
       '.....HHHHHH.....',
       '....HHHHHHHH....',
@@ -366,7 +361,7 @@
       '....SS..SS......',
       '....SS..SS......',
     ];
-    const CAVEMAN_PALETTE = { H: '#3b2b1e', S: '#c78d5a', E: '#1a1a1a', C: '#8a5a33' };
+    const CAVEMAN_PAL = { H:'#3b2b1e', S:'#c78d5a', E:'#1a1a1a', C:'#8a5a33' };
     const CAVEWOMAN = [
       '.....HHHHHH.....',
       '....HHHHHHHH....',
@@ -388,19 +383,16 @@
       '....SS..SS......',
       '....SS..SS......',
     ];
-    const CAVEWOMAN_PALETTE = { H: '#5a3a22', S: '#d29a66', E: '#1a1a1a', C: '#9a6a3f', D: '#6b8f3f' };
-    const M_NAMES = ['Grok', 'Uga', 'Zog', 'Bruk', 'Tonk', 'Nala', 'Ogg', 'Kru', 'Mog', 'Sara'];
-    const F_NAMES = ['Aya', 'Sula', 'Neya', 'Mara', 'Ika', 'Ona', 'Tia', 'Ula', 'Ena', 'Rya'];
-    const LOOK_POOL = {
-      skins: ['#f2c99b', '#e0aa7a', '#c78d5a', '#a9714b', '#8a5a3a', '#6e452c'],
-      hairs: ['#191919', '#3b2b1e', '#5a3a22', '#7a5230', '#96613a', '#b8863b', '#a33c2a'],
-      greys: ['#c9c9c9', '#d5d5d5', '#b0b0b0'],
-      cloths: ['#8a5a33', '#6b8f3f', '#7a5230', '#96613a', '#5e7a46', '#8f6a4a', '#a0522d'],
-      dresses: ['#6b8f3f', '#5e7a46', '#7fa04a', '#4f6f3a', '#8a9a4a', '#b07850'],
-      eyes: ['#1a1a1a', '#2e3a5e', '#2e4a2e', '#5e3a1e', '#4a2e5e'],
-    };
-    function mulberry32(seed) {
-      let a = seed >>> 0;
+    const CAVEWOMAN_PAL = { H:'#5a3a22', S:'#d29a66', E:'#1a1a1a', C:'#9a6a3f', D:'#6b8f3f' };
+    const M_NAMES = ['Grok','Uga','Zog','Bruk','Tonk','Ogg','Kru','Mog'];
+    const F_NAMES = ['Aya','Sula','Neya','Mara','Ika','Ona','Tia','Ula'];
+    const SKINS = ['#f2c99b','#e0aa7a','#c78d5a','#a9714b','#8a5a3a','#6e452c'];
+    const HAIRS = ['#191919','#3b2b1e','#5a3a22','#7a5230','#96613a','#b8863b','#a33c2a'];
+    const CLOTHS = ['#8a5a33','#6b8f3f','#7a5230','#96613a','#5e7a46','#8f6a4a'];
+    const DRESSES = ['#6b8f3f','#5e7a46','#7fa04a','#4f6f3a','#b07850'];
+    const EYES = ['#1a1a1a','#2e3a5e','#2e4a2e','#5e3a1e'];
+
+    function mulberry32(a) {
       return function () {
         a |= 0; a = (a + 0x6d2b79f5) | 0;
         let t = Math.imul(a ^ (a >>> 15), 1 | a);
@@ -408,22 +400,30 @@
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
       };
     }
-    function pickLook(rnd, female) {
-      const P = LOOK_POOL;
-      const pick = (arr) => arr[Math.floor(rnd() * arr.length)];
-      return {
-        skin: pick(P.skins), hair: pick(P.hairs), grey: pick(P.greys),
-        cloth: pick(P.cloths), dress: female ? pick(P.dresses) : null,
-        eyes: pick(P.eyes),
-        style: Math.floor(rnd() * (female ? 3 : 4)),
-        beard: female ? -1 : Math.floor(rnd() * 3),
-      };
-    }
-    function artVariant(baseArt, female, style, beard) {
-      const g = baseArt.map((r) => r.split(''));
-      const W = g[0].length;
+    function pick(arr, rnd) { return arr[Math.floor(rnd() * arr.length)]; }
+
+    let currentLook = null;
+    function rollHuman() {
+      const rnd = mulberry32((Math.random() * 0xffffffff) >>> 0);
+      const female = Math.random() < 0.5;
+      const skin = pick(SKINS, rnd), hair = pick(HAIRS, rnd);
+      const cloth = pick(CLOTHS, rnd), eye = pick(EYES, rnd);
+      const dress = female ? pick(DRESSES, rnd) : null;
+      const style = Math.floor(rnd() * (female ? 3 : 4));
+      const beard = female ? -1 : Math.floor(rnd() * 3);
+      const names = female ? F_NAMES : M_NAMES;
+      const name = pick(names, rnd);
+      const age = 18 + Math.floor(rnd() * 35);
+
+      const base = female ? CAVEWOMAN : CAVEMAN;
+      const pal = { ...(female ? CAVEWOMAN_PAL : CAVEMAN_PAL) };
+      pal.S = skin; pal.H = hair; pal.E = eye;
+      if (female) pal.D = dress; else pal.C = cloth;
+
+      // apply style variants
+      const g = base.map(r => r.split(''));
       const put = (r, c, ch) => {
-        if (r >= 0 && r < g.length && c >= 0 && c < W && g[r][c] === '.') g[r][c] = ch;
+        if (r >= 0 && r < g.length && c >= 0 && c < g[0].length && g[r][c] === '.') g[r][c] = ch;
       };
       if (!female) {
         if (style === 1) for (let r = 1; r <= 4; r++) put(r, 12, 'H');
@@ -435,149 +435,59 @@
         if (style === 1) for (let r = 9; r <= 12; r++) put(r, 12, 'H');
         if (style === 2) put(1, 12, 'D');
       }
-      return g.map((r) => r.join(''));
-    }
-    function lookPal(basePal, look) {
-      const p = { ...basePal };
-      if (p.S) p.S = look.skin;
-      if (p.H) p.H = look.hair;
-      if (p.E) p.E = look.eyes;
-      if (p.C) p.C = look.cloth;
-      if (p.D) p.D = look.dress || p.D;
-      if (p.G) p.G = look.grey;
-      return p;
-    }
+      const art = g.map(r => r.join(''));
 
-    let current = null;
-    function rollHuman() {
-      const rnd = mulberry32((Math.random() * 0xffffffff) >>> 0);
-      const female = Math.random() < 0.5;
-      const look = pickLook(rnd, female);
-      const base = female ? CAVEWOMAN : CAVEMAN;
-      const basePal = female ? CAVEWOMAN_PALETTE : CAVEMAN_PALETTE;
-      const art = artVariant(base, female, look.style, look.beard);
-      const pal = lookPal(basePal, look);
-      const names = female ? F_NAMES : M_NAMES;
-      const name = names[Math.floor(rnd() * names.length)];
-      const age = 18 + Math.floor(rnd() * 35);
-
+      // draw to canvas
       const cv = document.getElementById('human');
-      const g = cv.getContext('2d');
-      g.imageSmoothingEnabled = false;
-      g.clearRect(0, 0, cv.width, cv.height);
-      const cols = art[0].length, rows = art.length;
-      const s = 3;
+      const ctx = cv.getContext('2d');
+      ctx.imageSmoothingEnabled = false;
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      const cols = art[0].length, rows = art.length, s = 3;
       const ox = Math.floor((cv.width - cols * s) / 2);
       const oy = Math.floor((cv.height - rows * s) / 2);
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           const c = pal[art[y][x]];
           if (!c) continue;
-          g.fillStyle = c;
-          g.fillRect(ox + x * s, oy + y * s, s, s);
+          ctx.fillStyle = c;
+          ctx.fillRect(ox + x * s, oy + y * s, s, s);
         }
       }
+
       document.getElementById('human-name').textContent = name;
       document.getElementById('human-desc').textContent =
         (female ? 'cavewoman' : 'caveman') + ' · ' + age + ' yrs';
 
-      const p = new URLSearchParams({
-        demo: '1', n: name, f: female ? '1' : '0', a: String(age),
-        skin: look.skin, hair: look.hair, grey: look.grey,
-        cloth: look.cloth, eyes: look.eyes,
-        style: String(look.style), beard: String(Math.max(0, look.beard)),
-      });
-      if (look.dress) p.set('dress', look.dress);
-      document.getElementById('spawn').dataset.href = 'index.html?' + p.toString();
-      current = { female, name, age, look };
+      currentLook = {
+        female, name, age, skin, hair, grey: '#c9c9c9', cloth, dress, eyes: eye, style, beard,
+      };
     }
     document.getElementById('reroll').addEventListener('click', rollHuman);
     rollHuman();
 
-    // ============================================================
-    // 3. Spawn button → zoom the Earth globe, then navigate
-    // ============================================================
+    // ================================================================
+    // 3. Spawn — zoom globe, loading, navigate
+    // ================================================================
     document.getElementById('spawn').addEventListener('click', (e) => {
       e.preventDefault();
-      const href = e.currentTarget.dataset.href;
-      const system = document.getElementById('system');
-      const content = document.getElementById('content');
-      const badge = document.getElementById('earth-badge');
+      const L = currentLook;
+      const p = new URLSearchParams({
+        demo: '1', n: L.name, f: L.female ? '1' : '0', a: String(L.age),
+        skin: L.skin, hair: L.hair, grey: L.grey,
+        cloth: L.cloth, eyes: L.eyes,
+        style: String(L.style), beard: String(Math.max(0, L.beard)),
+      });
+      if (L.dress) p.set('dress', L.dress);
 
-      // Phase 1: zoom the Earth globe to fill the screen
-      content.classList.add('hidden');
-      if (badge) badge.style.display = 'none';
-      system.classList.add('zoom-target');
+      // phase 1: fade out
+      document.body.classList.add('zooming');
 
-      // Phase 2: show loading overlay, then navigate
+      // phase 2: loading overlay, then navigate
       setTimeout(() => {
-        const overlay = document.getElementById('loading-overlay');
-        overlay.classList.add('show');
-        setTimeout(() => { window.location.href = href; }, 500);
-      }, 700);
+        document.getElementById('loading-overlay').classList.add('show');
+        setTimeout(() => { window.location.href = 'index.html?' + p.toString(); }, 400);
+      }, 500);
     });
-
-    // ============================================================
-    // 4. Live online counter — MQTT presence channel
-    // ============================================================
-    (function counter() {
-      const TOPIC = 'pixelworld/demo/v1';
-      const BROKERS = ['wss://broker.hivemq.com:8884/mqtt', 'wss://broker.emqx.io:8084/mqtt'];
-      const TTL = 45000;
-      const players = new Map();
-      const countEl = document.getElementById('earth-count');
-      const dot = document.getElementById('live-dot');
-      let mqttClient = null, idx = 0;
-
-      function update() {
-        const n = players.size;
-        countEl.textContent = n;
-        dot.classList.toggle('off', !mqttClient || !n);
-      }
-      function sweep() {
-        const now = Date.now();
-        for (const [id, ts] of players) if (now - ts > TTL) players.delete(id);
-        update();
-      }
-      setInterval(sweep, 5000);
-
-      function connect(i) {
-        if (i >= BROKERS.length || typeof mqtt === 'undefined') return;
-        idx = i;
-        const c = mqtt.connect(BROKERS[i], {
-          clientId: 'pw-page-' + Math.random().toString(36).slice(2, 10),
-          connectTimeout: 9000, reconnectPeriod: 4000, keepalive: 30,
-        });
-        mqttClient = c;
-        let once = false;
-        c.on('connect', () => {
-          once = true;
-          c.subscribe([TOPIC + '/presence/+', TOPIC + '/pos'], { qos: 0 }, () => {
-            countEl.parentElement.style.borderColor = 'rgba(88,217,94,0.6)';
-            update();
-          });
-        });
-        c.on('message', (topic, payload) => {
-          const txt = payload.toString();
-          if (topic.startsWith(TOPIC + '/presence/')) {
-            const id = topic.slice(topic.lastIndexOf('/') + 1);
-            if (!txt) { players.delete(id); }
-            else {
-              try { players.set(JSON.parse(txt).id, Date.now()); } catch (e) {}
-            }
-          } else if (topic.endsWith('/pos')) {
-            try { const m = JSON.parse(txt); if (m.id) players.set(m.id, Date.now()); } catch (e) {}
-          }
-          update();
-        });
-        c.on('close', () => { if (!once) setTimeout(() => connect(idx + 1), 600); });
-      }
-      const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/mqtt@5/dist/mqtt.min.js';
-      s.onload = () => connect(0);
-      s.onerror = () => { dot.classList.add('off'); };
-      document.head.appendChild(s);
-    })();
   </script>
 </body>
 </html>
