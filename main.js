@@ -5720,6 +5720,14 @@ function charGroundY(x, z) {
   return Math.max(groundYAt(x, z), SEA_LEVEL - 0.45);
 }
 
+function smoothGroundY(cm, dt, x, z) {
+  const targetY = charGroundY(x, z);
+  if (cm.gy === undefined || cm.gy === null) cm.gy = targetY;
+  const speed = targetY > cm.gy ? 18.0 : 14.0;
+  cm.gy = THREE.MathUtils.damp(cm.gy, targetY, speed, dt);
+  return cm.gy;
+}
+
 // --- floating name tag + health bar above each villager --------------------
 function makeNameSprite() {
   const canvas = document.createElement('canvas');
