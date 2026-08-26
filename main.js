@@ -1681,7 +1681,7 @@ function syncChunks(force = false) {
   for (let i = pendingQueue.length - 1; i >= 0; i--) {
     const j = pendingQueue[i];
     const jd = chebDist(j.cx, j.cz, c);
-    if (jd > RENDER_RADIUS) {
+    if (jd > effectiveRadius) {
       pendingQueue.splice(i, 1);
       requested.delete(j.key);
     } else {
@@ -5038,14 +5038,44 @@ function ensureChunkIcons(ch) {
   const pos = ud.pos, col = ud.col;
   const hasH = !!ud.h;
   const count = col.length;
-  const ppos = new Float32Array(count * 3);
-  const pcol = new Float32Array(count);
+  if (count === 0) return;
+
+  // Cluster nearby tree positions onto an 8x8 spatial grid cell so zoomed-out view shows merged grove markers
+  const clusters = new Map();
+  const CELL_SIZE = 8.0;
+
   for (let i = 0; i < count; i++) {
-    ppos[i * 3] = pos[i * 3];
-    ppos[i * 3 + 1] = pos[i * 3 + 1] + (hasH ? ud.h[i] : 0);
-    ppos[i * 3 + 2] = pos[i * 3 + 2];
-    pcol[i] = col[i];
+    const px = pos[i * 3];
+    const py = pos[i * 3 + 1] + (hasH ? ud.h[i] : 0);
+    const pz = pos[i * 3 + 2];
+
+    const cx = Math.floor(px / CELL_SIZE);
+    const cz = Math.floor(pz / CELL_SIZE);
+    const key = cx + '_' + cz;
+
+    let item = clusters.get(key);
+    if (!item) {
+      item = { sumX: 0, sumY: 0, sumZ: 0, count: 0, col: col[i] };
+      clusters.set(key, item);
+    }
+    item.sumX += px;
+    item.sumY += py;
+    item.sumZ += pz;
+    item.count++;
   }
+
+  const cCount = clusters.size;
+  const ppos = new Float32Array(cCount * 3);
+  const pcol = new Float32Array(cCount);
+  let idx = 0;
+  for (const item of clusters.values()) {
+    ppos[idx * 3] = item.sumX / item.count;
+    ppos[idx * 3 + 1] = item.sumY / item.count;
+    ppos[idx * 3 + 2] = item.sumZ / item.count;
+    pcol[idx] = item.col;
+    idx++;
+  }
+
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(ppos, 3));
   g.setAttribute('aCol', new THREE.BufferAttribute(pcol, 1));
@@ -10937,8 +10967,10 @@ function animate() {
   skyCol.multiplyScalar(envDim);
   scene.background.copy(skyCol);
   scene.fog.color.copy(skyCol);
-  scene.fog.near = FOG_BASE_NEAR * envFogMul;
-  scene.fog.far = FOG_BASE_FAR * envFogMul;
+  const fogDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
+  const fogZoomMul = Math.max(1.0, fogDist / 120);
+  scene.fog.near = FOG_BASE_NEAR * envFogMul * fogZoomMul;
+  scene.fog.far = FOG_BASE_FAR * envFogMul * fogZoomMul;
   treeMat.uniforms.uFogColor.value.copy(scene.fog.color);
   // seasons + sun on every tree
   treeMat.uniforms.uSeasonA.value = b.i;
