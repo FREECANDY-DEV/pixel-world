@@ -3353,20 +3353,19 @@ const treeMat = new THREE.ShaderMaterial({
       float vertK = clamp(toCam.y / distC, 0.0, 1.0);
       float lenXZ = max(length(toCam.xz), 0.001);
       vec2 dirXZ = toCam.xz / lenXZ;
-      vec3 basePos = iPos + bendWorld;
-      // elevate base above voxel face, scaling dynamically with top-down camera pitch
-      basePos.y += 0.15 + vertK * (0.35 + iH * 0.10) + aLift * 0.20;
+      // bottom of the art is ALWAYS anchored strictly to the top of the block it spawned on
+      vec3 basePos = iPos + vec3(0.0, 0.04 + aLift * 0.05, 0.0) + bendWorld;
       vec3 rightA = vec3(dirXZ.y, 0.0, -dirXZ.x);
-      // hybrid spherical billboarding: upright at eye-level, smoothly tilts to face camera in top view
-      float tiltFactor = smoothstep(0.15, 0.90, vertK);
-      vec3 worldUp = vec3(0.0, 1.0, 0.0);
-      vec3 viewUp = vec3(-dirXZ.x * 0.85, clamp(1.0 - vertK * 0.5, 0.2, 1.0), -dirXZ.y * 0.85);
-      vec3 billboardUp = mix(worldUp, viewUp, tiltFactor);
-      vec3 wpq = basePos + rightA * (position.x * iH) + billboardUp * (position.y * iH);
+      // top of art tilts back away from camera as camera moves to top view
+      float theta = smoothstep(0.1, 0.95, vertK) * 1.25;
+      float sinT = sin(theta);
+      float cosT = cos(theta);
+      vec3 upA = vec3(-dirXZ.x * sinT, cosT, -dirXZ.y * sinT);
+      vec3 wpq = basePos + rightA * (position.x * iH) + upA * (position.y * iH);
       vec4 mv = viewMatrix * vec4(wpq, 1.0);
       float safeD = max(-mv.z, 0.001);
-      // view-space depth clearance: pull sprites forward toward camera so voxel blocks never swallow them
-      float pull = min(safeD * 0.07, 6.0) + (0.55 + vertK * 0.85 + aLift * 0.50);
+      // view-space depth clearance so ground block faces never clip the quad
+      float pull = min(safeD * 0.04, 4.0) + 0.35 + aLift * 0.30;
       mv.z -= pull;
       mv.z = min(mv.z, -0.35);
       vDist = max(-mv.z, 1.0);
