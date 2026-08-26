@@ -950,20 +950,54 @@
           return '#' + String(assetCounter++).padStart(4, '0');
         }
 
-        // 1. 👤 Tribe & Hero Class Human Figures
+        // 1. 👤 Tribe & Hero Class Human Figures (With Real-Time Skin Tone, Hairstyle & Beard Morphing)
         addHeader('👤 Tribe & Hero Classes');
-        GRID_CHARACTERS.forEach((ch) => {
+        GRID_CHARACTERS.forEach((ch, idx) => {
           const id = getNextId();
           createCard(ch.name, id, (ctx, t) => {
-            const variant = Math.floor(t * 0.5) % 4;
+            const step = Math.floor(t * 0.8 + idx * 1.5);
+            const skinTones = ['#c78d5a', '#e0ac69', '#8d5524', '#f1c27d', '#ffd23f', '#ffdbac'];
+            const hairColors = ['#111827', '#3b2b1e', '#dc2626', '#facc15', '#e2e8f0', '#7c3aed'];
+            const clothColors = ['#8a5a33', '#b91c1c', '#047857', '#0284c7', '#d97706', '#6b21a8'];
+
+            const skin = skinTones[step % skinTones.length];
+            const hair = hairColors[(step + 1) % hairColors.length];
+            const cloth = clothColors[(step + 2) % clothColors.length];
+            const style = step % 4; // 0: Normal, 1: Side Lock, 2: Long Strands, 3: Headband / Crest
+            const beard = (step % 3); // 0: None, 1: Full Beard, 2: Chin Stubble
+
             const scale = 2;
-            const bob = Math.round(Math.sin(t * 6) * 1);
-            const ox = Math.floor((48 - ch.art[0].length * scale) / 2);
-            const oy = Math.floor((48 - ch.art.length * scale) / 2) + bob;
+            const bob = Math.round(Math.sin(t * 6 + idx) * 1);
+            
+            // Build dynamically restyled pixel art grid
+            let artRows = ch.art.map(r => r.split(''));
+            const W = artRows[0].length;
+            const put = (r, c, val) => {
+              if (r >= 0 && r < artRows.length && c >= 0 && c < W && artRows[r][c] === '.') {
+                artRows[r][c] = val;
+              }
+            };
+
+            // Apply hairstyle & beard modifications for humans
+            if (ch.name === 'Caveman' || ch.name === 'Tribe Child' || ch.name === 'Tribe Elder' || ch.name === 'Knight' || ch.name === 'Pirate' || ch.name === 'Ninja') {
+              if (style === 1) for (let r = 1; r <= 4; r++) put(r, 12, 'H');
+              if (style === 2) for (let r = 7; r <= 9; r++) { put(r, 3, 'H'); put(r, 12, 'H'); }
+              if (style === 3) for (let c = 5; c <= 10; c++) if (artRows[2] && artRows[2][c] === 'H') artRows[2][c] = 'R';
+
+              if (beard === 1 && ch.name !== 'Tribe Child') { put(7, 7, 'H'); put(7, 8, 'H'); put(8, 7, 'H'); put(8, 8, 'H'); }
+              if (beard === 2 && ch.name !== 'Tribe Child') { put(7, 7, 'H'); put(7, 8, 'H'); }
+            }
+
             const curPal = Object.assign({}, ch.pal);
-            if (variant === 1 && curPal.C) curPal.C = '#b91c1c';
-            if (variant === 2 && curPal.C) curPal.C = '#047857';
-            drawPixelArtGrid(ctx, ch.art, curPal, scale, ox, oy);
+            if (curPal.S) curPal.S = skin;
+            if (curPal.H) curPal.H = hair;
+            if (curPal.C) curPal.C = cloth;
+            if (curPal.R) curPal.R = cloth;
+
+            const ox = Math.floor((48 - artRows[0].length * scale) / 2);
+            const oy = Math.floor((48 - artRows.length * scale) / 2) + bob;
+            
+            drawPixelArtGrid(ctx, artRows.map(r => r.join('')), curPal, scale, ox, oy);
           });
         });
 
