@@ -222,22 +222,34 @@
       const sunFlareTex = new THREE.CanvasTexture(sTexC);
 
       // --- 4. Objects ---
-      // Sun (always in background)
+      // Sun (HUGE glowing star always in background)
       const sunGroup = new THREE.Group();
-      sunGroup.position.set(0, 12, -180);
+      sunGroup.position.set(0, 20, -260);
+
+      // Huge Sun Sphere
       const sunMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(24, 32, 32),
-        new THREE.MeshBasicMaterial({ color: 0xffe666 })
+        new THREE.SphereGeometry(80, 48, 48),
+        new THREE.MeshBasicMaterial({ color: 0xffea70 })
       );
       sunGroup.add(sunMesh);
+
+      // Inner Corona Glow
       const sunSprite = new THREE.Sprite(
         new THREE.SpriteMaterial({ map: sunFlareTex, transparent: true, blending: THREE.AdditiveBlending })
       );
-      sunSprite.scale.set(160, 160, 1);
+      sunSprite.scale.set(450, 450, 1);
       sunGroup.add(sunSprite);
+
+      // Outer Deep Space Solar Flare
+      const sunOuterSprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({ map: sunFlareTex, transparent: true, blending: THREE.AdditiveBlending, opacity: 0.5 })
+      );
+      sunOuterSprite.scale.set(750, 750, 1);
+      sunGroup.add(sunOuterSprite);
+
       scene.add(sunGroup);
 
-      const sunLight = new THREE.PointLight(0xfffaed, 5.0, 1000);
+      const sunLight = new THREE.PointLight(0xfffaed, 6.5, 1500);
       sunLight.position.copy(sunGroup.position);
       scene.add(sunLight);
 
@@ -288,24 +300,24 @@
         const t = (performance.now() - startT) * 0.001;
 
         // Earth orbits Sun slowly in background
-        const earthOrbitAngle = t * 0.08;
-        earthGroup.position.x = sunGroup.position.x + Math.sin(earthOrbitAngle) * 55;
-        earthGroup.position.z = sunGroup.position.z + Math.cos(earthOrbitAngle) * 55;
+        const earthOrbitAngle = t * 0.06;
+        earthGroup.position.x = sunGroup.position.x + Math.sin(earthOrbitAngle) * 60;
+        earthGroup.position.z = sunGroup.position.z + Math.cos(earthOrbitAngle) * 60 + 120;
         earthMesh.rotation.y = t * 0.18;
 
         // Moon orbits Earth (globus)
         const moonOrbitAngle = t * 0.55;
-        moonMesh.position.x = earthGroup.position.x + Math.cos(moonOrbitAngle) * 25;
-        moonMesh.position.z = earthGroup.position.z + Math.sin(moonOrbitAngle) * 25;
+        moonMesh.position.x = earthGroup.position.x + Math.cos(moonOrbitAngle) * 26;
+        moonMesh.position.z = earthGroup.position.z + Math.sin(moonOrbitAngle) * 26;
         moonMesh.position.y = earthGroup.position.y + Math.sin(moonOrbitAngle * 0.8) * 6;
         moonMesh.rotation.y = t * 0.2;
 
-        // Camera rotates around Earth (globus)
-        const camAngle = t * 0.22;
+        // Camera rotates around Earth (globus) with HUGE Sun in background
+        const camAngle = t * 0.20;
         const camDist = 42;
         camera.position.x = earthGroup.position.x + Math.sin(camAngle) * camDist;
         camera.position.z = earthGroup.position.z + Math.cos(camAngle) * camDist;
-        camera.position.y = earthGroup.position.y + 10 + Math.sin(t * 0.15) * 3;
+        camera.position.y = earthGroup.position.y + 8 + Math.sin(t * 0.12) * 3;
         camera.lookAt(earthGroup.position);
 
         renderer.render(scene, camera);
