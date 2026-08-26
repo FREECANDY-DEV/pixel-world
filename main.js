@@ -111,16 +111,13 @@ function terrainHeight(x, z, seed) {
   const m = Math.max(0, (mtnMask - 0.46) / 0.54);
   e += Math.pow(m, 1.4) * ridge * 3.4 + m * peaks * 0.9; // mountain ranges
 
-  // --- lake basins: smooth circular depressions in the midlands ---
+  // --- lake basins: smooth, natural, shallow depressions (no sharp cliff holes) ---
   const lakeMask = valueNoise2(x * 0.012, z * 0.012, seed + 2000);
   const lakeDetail = valueNoise2(x * 0.035, z * 0.035, seed + 2001);
-  if (lakeMask > 0.62 && lakeDetail > 0.48) {
-    const lakeStrength = (lakeMask - 0.62) * 4.5 * (lakeDetail - 0.48) * 3.5;
-    const lakeDepth = Math.min(lakeStrength, 0.7);
-    // carve a basin — only in the midlands (not in ocean or on mountain peaks)
-    if (e > -0.1 && e < 1.2) {
-      e -= lakeDepth * 0.8;
-    }
+  const lakeEdge = sstep(Math.max(0.0, Math.min(1.0, (lakeMask - 0.58) / 0.25))) *
+                   sstep(Math.max(0.0, Math.min(1.0, (lakeDetail - 0.44) / 0.3)));
+  if (lakeEdge > 0.01 && e > -0.1 && e < 1.2) {
+    e -= lakeEdge * 0.28;
   }
 
   // --- river valleys: long carved grooves following a noise curve ---
@@ -1371,43 +1368,10 @@ function spawnWaterfallSpray(wx, wz) {
   waterfallSprays.push({ pos: new THREE.Vector3(wx, gy, wz), particles: pos, n, pts, t: 0 });
 }
 
-function updateWaterfallSprays(dt, t) {
-  for (const s of waterfallSprays) {
-    s.t += dt;
-    const p = s.particles;
-    for (let i = 0; i < s.n; i++) {
-      // spray upward in an arc, then fall
-      const phase = (s.t * 2.5 + i * 0.3) % 1.5;
-      const up = Math.max(0, 1 - phase) * 1.8;
-      const spread = phase * 0.6;
-      p[i * 3 + 1] = s.pos.y + up + Math.sin(i * 1.7) * 0.15;
-      p[i * 3] += (Math.sin(s.t * 3 + i * 2.1) * 0.02) * dt * 60;
-      p[i * 3 + 2] += (Math.cos(s.t * 2.7 + i * 1.9) * 0.02) * dt * 60;
-    }
-    s.pts.geometry.attributes.position.needsUpdate = true;
-    s.pts.material.opacity = 0.5 + Math.sin(t * 4) * 0.2;
-  }
-}
+function updateWaterfallSprays(dt, t) {}
 
-// detect waterfalls on chunk load: steep drops near water
-function detectWaterfalls(cx, cz) {
-  const startX = cx * CHUNK, startZ = cz * CHUNK;
-  for (let lx = 0; lx < CHUNK; lx += 3) {
-    for (let lz = 0; lz < CHUNK; lz += 3) {
-      const wx = startX + lx, wz = startZ + lz;
-      const gy = groundYAt(wx, wz);
-      // check if there's a steep drop into water nearby
-      for (const [dx, dz] of [[3,0],[-3,0],[0,3],[0,-3]]) {
-        const ngy = groundYAt(wx + dx, wz + dz);
-        if (gy - ngy > 3 && ngy <= SEA_LEVEL - 0.5) {
-          // this is a waterfall edge
-          spawnWaterfallSpray(wx + dx / 2, wz + dz / 2);
-          break;
-        }
-      }
-    }
-  }
-}
+// detect waterfalls on chunk load: steep drops near water (disabled per user request)
+function detectWaterfalls(cx, cz) {}
 
 function updateParticles(sys, dt, t, wind) {
   const hw = FX_BOX.w / 2;
@@ -6956,6 +6920,9 @@ const charJoy = { x: 0, z: 0, tx: 0, tz: 0, active: false }; // villager steerin
 let followCm = null; // camera tracks this villager while selected
 const followPrev = new THREE.Vector3();
 function selectCaveman(cm) {
+  if (DEMO_MODE && demoState.me && cm !== demoState.me) {
+    cm = demoState.me;
+  }
   if (selectedCm && selectedCm.outSpr) selectedCm.outSpr.visible = false;
   const prev = selectedCm;
   selectedCm = cm;
@@ -9182,7 +9149,14 @@ function updateDemo(dt, t) {
   if (!DEMO_MODE) return;
   const s = demoState;
   const now = performance.now();
-  const hide = iconMode || spaceMode;
+  // Lock selection & camera target to player's own character
+  if (s.me && s.me.spr) {
+    selectedCm = s.me;
+    followCm = s.me;
+    controls.target.x = THREE.MathUtils.damp(controls.target.x, s.me.spr.position.x, 14, dt);
+    controls.target.z = THREE.MathUtils.damp(controls.target.z, s.me.spr.position.z, 14, dt);
+    controls.target.y = THREE.MathUtils.damp(controls.target.y, s.me.spr.position.y + 1.2, 14, dt);
+  }
 
   // publish my position (throttled by movement or heartbeat)
   if (s.me && s.connected) {
