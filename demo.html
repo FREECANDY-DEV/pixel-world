@@ -726,7 +726,23 @@
         'Red Poppy': (c) => { tpx(c, 23, 26, 2, 18, '#388e3c'); tpx(c, 19, 20, 10, 8, '#e53935'); tpx(c, 22, 22, 4, 4, '#212121'); },
         Sunflower: (c) => { tpx(c, 23, 22, 2, 22, '#2e7d32'); tpx(c, 16, 14, 16, 16, '#fbc02d'); tpx(c, 20, 18, 8, 8, '#5d4037'); },
         Beehive: (c) => { tpx(c, 16, 24, 16, 16, '#f57f17'); for (let y = 24; y < 40; y += 4) tpx(c, 16, y, 16, 1, '#fbc02d'); tpx(c, 22, 34, 4, 4, '#212121'); },
-        'Iron Ore': (c) => { tpx(c, 12, 28, 24, 16, '#616161'); tpx(c, 16, 30, 6, 4, '#b71c1c'); tpx(c, 24, 36, 8, 4, '#b71c1c'); }
+        'Iron Ore': (c) => { tpx(c, 12, 28, 24, 16, '#616161'); tpx(c, 16, 30, 6, 4, '#b71c1c'); tpx(c, 24, 36, 8, 4, '#b71c1c'); },
+        'T-Rex': (c) => { tpx(c, 10, 16, 18, 14, '#2e7d32'); tpx(c, 20, 14, 12, 10, '#388e3c'); tpx(c, 26, 20, 8, 3, '#ffffff'); tpx(c, 6, 26, 10, 6, '#1b5e20'); tpx(c, 14, 30, 6, 12, '#2e7d32'); tpx(c, 22, 30, 6, 12, '#2e7d32'); },
+        Wolf: (c) => { tpx(c, 12, 28, 20, 10, '#78909c'); tpx(c, 10, 24, 8, 8, '#90a4ae'); tpx(c, 8, 22, 3, 5, '#546e7a'); tpx(c, 14, 38, 4, 8, '#546e7a'); tpx(c, 26, 38, 4, 8, '#546e7a'); tpx(c, 30, 26, 6, 4, '#78909c'); },
+        Bear: (c) => { tpx(c, 10, 22, 24, 16, '#4e342e'); tpx(c, 8, 20, 10, 10, '#3e2723'); tpx(c, 6, 18, 4, 4, '#3e2723'); tpx(c, 12, 38, 6, 8, '#271c19'); tpx(c, 26, 38, 6, 8, '#271c19'); },
+        Snake: (c) => { for (let i = 0; i < 6; i++) { tpx(c, 12 + i * 4, 36 + (i % 2 === 0 ? 0 : 4), 6, 5, '#f57f17'); tpx(c, 14 + i * 4, 37 + (i % 2 === 0 ? 0 : 4), 2, 2, '#bf360c'); } tpx(c, 32, 32, 6, 6, '#f57f17'); tpx(c, 36, 34, 3, 2, '#d50000'); },
+        Watchtower: (c) => { tpx(c, 14, 24, 4, 22, '#5d4037'); tpx(c, 30, 24, 4, 22, '#5d4037'); tpx(c, 10, 18, 28, 6, '#8d6e63'); tpx(c, 12, 12, 24, 6, '#4e342e'); tpx(c, 16, 28, 16, 2, '#4e342e'); },
+        Pyramid: (c) => { for (let i = 0; i < 8; i++) { tpx(c, 8 + i * 2, 40 - i * 3, 32 - i * 4, 3, i % 2 === 0 ? '#d7ccc8' : '#bcaaa4'); } tpx(c, 22, 16, 4, 3, '#ffb300'); },
+        Crossbow: (c) => { tpx(c, 22, 12, 4, 30, '#5d4037'); tpx(c, 10, 20, 28, 4, '#78909c'); tpx(c, 12, 24, 24, 1, '#eceff1'); tpx(c, 20, 32, 8, 4, '#3e2723'); },
+        Grenade: (c) => { tpx(c, 18, 22, 12, 16, '#33691e'); tpx(c, 18, 22, 12, 2, '#1b5e20'); tpx(c, 22, 16, 4, 6, '#78909c'); tpx(c, 24, 14, 4, 3, '#ff6f00'); },
+        'Combat Mech': (c) => { tpx(c, 14, 16, 20, 14, '#37474f'); tpx(c, 18, 20, 12, 4, '#00e5ff'); tpx(c, 10, 20, 4, 10, '#263238'); tpx(c, 34, 20, 4, 10, '#263238'); tpx(c, 16, 30, 6, 14, '#263238'); tpx(c, 26, 30, 6, 14, '#263238'); },
+        Canoe: (c) => { tpx(c, 6, 30, 36, 8, '#6d4c41'); tpx(c, 10, 28, 28, 3, '#4e342e'); tpx(c, 22, 20, 4, 16, '#8d6e63'); tpx(c, 20, 34, 8, 2, '#3e2723'); },
+        Jellyfish: (c) => { tpx(c, 16, 16, 16, 12, 'rgba(0, 229, 255, 0.75)'); tpx(c, 18, 14, 12, 4, '#e040fb'); for (let i = 0; i < 4; i++) { tpx(c, 18 + i * 3, 28, 2, 12, 'rgba(224, 64, 251, 0.7)'); } },
+        Crab: (c) => { tpx(c, 14, 28, 20, 10, '#ff3d00'); tpx(c, 10, 22, 6, 8, '#dd2c00'); tpx(c, 32, 22, 6, 8, '#dd2c00'); for (let i = 0; i < 3; i++) { tpx(c, 12 + i * 3, 38, 2, 6, '#dd2c00'); tpx(c, 28 + i * 3, 38, 2, 6, '#dd2c00'); } },
+        'Gold Ore': (c) => { tpx(c, 12, 28, 24, 16, '#616161'); tpx(c, 16, 30, 8, 5, '#ffab00'); tpx(c, 26, 36, 6, 4, '#ffab00'); tpx(c, 20, 38, 4, 3, '#ffd600'); },
+        Mushroom: (c) => { tpx(c, 21, 28, 6, 14, '#eceff1'); tpx(c, 12, 18, 24, 12, '#d50000'); for (const [mx, my] of [[16, 22], [22, 20], [28, 24], [20, 25]]) { tpx(c, mx, my, 3, 3, '#ffffff'); } },
+        Knight: (c) => { tpx(c, 18, 14, 12, 10, '#b0bec5'); tpx(c, 20, 18, 8, 2, '#37474f'); tpx(c, 16, 24, 16, 14, '#78909c'); tpx(c, 18, 38, 5, 8, '#455a64'); tpx(c, 25, 38, 5, 8, '#455a64'); tpx(c, 12, 24, 4, 12, '#ff1744'); },
+        Cyborg: (c) => { tpx(c, 18, 14, 12, 10, '#37474f'); tpx(c, 24, 18, 4, 2, '#ff1744'); tpx(c, 16, 24, 16, 14, '#263238'); tpx(c, 10, 24, 6, 12, '#00e5ff'); tpx(c, 18, 38, 5, 8, '#1a237e'); tpx(c, 25, 38, 5, 8, '#1a237e'); }
       };
 
       const FISH_SPECIES = [
@@ -815,6 +831,9 @@
             drawPixelArtGrid(ctx, ch.art, ch.pal, scale, ox, oy);
           });
         });
+        ['Knight', 'Cyborg'].forEach(name => {
+          createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
+        });
 
         // 2. 🌲 Vegetation & World Flora (25 species)
         addHeader('🌲 Vegetation & Flora (25 World Species)');
@@ -830,37 +849,37 @@
 
         // 4. 🦣 Wildlife & Beasts
         addHeader('🦣 Wildlife & Beasts');
-        ['Mammoth', 'Sabertooth', 'Wild Boar', 'Rabbit', 'Eagle', 'Honeybee'].forEach(name => {
+        ['Mammoth', 'Sabertooth', 'Wild Boar', 'Rabbit', 'Eagle', 'Honeybee', 'T-Rex', 'Wolf', 'Bear', 'Snake'].forEach(name => {
           createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
         });
 
         // 5. 🏚️ Housing & Base Building
         addHeader('🏚️ Housing & Base Building (Era Tiers)');
-        ['Thatch Hut', 'Log Cabin', 'Stone Cottage', 'Bunker', 'Cyber Hab'].forEach(name => {
+        ['Thatch Hut', 'Log Cabin', 'Stone Cottage', 'Bunker', 'Cyber Hab', 'Watchtower', 'Pyramid'].forEach(name => {
           createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
         });
 
         // 6. ⚔️ Weapons & Armaments
         addHeader('⚔️ Weapons & Armaments (Evolutionary Tiers)');
-        ['Flint Spear', 'Iron Sword', 'Tactical Rifle', 'Plasma Saber'].forEach(name => {
+        ['Flint Spear', 'Iron Sword', 'Tactical Rifle', 'Plasma Saber', 'Crossbow', 'Grenade'].forEach(name => {
           createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
         });
 
         // 7. 🚗 Vehicles & Transports
         addHeader('🚗 Vehicles & Transports');
-        ['Chariot', 'Survival Jeep', 'Hovercraft'].forEach(name => {
+        ['Chariot', 'Survival Jeep', 'Hovercraft', 'Combat Mech', 'Canoe'].forEach(name => {
           createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
         });
 
         // 8. 🦈 Apex Predators & Marine Life
         addHeader('🦈 Marine Predators');
-        ['Great White', 'Octopus', 'Sea Turtle'].forEach(name => {
+        ['Great White', 'Octopus', 'Sea Turtle', 'Jellyfish', 'Crab'].forEach(name => {
           createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
         });
 
         // 9. 🪵 Resources & Props
         addHeader('🪵 Resources & World Props');
-        ['Wood Pile', 'Red Poppy', 'Sunflower', 'Beehive', 'Iron Ore'].forEach(name => {
+        ['Wood Pile', 'Red Poppy', 'Sunflower', 'Beehive', 'Iron Ore', 'Gold Ore', 'Mushroom'].forEach(name => {
           createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
         });
       });

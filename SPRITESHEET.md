@@ -216,11 +216,11 @@ game does (sun angle derived from the hour of day):
 
 ## 9. Evolutionary Survival & Tactical Assets Library — `SURVIVAL_PAINTERS`
 
-A massive collection of **26 code-painted pixel art assets** designed for human evolution, survival tactics, base building, combat, and resource gathering across eras (Stone Age $\rightarrow$ Medieval $\rightarrow$ Modern $\rightarrow$ Sci-Fi).
+A massive collection of **42 code-painted pixel art assets** designed for human evolution, survival tactics, base building, combat, and resource gathering across eras (Stone Age $\rightarrow$ Medieval $\rightarrow$ Modern $\rightarrow$ Sci-Fi).
 
 Available in `main.js` via `SURVIVAL_PAINTERS` and helper `__DBG.renderSurvivalAsset(kind, canvas, width, height)`:
 
-### 🦣 9.1 Wildlife & Creatures (`mammoth`, `sabertooth`, `boar`, `rabbit`, `eagle`, `bee`)
+### 🦣 9.1 Wildlife & Creatures (`mammoth`, `sabertooth`, `boar`, `rabbit`, `eagle`, `bee`, `dino_t_rex`, `wolf`, `bear`, `snake`)
 
 | Asset Key | Name | Era / Environment | Description & Colors |
 |-----------|------|-------------------|----------------------|
@@ -230,10 +230,14 @@ Available in `main.js` via `SURVIVAL_PAINTERS` and helper `__DBG.renderSurvivalA
 | `rabbit` | Wild Rabbit | Plains & Meadows | Fluffy grey-brown rabbit (`#9c8874`), long ears (`#d4c4b0`), and white puff tail. |
 | `eagle` | Soaring Eagle | Mountain Skies | Brown raptor (`#4a3625`), white head (`#ffffff`), and curved yellow beak (`#ffcc00`). |
 | `bee` | Honeybee | Flower Fields | Tiny yellow-and-black striped bee (`#f5ba18` / `#1a1813`) with translucent wings. |
+| `dino_t_rex` | Prehistoric T-Rex | Cretaceous Jungles | Massive green apex predator (`#2e7d32`), sharp white teeth (`#ffffff`), and strong hind legs. |
+| `wolf` | Timber Wolf | Pine Forests | Blue-grey wolf (`#78909c`) with pointed ears and bushy tail. |
+| `bear` | Grizzly Bear | Mountain Forests | Large dark brown bear (`#4e342e`) with heavy paws and snout. |
+| `snake` | Rattlesnake | Deserts & Rocks | Coiled orange-brown snake (`#f57f17`) with red tongue tip (`#d50000`). |
 
 ---
 
-### 🏚️ 9.2 Evolutionary Housing & Shelters (`thatchhut`, `logcabin`, `stonecottage`, `concretebunker`, `cyberhab`)
+### 🏚️ 9.2 Evolutionary Housing & Shelters (`thatchhut`, `logcabin`, `stonecottage`, `concretebunker`, `cyberhab`, `watchtower`, `pyramid`)
 
 | Asset Key | Name | Era / Tech Level | Description & Features |
 |-----------|------|------------------|------------------------|
@@ -242,10 +246,12 @@ Available in `main.js` via `SURVIVAL_PAINTERS` and helper `__DBG.renderSurvivalA
 | `stonecottage` | Medieval Stone Cottage | Medieval Era | Cobblestone walls (`#858994`), terracotta roof tiles (`#a33928`), and glass windows (`#82ccdd`). |
 | `concretebunker` | Tactical Concrete Bunker | Modern Era | Heavy reinforced concrete (`#57606f`), steel blast door (`#2f3542`), and tactical vision slit. |
 | `cyberhab` | Sci-Fi Cyber Hab Dome | Futuristic Era | Dark alloy structure (`#2f3542`), cyan solar dome (`#00d2d3`), blue airlock, and amber neon line. |
+| `watchtower` | Wooden Guard Tower | Feudal / Ancient Era | Raised timber platform (`#8d6e63`) on 4 support posts (`#5d4037`) with protective railing. |
+| `pyramid` | Ancient Stone Pyramid | Ancient Kingdom | Stepped sandstone pyramid (`#d7ccc8`) with golden capstone apex (`#ffb300`). |
 
 ---
 
-### ⚔️ 9.3 Evolutionary Weapons & Tactical Armaments (`flintspear`, `ironsword`, `tacticalrifle`, `plasmasaber`)
+### ⚔️ 9.3 Evolutionary Weapons & Tactical Armaments (`flintspear`, `ironsword`, `tacticalrifle`, `plasmasaber`, `crossbow`, `grenade`)
 
 | Asset Key | Name | Era / Weapon Class | Description & Crafting Details |
 |-----------|------|--------------------|--------------------------------|
@@ -253,30 +259,36 @@ Available in `main.js` via `SURVIVAL_PAINTERS` and helper `__DBG.renderSurvivalA
 | `ironsword` | Steel Longsword | Medieval Melee | Double-edged steel blade (`#cfd8dc`), shiny edge highlight, gold guard (`#ffb300`), and leather hilt. |
 | `tacticalrifle` | Assault Rifle | Modern Ranged | Dark receiver & barrel (`#263238`), tactical scope (`#009688`), stock, and magazine. |
 | `plasmasaber` | Energy Plasma Saber | Sci-Fi Melee | Metallic hilt (`#37474f`) projecting a glowing cyan plasma beam (`rgba(0,240,255,0.85)`). |
+| `crossbow` | Heavy Crossbow | Medieval Ranged | Wooden tiller (`#5d4037`), steel prod lathe (`#78909c`), and taut bowstring (`#eceff1`). |
+| `grenade` | Tactical Frag Grenade | Modern Explosive | Olive drab ribbed body (`#33691e`), metal fuse pin (`#78909c`), and orange safety lever. |
 
 ---
 
-### 🚗 9.4 Vehicles & Transports (`chariot`, `survivaljeep`, `hovercraft`)
+### 🚗 9.4 Vehicles & Transports (`chariot`, `survivaljeep`, `hovercraft`, `mech`, `boat`)
 
 | Asset Key | Name | Era / Vehicle Type | Description & Features |
 |-----------|------|--------------------|------------------------|
 | `chariot` | Ancient Wooden Chariot | Ancient Era | Wooden chassis (`#8d6e63`) with dual spoked wheels (`#4e342e`) and hitch bar. |
 | `survivaljeep` | 4x4 Survival Jeep | Modern Tactical | Olive green body (`#2e7d32`), roll cage, heavy off-road tires (`#212121`), and yellow headlight. |
 | `hovercraft` | Recon Hovercraft | Sci-Fi Tactical | Sleek alloy hull (`#37474f`), glass canopy (`#00bcd4`), and glowing cyan anti-grav levitation skirt. |
+| `mech` | Combat Walker Mech | Futuristic Military | Bipedal armored chassis (`#37474f`), cyan visor cockpit (`#00e5ff`), and shoulder mounts. |
+| `boat` | Dugout Wooden Canoe | River / Coastal | Hollowed log hull (`#6d4c41`) with wooden paddle (`#8d6e63`). |
 
 ---
 
-### 🦈 9.5 Ocean & Marine Predators (`greatwhite`, `octopus`, `seaturtle`)
+### 🦈 9.5 Ocean & Marine Predators (`greatwhite`, `octopus`, `seaturtle`, `jellyfish`, `crab`)
 
 | Asset Key | Name | Environment | Description & Features |
 |-----------|------|-------------|------------------------|
 | `greatwhite` | Great White Shark | Deep Ocean | Streamlined slate-grey shark (`#607d8b`), white underside (`#eceff1`), dorsal fin, and sharp tail. |
 | `octopus` | Giant Octopus | Coral Reefs | Crimson-red octopus (`#d32f2f`) with 6 curling tentacles (`#b71c1c`). |
 | `seaturtle` | Sea Turtle | Coastal Waters | Dark green patterned carapace shell (`#2e7d32`) with swimming flippers (`#1b5e20`). |
+| `jellyfish` | Bioluminescent Jellyfish | Deep Ocean | Translucent cyan bell dome (`rgba(0,229,255,0.75)`) with purple tentacles (`#e040fb`). |
+| `crab` | Beach Crab | Coastal Shallows | Bright red carapace (`#ff3d00`) with two large claws (`#dd2c00`) and walking legs. |
 
 ---
 
-### 🪵 9.6 Crafting Resources & Nature Props (`woodpile`, `poppy`, `sunflower`, `beehive`, `ironore`)
+### 🪵 9.6 Crafting Resources & Nature Props (`woodpile`, `poppy`, `sunflower`, `beehive`, `ironore`, `goldore`, `mushroom`, `knight`, `cyborg`)
 
 | Asset Key | Name | Crafting Category | Description & Purpose |
 |-----------|------|-------------------|-----------------------|
@@ -285,6 +297,10 @@ Available in `main.js` via `SURVIVAL_PAINTERS` and helper `__DBG.renderSurvivalA
 | `sunflower` | Golden Sunflower | Botany / Agriculture | Tall green stem (`#2e7d32`), golden yellow petals (`#fbc02d`), and brown seed head. |
 | `beehive` | Woven Skep Beehive | Agriculture / Food | Straw skep beehive (`#f57f17`) with entrance hole and honey stripes. |
 | `ironore` | Iron Ore Chunk | Metallurgy / Mining | Rough grey stone rock (`#616161`) with rich reddish iron veins (`#b71c1c`). |
+| `goldore` | Gold Ore Deposit | Mining / Currency | Stone rock (`#616161`) embedded with gleaming yellow gold flecks (`#ffab00`). |
+| `mushroom` | Glowing Toadstool | Forest Botany | White stem (`#eceff1`) with bright red cap (`#d50000`) and white spots. |
+| `knight` | Armored Knight | Feudal Unit | Full steel plate armor (`#b0bec5`), visor slit (`#37474f`), and red banner cape (`#ff1744`). |
+| `cyborg` | Cybernetic Soldier | Sci-Fi Unit | Dark alloy suit (`#263238`), red visor optic (`#ff1744`), and cyan plasma arm (`#00e5ff`). |
 
 ---
 
