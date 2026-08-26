@@ -6445,8 +6445,8 @@ function spawnCaveman(x, z, female = false, forceAge = null, lookOverride = null
   // every person is drawn with their own palette + hairstyle variants
   const rnd = mulberry32((Math.random() * 0xffffffff) >>> 0);
   const look = lookOverride || pickLook(rnd, female);
-  // All spawned players (local and remote) wear the HAZMAT suit!
-  const isHazmat = true;
+  // Players wear the HAZMAT suit; Adam, Eve, Cain, Abel & tribe NPCs spawn as Human Cavemans!
+  const isHazmat = !!(lookOverride && (lookOverride.isPlayer || lookOverride.hazmat || lookOverride.skin === '#ffd23f' || (lookOverride.name && lookOverride.name.startsWith('Subject')))) || (DEMO_MODE && !lookOverride && cavemen.length === 0);
 
   const mats = {};
   for (const [key, cfg] of Object.entries(STAGES)) {
@@ -9428,6 +9428,7 @@ function initDemoMode() {
     const z = homePos.z + Math.sin(ang) * r;
     if (isDry(x, z) && !treeHit(x, z)) { sx = x; sz = z; break; }
   }
+  if (demoLook) { demoLook.isPlayer = true; demoLook.hazmat = true; }
   spawnCaveman(sx, sz, demoFemale, demoAge, demoLook);
   const me = cavemen[cavemen.length - 1];
   me.stats.name = demoState.name;
@@ -9827,12 +9828,8 @@ function makeHologramMat() {
 
 // --- DEMO MODULE part 3: ghosts & bubbles ------------------------------------
 function demoMakeGhostMat(female, look) {
-  if (!look) return female ? womanMatR : cavemanMatR;
-  const cfg = (female ? FEMALE_STAGES : AGE_STAGES).adult;
-  const vArt = artVariant(cfg.art, female, look.style, look.beard);
-  const vp = lookPal(cfg.pal || CAVEMAN_PALETTE, look);
-  const [mr] = makeCavemanMats(vArt, vp);
-  return mr;
+  const [hzR] = makeCavemanMats(HAZMAT_HUMAN, HAZMAT_PALETTE);
+  return hzR;
 }
 
 function demoMakeGhost(id, name, color, female = false, look = null) {
