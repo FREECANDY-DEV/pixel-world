@@ -214,6 +214,80 @@ game does (sun angle derived from the hour of day):
 
 ---
 
+## 9. Evolutionary Survival & Tactical Assets Library — `SURVIVAL_PAINTERS`
+
+A massive collection of **26 code-painted pixel art assets** designed for human evolution, survival tactics, base building, combat, and resource gathering across eras (Stone Age $\rightarrow$ Medieval $\rightarrow$ Modern $\rightarrow$ Sci-Fi).
+
+Available in `main.js` via `SURVIVAL_PAINTERS` and helper `__DBG.renderSurvivalAsset(kind, canvas, width, height)`:
+
+### 🦣 9.1 Wildlife & Creatures (`mammoth`, `sabertooth`, `boar`, `rabbit`, `eagle`, `bee`)
+
+| Asset Key | Name | Era / Environment | Description & Colors |
+|-----------|------|-------------------|----------------------|
+| `mammoth` | Prehistoric Mammoth | Stone Age Tundra | Massive brown furred mammoth (`#63422b`), front hump, curved ivory tusks (`#f4f0e4`), and trunk. |
+| `sabertooth` | Sabertooth Tiger | Stone Age Predator | Golden amber predatory feline (`#c7863c`), long white saber fangs (`#ffffff`), and tail. |
+| `boar` | Wild Boar | Forests & Swamps | Dark bristly boar (`#42362b`) with sharp white tusks and snout. |
+| `rabbit` | Wild Rabbit | Plains & Meadows | Fluffy grey-brown rabbit (`#9c8874`), long ears (`#d4c4b0`), and white puff tail. |
+| `eagle` | Soaring Eagle | Mountain Skies | Brown raptor (`#4a3625`), white head (`#ffffff`), and curved yellow beak (`#ffcc00`). |
+| `bee` | Honeybee | Flower Fields | Tiny yellow-and-black striped bee (`#f5ba18` / `#1a1813`) with translucent wings. |
+
+---
+
+### 🏚️ 9.2 Evolutionary Housing & Shelters (`thatchhut`, `logcabin`, `stonecottage`, `concretebunker`, `cyberhab`)
+
+| Asset Key | Name | Era / Tech Level | Description & Features |
+|-----------|------|------------------|------------------------|
+| `thatchhut` | Straw Thatch Hut | Stone Age | Conical reed/straw thatch hut (`#87693d`), log doorframe, and top smoke vent. |
+| `logcabin` | Timber Log Cabin | Bronze / Iron Age | Stacked wooden logs (`#664327`), stone chimney (`#6b6660`), and glowing yellow window. |
+| `stonecottage` | Medieval Stone Cottage | Medieval Era | Cobblestone walls (`#858994`), terracotta roof tiles (`#a33928`), and glass windows (`#82ccdd`). |
+| `concretebunker` | Tactical Concrete Bunker | Modern Era | Heavy reinforced concrete (`#57606f`), steel blast door (`#2f3542`), and tactical vision slit. |
+| `cyberhab` | Sci-Fi Cyber Hab Dome | Futuristic Era | Dark alloy structure (`#2f3542`), cyan solar dome (`#00d2d3`), blue airlock, and amber neon line. |
+
+---
+
+### ⚔️ 9.3 Evolutionary Weapons & Tactical Armaments (`flintspear`, `ironsword`, `tacticalrifle`, `plasmasaber`)
+
+| Asset Key | Name | Era / Weapon Class | Description & Crafting Details |
+|-----------|------|--------------------|--------------------------------|
+| `flintspear` | Chipped Flint Spear | Stone Age Melee | Wooden shaft (`#795548`), sinew binding (`#4e342e`), and sharp grey flint tip (`#9e9e9e`). |
+| `ironsword` | Steel Longsword | Medieval Melee | Double-edged steel blade (`#cfd8dc`), shiny edge highlight, gold guard (`#ffb300`), and leather hilt. |
+| `tacticalrifle` | Assault Rifle | Modern Ranged | Dark receiver & barrel (`#263238`), tactical scope (`#009688`), stock, and magazine. |
+| `plasmasaber` | Energy Plasma Saber | Sci-Fi Melee | Metallic hilt (`#37474f`) projecting a glowing cyan plasma beam (`rgba(0,240,255,0.85)`). |
+
+---
+
+### 🚗 9.4 Vehicles & Transports (`chariot`, `survivaljeep`, `hovercraft`)
+
+| Asset Key | Name | Era / Vehicle Type | Description & Features |
+|-----------|------|--------------------|------------------------|
+| `chariot` | Ancient Wooden Chariot | Ancient Era | Wooden chassis (`#8d6e63`) with dual spoked wheels (`#4e342e`) and hitch bar. |
+| `survivaljeep` | 4x4 Survival Jeep | Modern Tactical | Olive green body (`#2e7d32`), roll cage, heavy off-road tires (`#212121`), and yellow headlight. |
+| `hovercraft` | Recon Hovercraft | Sci-Fi Tactical | Sleek alloy hull (`#37474f`), glass canopy (`#00bcd4`), and glowing cyan anti-grav levitation skirt. |
+
+---
+
+### 🦈 9.5 Ocean & Marine Predators (`greatwhite`, `octopus`, `seaturtle`)
+
+| Asset Key | Name | Environment | Description & Features |
+|-----------|------|-------------|------------------------|
+| `greatwhite` | Great White Shark | Deep Ocean | Streamlined slate-grey shark (`#607d8b`), white underside (`#eceff1`), dorsal fin, and sharp tail. |
+| `octopus` | Giant Octopus | Coral Reefs | Crimson-red octopus (`#d32f2f`) with 6 curling tentacles (`#b71c1c`). |
+| `seaturtle` | Sea Turtle | Coastal Waters | Dark green patterned carapace shell (`#2e7d32`) with swimming flippers (`#1b5e20`). |
+
+---
+
+### 🪵 9.6 Crafting Resources & Nature Props (`woodpile`, `poppy`, `sunflower`, `beehive`, `ironore`)
+
+| Asset Key | Name | Crafting Category | Description & Purpose |
+|-----------|------|-------------------|-----------------------|
+| `woodpile` | Chopped Timber Stack | Fuel / Construction | Stacked wooden logs (`#6d4c41`) with visible ringed log ends (`#d7ccc8`). |
+| `poppy` | Red Poppy Flower | Botany / Medicine | Vibrant crimson poppy (`#e53935`) with green stem and dark center core. |
+| `sunflower` | Golden Sunflower | Botany / Agriculture | Tall green stem (`#2e7d32`), golden yellow petals (`#fbc02d`), and brown seed head. |
+| `beehive` | Woven Skep Beehive | Agriculture / Food | Straw skep beehive (`#f57f17`) with entrance hole and honey stripes. |
+| `ironore` | Iron Ore Chunk | Metallurgy / Mining | Rough grey stone rock (`#616161`) with rich reddish iron veins (`#b71c1c`). |
+
+---
+
 ### Palette conventions
 
 - Outline-free soft pixel style; 1px highlights top-left, 1px shade bottom-right.

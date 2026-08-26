@@ -3304,6 +3304,207 @@ const PAINTERS = {
   bloom: paintBloom, bramble: paintBramble,
 };
 
+// --- Evolutionary Survival & Tactical Assets Expansion --------------------
+function paintMammoth(c, ox) {
+  tpx(c, ox + 10, 24, 26, 16, '#63422b');
+  tpx(c, ox + 8, 20, 12, 10, '#52341e');
+  tpx(c, ox + 12, 40, 6, 6, '#422815');
+  tpx(c, ox + 26, 40, 6, 6, '#422815');
+  tpx(c, ox + 6, 28, 4, 12, '#331d0d');
+  tpx(c, ox + 4, 38, 5, 3, '#331d0d');
+  tpx(c, ox + 8, 32, 12, 3, '#e8e4d8');
+  tpx(c, ox + 4, 28, 4, 5, '#f4f0e4');
+}
+
+function paintSabertooth(c, ox) {
+  tpx(c, ox + 12, 30, 22, 10, '#c7863c');
+  tpx(c, ox + 10, 26, 8, 7, '#d9974c');
+  tpx(c, ox + 10, 32, 2, 4, '#ffffff');
+  tpx(c, ox + 12, 32, 2, 4, '#ffffff');
+  tpx(c, ox + 14, 40, 4, 6, '#a86c28');
+  tpx(c, ox + 28, 40, 4, 6, '#a86c28');
+  tpx(c, ox + 34, 28, 6, 3, '#c7863c');
+}
+
+function paintBoar(c, ox) {
+  tpx(c, ox + 14, 32, 20, 10, '#42362b');
+  tpx(c, ox + 10, 34, 6, 6, '#544638');
+  tpx(c, ox + 8, 38, 3, 2, '#ffffff');
+  tpx(c, ox + 16, 42, 4, 4, '#2b221a');
+  tpx(c, ox + 28, 42, 4, 4, '#2b221a');
+}
+
+function paintRabbit(c, ox) {
+  tpx(c, ox + 20, 36, 10, 8, '#9c8874');
+  tpx(c, ox + 18, 32, 6, 6, '#b09c86');
+  tpx(c, ox + 18, 25, 2, 7, '#d4c4b0');
+  tpx(c, ox + 21, 25, 2, 7, '#d4c4b0');
+  tpx(c, ox + 30, 38, 3, 3, '#ffffff');
+}
+
+function paintEagle(c, ox) {
+  tpx(c, ox + 14, 28, 20, 6, '#4a3625');
+  tpx(c, ox + 22, 24, 6, 12, '#382617');
+  tpx(c, ox + 23, 20, 4, 4, '#ffffff');
+  tpx(c, ox + 22, 21, 2, 2, '#ffcc00');
+}
+
+function paintBee(c, ox) {
+  tpx(c, ox + 22, 34, 8, 6, '#f5ba18');
+  tpx(c, ox + 24, 34, 2, 6, '#1a1813');
+  tpx(c, ox + 28, 34, 2, 6, '#1a1813');
+  tpx(c, ox + 20, 30, 5, 4, 'rgba(220,240,255,0.7)');
+  tpx(c, ox + 26, 30, 5, 4, 'rgba(220,240,255,0.7)');
+}
+
+function paintThatchHut(c, ox) {
+  tpx(c, ox + 12, 28, 24, 18, '#87693d');
+  tpx(c, ox + 16, 20, 16, 8, '#a6844e');
+  tpx(c, ox + 20, 14, 8, 6, '#bf9b5e');
+  tpx(c, ox + 20, 34, 8, 12, '#3b2b18');
+  tpx(c, ox + 22, 10, 4, 4, '#241a0e');
+}
+
+function paintLogCabin(c, ox) {
+  tpx(c, ox + 10, 26, 28, 20, '#664327');
+  for (let y = 26; y < 46; y += 4) tpx(c, ox + 10, y, 28, 1, '#422813');
+  tpx(c, ox + 8, 18, 32, 8, '#8c5932');
+  tpx(c, ox + 32, 12, 4, 14, '#6b6660');
+  tpx(c, ox + 20, 34, 8, 12, '#362110');
+  tpx(c, ox + 13, 30, 4, 4, '#ffe082');
+}
+
+function paintStoneCottage(c, ox) {
+  tpx(c, ox + 10, 24, 28, 22, '#858994');
+  tpx(c, ox + 8, 16, 32, 8, '#a33928');
+  tpx(c, ox + 20, 34, 8, 12, '#4d3019');
+  tpx(c, ox + 14, 28, 4, 5, '#82ccdd');
+  tpx(c, ox + 30, 28, 4, 5, '#82ccdd');
+}
+
+function paintConcreteBunker(c, ox) {
+  tpx(c, ox + 8, 24, 32, 20, '#57606f');
+  tpx(c, ox + 6, 20, 36, 4, '#2f3542');
+  tpx(c, ox + 18, 32, 12, 12, '#2f3542');
+  tpx(c, ox + 12, 28, 24, 2, '#1e272e');
+}
+
+function paintCyberHab(c, ox) {
+  tpx(c, ox + 10, 22, 28, 22, '#2f3542');
+  tpx(c, ox + 14, 16, 20, 8, '#00d2d3');
+  tpx(c, ox + 20, 32, 8, 12, '#54a0ff');
+  tpx(c, ox + 10, 28, 28, 2, '#ff9f43');
+}
+
+function paintFlintSpear(c, ox) {
+  tpx(c, ox + 22, 12, 4, 32, '#795548');
+  tpx(c, ox + 21, 6, 6, 8, '#9e9e9e');
+  tpx(c, ox + 22, 14, 4, 3, '#4e342e');
+}
+
+function paintIronSword(c, ox) {
+  tpx(c, ox + 22, 8, 4, 28, '#cfd8dc');
+  tpx(c, ox + 23, 8, 2, 28, '#ffffff');
+  tpx(c, ox + 18, 36, 12, 3, '#ffb300');
+  tpx(c, ox + 22, 39, 4, 6, '#3e2723');
+}
+
+function paintTacticalRifle(c, ox) {
+  tpx(c, ox + 10, 26, 26, 4, '#263238');
+  tpx(c, ox + 8, 27, 4, 6, '#37474f');
+  tpx(c, ox + 20, 30, 4, 8, '#1a237e');
+  tpx(c, ox + 18, 22, 8, 3, '#009688');
+}
+
+function paintPlasmaSaber(c, ox) {
+  tpx(c, ox + 22, 28, 4, 14, '#37474f');
+  tpx(c, ox + 21, 6, 6, 22, 'rgba(0, 240, 255, 0.85)');
+  tpx(c, ox + 23, 6, 2, 22, '#ffffff');
+}
+
+function paintChariot(c, ox) {
+  tpx(c, ox + 16, 26, 16, 12, '#8d6e63');
+  tpx(c, ox + 12, 34, 8, 8, '#4e342e');
+  tpx(c, ox + 28, 34, 8, 8, '#4e342e');
+  tpx(c, ox + 6, 32, 10, 2, '#6d4c41');
+}
+
+function paintSurvivalJeep(c, ox) {
+  tpx(c, ox + 8, 26, 32, 12, '#2e7d32');
+  tpx(c, ox + 12, 20, 20, 8, '#1b5e20');
+  tpx(c, ox + 10, 34, 8, 8, '#212121');
+  tpx(c, ox + 30, 34, 8, 8, '#212121');
+  tpx(c, ox + 36, 28, 4, 4, '#ffeb3b');
+}
+
+function paintHoverCraft(c, ox) {
+  tpx(c, ox + 8, 26, 32, 10, '#37474f');
+  tpx(c, ox + 14, 20, 16, 8, '#00bcd4');
+  tpx(c, ox + 10, 34, 28, 4, 'rgba(0, 229, 255, 0.7)');
+}
+
+function paintGreatWhite(c, ox) {
+  tpx(c, ox + 8, 22, 32, 12, '#607d8b');
+  tpx(c, ox + 12, 30, 24, 6, '#eceff1');
+  tpx(c, ox + 22, 14, 6, 10, '#455a64');
+  tpx(c, ox + 6, 20, 6, 14, '#455a64');
+}
+
+function paintOctopus(c, ox) {
+  tpx(c, ox + 18, 20, 12, 12, '#d32f2f');
+  for (let i = 0; i < 6; i++) {
+    tpx(c, ox + 10 + i * 5, 30, 4, 12, '#b71c1c');
+  }
+}
+
+function paintSeaTurtle(c, ox) {
+  tpx(c, ox + 14, 22, 20, 16, '#2e7d32');
+  tpx(c, ox + 16, 24, 16, 12, '#43a047');
+  tpx(c, ox + 8, 20, 8, 6, '#1b5e20');
+  tpx(c, ox + 32, 20, 8, 6, '#1b5e20');
+}
+
+function paintWoodPile(c, ox) {
+  for (let y = 38; y >= 30; y -= 4) {
+    tpx(c, ox + 12, y, 24, 3, '#6d4c41');
+    tpx(c, ox + 12, y, 3, 3, '#d7ccc8');
+    tpx(c, ox + 33, y, 3, 3, '#d7ccc8');
+  }
+}
+
+function paintPoppyFlower(c, ox) {
+  tpx(c, ox + 23, 26, 2, 18, '#388e3c');
+  tpx(c, ox + 19, 20, 10, 8, '#e53935');
+  tpx(c, ox + 22, 22, 4, 4, '#212121');
+}
+
+function paintSunflower(c, ox) {
+  tpx(c, ox + 23, 22, 2, 22, '#2e7d32');
+  tpx(c, ox + 16, 14, 16, 16, '#fbc02d');
+  tpx(c, ox + 20, 18, 8, 8, '#5d4037');
+}
+
+function paintBeehive(c, ox) {
+  tpx(c, ox + 16, 24, 16, 16, '#f57f17');
+  for (let y = 24; y < 40; y += 4) tpx(c, ox + 16, y, 16, 1, '#fbc02d');
+  tpx(c, ox + 22, 34, 4, 4, '#212121');
+}
+
+function paintIronOre(c, ox) {
+  tpx(c, ox + 12, 28, 24, 16, '#616161');
+  tpx(c, ox + 16, 30, 6, 4, '#b71c1c');
+  tpx(c, ox + 24, 36, 8, 4, '#b71c1c');
+}
+
+const SURVIVAL_PAINTERS = {
+  mammoth: paintMammoth, sabertooth: paintSabertooth, boar: paintBoar, rabbit: paintRabbit, eagle: paintEagle, bee: paintBee,
+  thatchhut: paintThatchHut, logcabin: paintLogCabin, stonecottage: paintStoneCottage, concretebunker: paintConcreteBunker, cyberhab: paintCyberHab,
+  flintspear: paintFlintSpear, ironsword: paintIronSword, tacticalrifle: paintTacticalRifle, plasmasaber: paintPlasmaSaber,
+  chariot: paintChariot, survivaljeep: paintSurvivalJeep, hovercraft: paintHoverCraft,
+  greatwhite: paintGreatWhite, octopus: paintOctopus, seaturtle: paintSeaTurtle,
+  woodpile: paintWoodPile, poppy: paintPoppyFlower, sunflower: paintSunflower, beehive: paintBeehive, ironore: paintIronOre
+};
+
 // --- programmatic seasonal variants --------------------------------------
 // Everything works on raw ImageData: canvas->canvas drawImage is unreliable
 // during early page load, while fillRect / getImageData / putImageData are
@@ -10788,7 +10989,20 @@ window.__DBG = {
   rebuildIconAtlas: () => { buildTreeAtlas(); buildIconAtlas(); return iconAtlasCanvas; },
   fishShaderSrc: () => fishMat.vertexShader,
   state: () => ({ iconMode, spaceMode, fishVisDist: FISH_VIS_DIST }),
-  version: 25,
+  version: 26,
+  survivalPainters: SURVIVAL_PAINTERS,
+  renderSurvivalAsset: (kind, canvas, width = 96, height = 96) => {
+    if (!SURVIVAL_PAINTERS[kind]) return false;
+    canvas.width = width; canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, width, height);
+    ctx.save();
+    ctx.scale(width / 48, height / 48);
+    SURVIVAL_PAINTERS[kind](ctx, 0);
+    ctx.restore();
+    return true;
+  },
   demoState: () => DEMO_MODE
     ? { mode: true, id: demoState.id, name: demoState.name, connected: demoState.connected,
         online: demoState.online, ghosts: demoState.ghosts.size, botHost: demoState.botHost }
