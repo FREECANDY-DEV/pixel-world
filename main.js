@@ -3388,7 +3388,8 @@ const treeMat = new THREE.ShaderMaterial({
       float distC = max(length(toCam), 0.001);
       float vertK = clamp(toCam.y / distC, 0.0, 1.0);
       float tiltA = smoothstep(0.35, 1.0, vertK) * 1.45; // ~83° at vertical
-      vec2 dirXZ = toCam.xz / max(length(toCam.xz), 0.001);
+      float lenXZ = length(toCam.xz);
+      vec2 dirXZ = lenXZ > 0.001 ? toCam.xz / lenXZ : vec2(0.0, 1.0);
       // anchor every plant to the block edge FACING the camera: hugging the
       // rim grounds it against the block face below (no mid-block floating),
       // while looking straight down eases it back to the centre. Kept small:
@@ -3398,10 +3399,10 @@ const treeMat = new THREE.ShaderMaterial({
       vec3 basePos = iPos + vec3(dirXZ.x, 0.0, dirXZ.y) * edgeAmt + bendWorld;
       // clear the block top it stands on: the laid-flat sprite sits a touch
       // higher so the voxel face below can never cover it from above
-      basePos.y += vertK * vertK * (0.16 + iH * 0.04);
+      basePos.y += vertK * vertK * (0.35 + iH * 0.08);
       // low sprites (bushes, rocks): tilt/rise toward the camera like the
       // tall trees do, so steep angles never sink them into the block
-      basePos.y += aLift * vertK * vertK * (0.75 + iH * 0.16);
+      basePos.y += aLift * vertK * vertK * (0.85 + iH * 0.20);
       // low sprites also get a small permanent rise (a touch more when the
       // view goes grazing) so their base always clears the block edge
       // they stand on, instead of hiding behind it at eye level
@@ -3426,6 +3427,9 @@ const treeMat = new THREE.ShaderMaterial({
       // lower ground in front never swallows them mid-body, but far-away
       // hills still occlude naturally (bias fades with distance)
       mv.z -= (0.55 + aLift * 0.85) * clamp(1.35 - safeD * 0.008, 0.35, 1.0);
+      // top-view depth clearance: when looking down from above, pull sprites forward in view depth so ground blocks can never hide them
+      float topViewBias = vertK * vertK * (0.8 + aLift * 0.5);
+      mv.z -= topViewBias;
       // eye-level guarantee for low sprites (rocks, bushes): at grazing
       // angles the next terrain row over can sit several units closer to
       // the camera and swallow them entirely — subtract view depth that
@@ -8390,7 +8394,7 @@ renderer.domElement.addEventListener('pointerup', (e) => {
   // pressing the campfire calls lightning down on it: the fire is small on
   // screen, so accept any tap whose view ray passes close to it — but only
   // when no villager was under the pointer (checked above)
-  {
+  if (!DEMO_MODE) {
     const fy = homeFire ? homeFire.position.y : groundYAt(homePos.x, homePos.z);
     const dHigh = raycaster.ray.distanceToPoint(
       new THREE.Vector3(homePos.x, fy + 1.4, homePos.z)
@@ -8533,6 +8537,14 @@ function initDemoMode() {
   if (!DEMO_MODE) return;
   // --- DEMO MODE: simplify the UI for social-only experience ---
   document.body.classList.add('demo-mode');
+  // Top build version badge
+  if (!document.getElementById('demo-build-badge')) {
+    const badge = document.createElement('div');
+    badge.id = 'demo-build-badge';
+    badge.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:999;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#ffd23f;background:rgba(6,10,16,0.85);padding:4px 12px;border-radius:12px;border:1px solid rgba(255,210,63,0.35);pointer-events:none;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,sans-serif;';
+    badge.textContent = 'Build v48.0.0';
+    document.body.appendChild(badge);
+  }
   // Hide ALL creator tools — demo players only use joystick + chat + camera orbit
   const hideIds = [
     'assets-toggle', 'assets-panel', 'assets-header',
@@ -9202,6 +9214,7 @@ function updateDemo(dt, t) {
     demoStepBubble(g, dt);
   }
 
+  if (!homeLit) igniteHome();
   // Grunk: stands by the fire, bobs gently, wears his name & bubbles
   const gr = s.botGhost;
   if (gr) {
@@ -9742,9 +9755,8 @@ function animate() {
     if (move.down) { mx -= rigFwd.x; mz -= rigFwd.z; }
     if (move.left) { mx -= rigRight.x; mz -= rigRight.z; }
     if (move.right) { mx += rigRight.x; mz += rigRight.z; }
-    if (move.right) { mx += rigRight.x; mz += rigRight.z; }
-    // camera stick: ignored while a villager is selected unless pushed hard
-    if (!selectedCm || joyMag > 0.12) {
+    // camera stick: only pans camera when no character is selected
+    if (!selectedCm) {
       mx += rigFwd.x * joy.y + rigRight.x * joy.x;
       mz += rigFwd.z * joy.y + rigRight.z * joy.x;
     }
