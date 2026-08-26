@@ -148,18 +148,20 @@
 
   <div class="footer">MQTT-powered · Zero accounts</div>
 
-  <script>
-    // ================================================================
-    // 1. 3D Rotating Earth Globe (canvas 2D — lightweight, no THREE.js)
-    // ================================================================
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
     (function () {
       const cv = document.getElementById('globe-canvas');
-      const ctx = cv.getContext('2d');
-      const W = cv.width, H = cv.height, CX = W / 2, CY = H / 2, R = W * 0.42;
-      let angle = 0;
+      const renderer = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(cv.clientWidth || 200, cv.clientHeight || 200, false);
 
-      // procedural earth texture
-      const texW = 256, texH = 128;
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+
+      // --- 1. Procedural Earth Texture ---
+      const texW = 512, texH = 256;
       const texC = document.createElement('canvas');
       texC.width = texW; texC.height = texH;
       const tg = texC.getContext('2d');
@@ -180,53 +182,146 @@
           if (Math.abs(lat) > 1.1) { r = 236; g = 241; b = 248; }
           else if (land) {
             const elev = (v - 0.15) / 0.85;
-            if (elev > 0.65) { r = 130; g = 125; b = 115; }
-            else { r = 55 + elev * 30; g = 120 + elev * 10; b = 48 + elev * 10; }
+            if (elev > 0.65) { r = 120; g = 115; b = 105; }
+            else { r = 45 + elev * 35; g = 115 + elev * 20; b = 45 + elev * 15; }
           } else {
             const deep = (0.15 - v) / 0.8;
-            r = 20 + deep * 10; g = 60 + deep * 20; b = 110 + deep * 30;
+            r = 15 + deep * 10; g = 50 + deep * 20; b = 115 + deep * 35;
           }
           const i = (y * texW + x) * 4;
           px[i] = r; px[i + 1] = g; px[i + 2] = b; px[i + 3] = 255;
         }
       }
       tg.putImageData(imgData, 0, 0);
+      const earthTex = new THREE.CanvasTexture(texC);
 
-      function draw() {
-        angle += 0.004;
-        ctx.clearRect(0, 0, W, H);
-        ctx.save();
-        for (let sy = -R; sy <= R; sy += 1.5) {
-          const sliceR = Math.sqrt(R * R - sy * sy);
-          if (sliceR < 1) continue;
-          const lat = Math.asin(sy / R);
-          for (let sx = -sliceR; sx <= sliceR; sx += 1.5) {
-            const lon = Math.atan2(sx, Math.sqrt(sliceR * sliceR - sx * sx)) + angle;
-            const tx = ((lon / (Math.PI * 2)) % 1 + 1) % 1;
-            const ty = (lat / Math.PI) + 0.5;
-            const px2 = Math.floor(tx * texW) % texW;
-            const py2 = Math.max(0, Math.min(texH - 1, Math.floor(ty * texH)));
-            const i = (py2 * texW + px2) * 4;
-            let r = px[i], g = px[i + 1], b = px[i + 2];
-            const nx3 = sx / R, ny3 = sy / R, nz3 = Math.sqrt(Math.max(0, 1 - nx3 * nx3 - ny3 * ny3));
-            const light = Math.max(0.35, ny3 * -0.3 + nz3 * 0.85 + 0.15);
-            r = Math.min(255, r * light); g = Math.min(255, g * light); b = Math.min(255, b * light);
-            ctx.fillStyle = `rgb(${r|0},${g|0},${b|0})`;
-            ctx.fillRect(CX + sx - 0.75, CY + sy - 0.75, 2, 2);
-          }
-        }
-        const grad = ctx.createRadialGradient(CX, CY, R * 0.92, CX, CY, R * 1.08);
-        grad.addColorStop(0, 'rgba(100,180,255,0)');
-        grad.addColorStop(0.6, 'rgba(100,180,255,0.08)');
-        grad.addColorStop(1, 'rgba(100,180,255,0)');
-        ctx.fillStyle = grad;
-        ctx.beginPath(); ctx.arc(CX, CY, R * 1.08, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-        requestAnimationFrame(draw);
+      // --- 2. Procedural Moon Texture ---
+      const mTexC = document.createElement('canvas');
+      mTexC.width = 128; mTexC.height = 64;
+      const mg = mTexC.getContext('2d');
+      mg.fillStyle = '#9e9fa5';
+      mg.fillRect(0, 0, 128, 64);
+      mg.fillStyle = '#6b6c72';
+      for (let i = 0; i < 35; i++) {
+        const cx = Math.random() * 128, cy = Math.random() * 64, cr = 1.5 + Math.random() * 5.5;
+        mg.beginPath(); mg.arc(cx, cy, cr, 0, Math.PI * 2); mg.fill();
       }
-      draw();
-    })();
+      const moonTex = new THREE.CanvasTexture(mTexC);
 
+      // --- 3. Sun Flare Texture ---
+      const sTexC = document.createElement('canvas');
+      sTexC.width = 128; sTexC.height = 128;
+      const sg = sTexC.getContext('2d');
+      const grad = sg.createRadialGradient(64, 64, 0, 64, 64, 64);
+      grad.addColorStop(0, 'rgba(255,255,240,1)');
+      grad.addColorStop(0.2, 'rgba(255,210,63,0.85)');
+      grad.addColorStop(0.5, 'rgba(255,140,20,0.4)');
+      grad.addColorStop(1, 'rgba(255,80,0,0)');
+      sg.fillStyle = grad;
+      sg.fillRect(0, 0, 128, 128);
+      const sunFlareTex = new THREE.CanvasTexture(sTexC);
+
+      // --- 4. Objects ---
+      // Sun (always in background)
+      const sunGroup = new THREE.Group();
+      sunGroup.position.set(0, 12, -180);
+      const sunMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(24, 32, 32),
+        new THREE.MeshBasicMaterial({ color: 0xffe666 })
+      );
+      sunGroup.add(sunMesh);
+      const sunSprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({ map: sunFlareTex, transparent: true, blending: THREE.AdditiveBlending })
+      );
+      sunSprite.scale.set(160, 160, 1);
+      sunGroup.add(sunSprite);
+      scene.add(sunGroup);
+
+      const sunLight = new THREE.PointLight(0xfffaed, 5.0, 1000);
+      sunLight.position.copy(sunGroup.position);
+      scene.add(sunLight);
+
+      const ambientLight = new THREE.AmbientLight(0x223344, 0.85);
+      scene.add(ambientLight);
+
+      // Earth Globe
+      const earthGroup = new THREE.Group();
+      const earthMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(14, 48, 48),
+        new THREE.MeshStandardMaterial({ map: earthTex, roughness: 0.7, metalness: 0.1 })
+      );
+      earthGroup.add(earthMesh);
+
+      // Earth Atmosphere Glow
+      const atmosMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(14.8, 32, 32),
+        new THREE.MeshBasicMaterial({ color: 0x64b4ff, transparent: true, opacity: 0.2, side: THREE.BackSide })
+      );
+      earthGroup.add(atmosMesh);
+      scene.add(earthGroup);
+
+      // Moon (rotates around Earth)
+      const moonMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(3.5, 32, 32),
+        new THREE.MeshStandardMaterial({ map: moonTex, roughness: 0.9 })
+      );
+      scene.add(moonMesh);
+
+      // Starfield Background
+      const starGeo = new THREE.BufferGeometry();
+      const starCount = 600;
+      const starPos = new Float32Array(starCount * 3);
+      for (let i = 0; i < starCount; i++) {
+        starPos[i * 3] = (Math.random() - 0.5) * 600;
+        starPos[i * 3 + 1] = (Math.random() - 0.5) * 600;
+        starPos[i * 3 + 2] = (Math.random() - 0.5) * 600;
+      }
+      starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+      const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.2, transparent: true, opacity: 0.85 });
+      const stars = new THREE.Points(starGeo, starMat);
+      scene.add(stars);
+
+      // --- 5. Animation Loop ---
+      let startT = performance.now();
+      function animate() {
+        requestAnimationFrame(animate);
+        const t = (performance.now() - startT) * 0.001;
+
+        // Earth orbits Sun slowly in background
+        const earthOrbitAngle = t * 0.08;
+        earthGroup.position.x = sunGroup.position.x + Math.sin(earthOrbitAngle) * 55;
+        earthGroup.position.z = sunGroup.position.z + Math.cos(earthOrbitAngle) * 55;
+        earthMesh.rotation.y = t * 0.18;
+
+        // Moon orbits Earth (globus)
+        const moonOrbitAngle = t * 0.55;
+        moonMesh.position.x = earthGroup.position.x + Math.cos(moonOrbitAngle) * 25;
+        moonMesh.position.z = earthGroup.position.z + Math.sin(moonOrbitAngle) * 25;
+        moonMesh.position.y = earthGroup.position.y + Math.sin(moonOrbitAngle * 0.8) * 6;
+        moonMesh.rotation.y = t * 0.2;
+
+        // Camera rotates around Earth (globus)
+        const camAngle = t * 0.22;
+        const camDist = 42;
+        camera.position.x = earthGroup.position.x + Math.sin(camAngle) * camDist;
+        camera.position.z = earthGroup.position.z + Math.cos(camAngle) * camDist;
+        camera.position.y = earthGroup.position.y + 10 + Math.sin(t * 0.15) * 3;
+        camera.lookAt(earthGroup.position);
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        const w = cv.clientWidth || 200, h = cv.clientHeight || 200;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      });
+    })();
+  </script>
+
+  <script>
     // ================================================================
     // 2. Static online counter via MQTT
     // ================================================================
