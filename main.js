@@ -2410,6 +2410,37 @@ const [womanMatR, womanMatL] = makeCavemanMats(CAVEWOMAN, CAVEWOMAN_PALETTE);
 const [womanChildMatR, womanChildMatL] = makeCavemanMats(CAVEWOMAN_CHILD, CAVEWOMAN_PALETTE);
 const [womanElderMatR, womanElderMatL] = makeCavemanMats(CAVEWOMAN_ELDER, CAVEWOMAN_ELDER_PALETTE);
 
+const HAZMAT_HUMAN = [
+  '.....YYYYYY.....', // Hood Top
+  '....YYYYYYYY....', // Hood Dome
+  '....YVVVVVVY....', // Dark Visor
+  '....YVVGGVVY....', // Visor Cyan Glass Reflection
+  '....YVVVVVVY....', // Visor Bottom
+  '....YYRRRYYY....', // Gas Mask Respirator Box
+  '....YYYYYYYY....', // Hood Chin/Neck
+  '.....YYYYYY.....',
+  '......YY........',
+  '....YYYYYYYY....', // Shoulders
+  '....YBBBBBYY....', // Utility Belt
+  '...YYYYYYYYYY...', // Suit Body
+  '...YYBBAAYY.....', // Hazard Stripes & Badge
+  '...YYYYYYYYYY...',
+  '....YYYYYY......',
+  '....KK..KK......', // Black Rubber Boots
+  '....KK..KK......',
+  '....KK..KK......',
+  '....KK..KK......',
+];
+const HAZMAT_PALETTE = {
+  Y: '#ffd23f', // Hazmat Yellow
+  V: '#0f172a', // Dark Glass Visor
+  G: '#38bdf8', // Cyan Glass Reflection
+  R: '#475569', // Respirator Box
+  B: '#1e293b', // Black Belts
+  A: '#e11d48', // Red Biohazard Badge
+  K: '#0f172a'  // Black Boots
+};
+
 // Age stages: art + size swap as cavemen age (1 game day = 1 year)
 const AGE_STAGES = {
   child: { label: 'Child', maxAge: 15, h: 2.1, art: CAVEMAN_CHILD, matR: childMatR, matL: childMatL, pal: CAVEMAN_PALETTE },

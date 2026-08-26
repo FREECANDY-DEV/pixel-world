@@ -300,25 +300,24 @@
         const t = (performance.now() - startT) * 0.001;
 
         // Earth orbits Sun slowly in background
-        const earthOrbitAngle = t * 0.06;
-        earthGroup.position.x = sunGroup.position.x + Math.sin(earthOrbitAngle) * 60;
-        earthGroup.position.z = sunGroup.position.z + Math.cos(earthOrbitAngle) * 60 + 120;
-        earthMesh.rotation.y = t * 0.18;
+        const earthOrbitAngle = t * 0.04;
+        earthGroup.position.x = sunGroup.position.x + Math.sin(earthOrbitAngle) * 40;
+        earthGroup.position.z = sunGroup.position.z + 160;
+        earthMesh.rotation.y = t * 0.22; // Earth spins on its axis
 
         // Moon orbits Earth (globus)
-        const moonOrbitAngle = t * 0.55;
+        const moonOrbitAngle = t * 0.65;
         moonMesh.position.x = earthGroup.position.x + Math.cos(moonOrbitAngle) * 26;
         moonMesh.position.z = earthGroup.position.z + Math.sin(moonOrbitAngle) * 26;
         moonMesh.position.y = earthGroup.position.y + Math.sin(moonOrbitAngle * 0.8) * 6;
         moonMesh.rotation.y = t * 0.2;
 
-        // Camera rotates around Earth (globus) with HUGE Sun in background
-        const camAngle = t * 0.20;
-        const camDist = 42;
-        camera.position.x = earthGroup.position.x + Math.sin(camAngle) * camDist;
-        camera.position.z = earthGroup.position.z + Math.cos(camAngle) * camDist;
-        camera.position.y = earthGroup.position.y + 8 + Math.sin(t * 0.12) * 3;
-        camera.lookAt(earthGroup.position);
+        // Camera sways gracefully in front of Earth facing toward the Sun
+        const camSway = Math.sin(t * 0.25) * 22;
+        camera.position.x = earthGroup.position.x + camSway;
+        camera.position.z = earthGroup.position.z + 46;
+        camera.position.y = earthGroup.position.y + 8 + Math.sin(t * 0.15) * 3;
+        camera.lookAt(earthGroup.position.x * 0.4, earthGroup.position.y, earthGroup.position.z - 20);
 
         renderer.render(scene, camera);
       }
@@ -378,50 +377,40 @@
     })();
 
     // ================================================================
-    // 3. Human pixel-art preview
+    // 3. Yellow Hazard Suit Human Pixel-Art Preview
     // ================================================================
-    const CAVEMAN = [
-      '.....HHHHHH.....','....HHHHHHHH....','....HHHHHHHH....',
-      '....HSSSSSSH....','....HSESSESH....','....HSSSSSSH....',
-      '....HSHHHHSH....','.....HHHHH......','......SS........',
-      '.....SSSS.......','....SSSSSS......','...SSCCCCSS.....',
-      '...SSCCCCSS.....','...SSCCCCSS.....','....CCCCCC......',
-      '....SS..SS......','....SS..SS......','....SS..SS......','....SS..SS......',
-    ];
-    const CAVEMAN_PAL = { H:'#3b2b1e', S:'#c78d5a', E:'#1a1a1a', C:'#8a5a33' };
-    const CAVEWOMAN = [
-      '.....HHHHHH.....','....HHHHHHHH....','....HHHHHHHH....',
-      '....HSSSSSSH....','....HSESSESH....','....HSSSSSSH....',
-      '....HSHHHHSH....','.....HHHHHH.....','....HH.SS.HH....',
-      '....HH.SS.HH....','.....SSSS.......','....SSSSSS......',
-      '..SSDDDDDDSS....','...SDDDDDDS.....','...DDDDDDDD.....',
-      '....DDDDDD......','....SS..SS......','....SS..SS......','....SS..SS......',
-    ];
-    const CAVEWOMAN_PAL = { H:'#5a3a22', S:'#d29a66', E:'#1a1a1a', C:'#9a6a3f', D:'#6b8f3f' };
     const SUBJECT_CODES = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Echo', 'Zeta', 'Zero', 'Prime', 'Apex', 'Nova', 'Orion', 'Vortex', '704', '912', '308', '007'];
 
-    const HAZMAT = [
-      '.....YYYYYY.....', // Yellow helmet top
-      '....YYYYYYYY....', // Yellow helmet
-      '....YYYYYYYY....',
-      '....YVVVVVVY....', // Dark Glass Visor
-      '....YVVVVVVY....',
-      '....YYYYYYYY....', // Yellow Chin
-      '....YYYYYYYY....',
+    const HAZMAT_HUMAN = [
+      '.....YYYYYY.....', // Hood Top
+      '....YYYYYYYY....', // Hood Dome
+      '....YVVVVVVY....', // Dark Visor
+      '....YVVGGVVY....', // Visor Cyan Glass Reflection
+      '....YVVVVVVY....', // Visor Bottom
+      '....YYRRRYYY....', // Gas Mask Respirator Box
+      '....YYYYYYYY....', // Hood Chin/Neck
       '.....YYYYYY.....',
       '......YY........',
-      '.....YYYY.......',
-      '....YYYYYY......',
-      '...YYYYYYYY.....', // Yellow Suit Body
-      '...YYYYYYYY.....',
-      '...YYYYYYYY.....',
+      '....YYYYYYYY....', // Shoulders
+      '....YBBBBBYY....', // Utility Belt
+      '...YYYYYYYYYY...', // Suit Body
+      '...YYBBAAYY.....', // Hazard Stripes & Badge
+      '...YYYYYYYYYY...',
       '....YYYYYY......',
       '....KK..KK......', // Black Rubber Boots
       '....KK..KK......',
       '....KK..KK......',
       '....KK..KK......',
     ];
-    const HAZMAT_PAL = { Y:'#ffd23f', V:'#111827', K:'#1a1a1a' };
+    const HAZMAT_PALETTE = {
+      Y: '#ffd23f', // Hazmat Yellow
+      V: '#0f172a', // Dark Glass Visor
+      G: '#38bdf8', // Cyan Glass Reflection
+      R: '#475569', // Respirator Box
+      B: '#1e293b', // Black Belts
+      A: '#e11d48', // Red Biohazard Badge
+      K: '#0f172a'  // Black Boots
+    };
 
     function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
@@ -438,11 +427,11 @@
       const ctx = cv.getContext('2d');
       ctx.imageSmoothingEnabled = false;
       ctx.clearRect(0, 0, cv.width, cv.height);
-      const cols = HAZMAT[0].length, rows = HAZMAT.length, s = 2;
+      const cols = HAZMAT_HUMAN[0].length, rows = HAZMAT_HUMAN.length, s = 2;
       const ox = Math.floor((cv.width - cols * s) / 2);
       const oy = Math.floor((cv.height - rows * s) / 2);
       for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
-        const c = HAZMAT_PAL[HAZMAT[y][x]]; if (!c) continue;
+        const c = HAZMAT_PALETTE[HAZMAT_HUMAN[y][x]]; if (!c) continue;
         ctx.fillStyle = c; ctx.fillRect(ox + x * s, oy + y * s, s, s);
       }
       document.getElementById('human-name').textContent = name;
