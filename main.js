@@ -3807,6 +3807,57 @@ function paintTreasureChest(c, ox) {
   tpx(c, ox + 22, 28, 4, 6, '#eab308');
 }
 
+// --- Era Specific NPC Enemies ---
+function paintRivalHunter(c, ox) {
+  tpx(c, ox + 18, 14, 12, 10, '#a76d3f'); // Skin
+  tpx(c, ox + 16, 12, 16, 4, '#111827'); // Spiky hair
+  tpx(c, ox + 20, 18, 8, 2, '#dc2626'); // Red warpaint stripe
+  tpx(c, ox + 16, 24, 16, 14, '#78350f'); // Pelt armor
+  tpx(c, ox + 10, 20, 4, 16, '#5d4037'); // Bone club
+  tpx(c, ox + 8, 18, 6, 4, '#eef4f8'); // Bone spike head
+  tpx(c, ox + 18, 38, 5, 8, '#a76d3f');
+  tpx(c, ox + 25, 38, 5, 8, '#a76d3f');
+}
+
+function paintBarbarianRaider(c, ox) {
+  tpx(c, ox + 18, 14, 12, 10, '#d29a66');
+  tpx(c, ox + 16, 10, 16, 6, '#d97706'); // Bronze helm
+  tpx(c, ox + 14, 8, 4, 6, '#f8fafc'); // Horn left
+  tpx(c, ox + 30, 8, 4, 6, '#f8fafc'); // Horn right
+  tpx(c, ox + 16, 24, 16, 14, '#78350f'); // Leather cuirass
+  tpx(c, ox + 10, 20, 5, 18, '#d97706'); // Bronze axe
+  tpx(c, ox + 18, 38, 5, 8, '#7a5230');
+  tpx(c, ox + 25, 38, 5, 8, '#7a5230');
+}
+
+function paintRenegadeKnight(c, ox) {
+  tpx(c, ox + 18, 12, 12, 12, '#334155'); // Dark iron helm
+  tpx(c, ox + 20, 18, 8, 2, '#dc2626'); // Red visor slit
+  tpx(c, ox + 16, 24, 16, 14, '#475569'); // Steel breastplate
+  tpx(c, ox + 10, 18, 4, 20, '#cbd5e1'); // Broadsword blade
+  tpx(c, ox + 8, 24, 8, 3, '#dc2626'); // Red guard
+  tpx(c, ox + 18, 38, 5, 8, '#1e293b');
+  tpx(c, ox + 25, 38, 5, 8, '#1e293b');
+}
+
+function paintRogueSoldier(c, ox) {
+  tpx(c, ox + 18, 12, 12, 10, '#1e293b'); // Tactical helmet
+  tpx(c, ox + 20, 16, 8, 4, '#0f172a'); // Goggles visor
+  tpx(c, ox + 16, 22, 16, 16, '#334155'); // Camo vest
+  tpx(c, ox + 10, 26, 16, 4, '#0f172a'); // Rifle
+  tpx(c, ox + 18, 38, 5, 8, '#1e293b');
+  tpx(c, ox + 25, 38, 5, 8, '#1e293b');
+}
+
+function paintCyberDrone(c, ox) {
+  tpx(c, ox + 14, 16, 20, 16, '#0f172a'); // Dark alloy chassis
+  tpx(c, ox + 18, 20, 12, 4, '#ef4444'); // Glowing red scanner eye
+  tpx(c, ox + 8, 24, 6, 10, '#00e5ff'); // Left pulse cannon
+  tpx(c, ox + 34, 24, 6, 10, '#00e5ff'); // Right pulse cannon
+  tpx(c, ox + 16, 32, 6, 12, '#334155'); // Leg left
+  tpx(c, ox + 26, 32, 6, 12, '#334155'); // Leg right
+}
+
 const SURVIVAL_PAINTERS = {
   mammoth: paintMammoth, sabertooth: paintSabertooth, boar: paintBoar, rabbit: paintRabbit, eagle: paintEagle, bee: paintBee,
   dino_t_rex: paintTRex, wolf: paintWolf, bear: paintBear, snake: paintSnake,
@@ -3821,7 +3872,9 @@ const SURVIVAL_PAINTERS = {
   jellyfish: paintJellyfish, crab: paintCrab, stingray: paintStingray, squid: paintSquid,
   woodpile: paintWoodPile, poppy: paintPoppyFlower, sunflower: paintSunflower, beehive: paintBeehive, ironore: paintIronOre,
   goldore: paintGoldOre, diamondore: paintDiamondOre, mushroom: paintMushroom, knight: paintKnight, cyborg: paintCyborg,
-  ninja: paintNinja, wizard: paintWizard, astronaut: paintAstronaut, pirate: paintPirate, chest: paintTreasureChest
+  ninja: paintNinja, wizard: paintWizard, astronaut: paintAstronaut, pirate: paintPirate, chest: paintTreasureChest,
+  enemy_hunter: paintRivalHunter, enemy_barbarian: paintBarbarianRaider, enemy_renegade_knight: paintRenegadeKnight,
+  enemy_rogue_soldier: paintRogueSoldier, enemy_cyber_drone: paintCyberDrone
 };
 
 // --- programmatic seasonal variants --------------------------------------

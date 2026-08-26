@@ -216,9 +216,31 @@ game does (sun angle derived from the hour of day):
 
 ## 9. Evolutionary Survival & Tactical Assets Library — `SURVIVAL_PAINTERS`
 
-A massive collection of **62 code-painted pixel art assets** designed for human evolution, survival tactics, base building, combat, and resource gathering across eras (Stone Age $\rightarrow$ Medieval $\rightarrow$ Modern $\rightarrow$ Sci-Fi).
+A massive collection of **67 code-painted pixel art assets** designed for human evolution, survival tactics, base building, combat, and resource gathering across 5 distinct Earth eras (Stone Age $\rightarrow$ Bronze & Iron Age $\rightarrow$ Medieval $\rightarrow$ Modern $\rightarrow$ Sci-Fi).
 
-Available in `main.js` via `SURVIVAL_PAINTERS` and helper `__DBG.renderSurvivalAsset(kind, canvas, width, height)`:
+### ⏳ 9.0 Human & Earth Evolution Era Timeline
+
+| Era | Name & Theme | Key Tech & Features | Era Exclusive Assets & NPC Threats |
+|-----|--------------|----------------------|-----------------------------------|
+| **Era 1** | 🗿 **Stone Age** *(Prehistoric Earth)* | Fire discovery, flint tools, hide shelters, megafauna hunting | `caveman`, `hazmat`, `flintspear`, `thatchhut`, `mammoth`, `sabertooth`, 👾 `enemy_hunter` (Rival Tribe Hunter) |
+| **Era 2** | ⚔️ **Bronze & Iron Age** *(Ancient Civilizations)* | Metallurgy, log cabins, spoked wheel chariots, stone pyramids | `logcabin`, `pyramid`, `watchtower`, `chariot`, `boat`, `ironsword`, `crossbow`, `goldore`, 👾 `enemy_barbarian` (Barbarian Raider) |
+| **Era 3** | 🏰 **Medieval & Feudal Era** *(Kingdoms & Empire)* | Fortressed keeps, windmills, steel plate armor, battleaxes | `castle`, `windmill`, `stonecottage`, `knight`, `wizard`, `pirate`, `battleaxe`, `chest`, 👾 `enemy_renegade_knight` (Renegade Knight) |
+| **Era 4** | 🏭 **Industrial & Modern Era** *(Machinery & Warfare)* | Reinforced concrete, assault rifles, 4x4 jeeps, battle tanks | `concretebunker`, `tacticalrifle`, `grenade`, `flamethrower`, `survivaljeep`, `tank`, `submarine`, 👾 `enemy_rogue_soldier` (Rogue Soldier) |
+| **Era 5** | 🚀 **Space & Cybernetic Era** *(Future Earth)* | Cyber domes, combat mechs, plasma sabers, starships | `cyberhab`, `mech`, `spaceship`, `hovercraft`, `plasmasaber`, `laser_cannon`, `cyborg`, `astronaut`, `ninja`, 👾 `enemy_cyber_drone` (Corrupted Cyber-Drone) |
+
+---
+
+### 👾 9.0.1 NPC Enemy Threats & Factions (`SURVIVAL_PAINTERS`)
+
+| Asset Key | Name | Era / Faction | Description & Threat Visuals |
+|-----------|------|---------------|------------------------------|
+| `enemy_hunter` | Rival Tribe Hunter | Stone Age | Hostile caveman (`#a76d3f`) with spiky hair, red face warpaint (`#dc2626`), and heavy bone spike club. |
+| `enemy_barbarian` | Barbarian Raider | Bronze / Iron Age | Horned bronze helmet (`#d97706`), leather cuirass, and double-bladed bronze axe. |
+| `enemy_renegade_knight` | Renegade Knight | Medieval Era | Dark iron helm (`#334155`) with red visor slit (`#dc2626`), steel breastplate, and broadsword. |
+| `enemy_rogue_soldier` | Rogue Soldier | Modern Era | Tactical Kevlar helmet (`#1e293b`), dark goggles visor (`#0f172a`), camo vest, and assault rifle. |
+| `enemy_cyber_drone` | Corrupted Cyber-Drone | Sci-Fi Era | Dark alloy chassis (`#0f172a`), red laser scanner eye (`#ef4444`), and twin cyan pulse cannons (`#00e5ff`). |
+
+---
 
 ### 🦣 9.1 Wildlife & Creatures (`mammoth`, `sabertooth`, `boar`, `rabbit`, `eagle`, `bee`, `dino_t_rex`, `wolf`, `bear`, `snake`, `dragon`, `scorpion`, `fox`, `owl`)
 

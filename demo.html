@@ -762,7 +762,12 @@
         Stingray: (c) => { tpx(c, 8, 24, 32, 12, '#475569'); tpx(c, 16, 20, 16, 18, '#64748b'); tpx(c, 22, 36, 4, 10, '#334155'); },
         Squid: (c) => { tpx(c, 16, 12, 16, 18, '#c026d3'); for (let i = 0; i < 5; i++) tpx(c, 14 + i * 4, 30, 3, 14, '#a21caf'); },
         'Diamond Ore': (c) => { tpx(c, 12, 28, 24, 16, '#616161'); tpx(c, 16, 30, 6, 6, '#06b6d4'); tpx(c, 26, 34, 6, 6, '#06b6d4'); },
-        Chest: (c) => { tpx(c, 10, 24, 28, 18, '#78350f'); tpx(c, 8, 22, 32, 6, '#b45309'); tpx(c, 22, 28, 4, 6, '#eab308'); }
+        Chest: (c) => { tpx(c, 10, 24, 28, 18, '#78350f'); tpx(c, 8, 22, 32, 6, '#b45309'); tpx(c, 22, 28, 4, 6, '#eab308'); },
+        'Rival Hunter': (c) => { tpx(c, 18, 14, 12, 10, '#a76d3f'); tpx(c, 16, 12, 16, 4, '#111827'); tpx(c, 20, 18, 8, 2, '#dc2626'); tpx(c, 16, 24, 16, 14, '#78350f'); tpx(c, 10, 20, 4, 16, '#5d4037'); tpx(c, 8, 18, 6, 4, '#eef4f8'); },
+        'Barbarian Raider': (c) => { tpx(c, 18, 14, 12, 10, '#d29a66'); tpx(c, 16, 10, 16, 6, '#d97706'); tpx(c, 14, 8, 4, 6, '#f8fafc'); tpx(c, 30, 8, 4, 6, '#f8fafc'); tpx(c, 16, 24, 16, 14, '#78350f'); tpx(c, 10, 20, 5, 18, '#d97706'); },
+        'Renegade Knight': (c) => { tpx(c, 18, 12, 12, 12, '#334155'); tpx(c, 20, 18, 8, 2, '#dc2626'); tpx(c, 16, 24, 16, 14, '#475569'); tpx(c, 10, 18, 4, 20, '#cbd5e1'); tpx(c, 8, 24, 8, 3, '#dc2626'); },
+        'Rogue Soldier': (c) => { tpx(c, 18, 12, 12, 10, '#1e293b'); tpx(c, 20, 16, 8, 4, '#0f172a'); tpx(c, 16, 22, 16, 16, '#334155'); tpx(c, 10, 26, 16, 4, '#0f172a'); },
+        'Cyber Drone': (c) => { tpx(c, 14, 16, 20, 16, '#0f172a'); tpx(c, 18, 20, 12, 4, '#ef4444'); tpx(c, 8, 24, 6, 10, '#00e5ff'); tpx(c, 34, 24, 6, 10, '#00e5ff'); }
       };
 
       const FISH_SPECIES = [
@@ -1072,6 +1077,21 @@
                 tpx(ctx, 10, 22, 28, 2, '#fde047');
               }
             }
+          });
+        });
+
+        // 10. 👾 Era NPC Enemies & Threats
+        addHeader('👾 Era NPC Enemies & Threats (Animated)');
+        ['Rival Hunter', 'Barbarian Raider', 'Renegade Knight', 'Rogue Soldier', 'Cyber Drone'].forEach((name) => {
+          createCard(name, (ctx, t) => {
+            const bob = Math.round(Math.sin(t * 6) * 1);
+            ctx.save(); ctx.translate(0, bob);
+            SURVIVAL_PAINTERS[name](ctx, 0);
+            if (name === 'Cyber Drone') {
+              const sweepX = 18 + Math.floor((t * 12) % 12);
+              tpx(ctx, sweepX, 21, 2, 2, '#ffffff');
+            }
+            ctx.restore();
           });
         });
 
