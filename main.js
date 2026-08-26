@@ -8770,8 +8770,11 @@ function demoPub(topic, obj) {
 }
 
 function demoPubPresence() {
+  const me = demoState.me;
   demoPub('presence/' + demoState.id, {
     id: demoState.id, name: demoState.name, color: demoState.color, ts: Date.now(),
+    female: me ? me.female : false,
+    look: me ? me.look : null,
   });
 }
 
@@ -8781,6 +8784,8 @@ function demoPubPos() {
   demoPub('pos', {
     id: demoState.id, name: demoState.name, color: demoState.color,
     x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2),
+    female: demoState.me.female,
+    look: demoState.me.look,
   });
 }
 
@@ -8795,7 +8800,8 @@ function demoOnMqtt(topic, payload) {
     } else {
       try {
         const m = JSON.parse(payload);
-        demoState.presence.set(m.id, { name: m.name, color: m.color, ts: m.ts || Date.now() });
+        demoState.presence.set(m.id, { name: m.name, color: m.color, female: m.female, look: m.look, ts: m.ts || Date.now() });
+        if (m.look) demoGhostFor(m.id, m.name, m.color, m.female, m.look);
         demoSetOnline(demoState.presence.size + 1);
       } catch (e) { /* ignore */ }
     }
@@ -8825,7 +8831,7 @@ function demoOnMqtt(topic, payload) {
       } else if (m.id === demoState.id) {
         demoShowBubble(demoState.meBubble, demoState.me, m.name, m.color, m.text);
       } else {
-        const g = demoGhostFor(m.id, m.name, m.color);
+        const g = demoGhostFor(m.id, m.name, m.color, m.female, m.look);
         demoShowBubble(g.bubble, g, m.name, m.color, m.text);
       }
       demoMaybeReply(m); // only the bot host answers
@@ -8836,12 +8842,12 @@ function demoOnMqtt(topic, payload) {
     try {
       const m = JSON.parse(payload);
       if (m.id === demoState.id) return;
-      const g = demoGhostFor(m.id, m.name, m.color);
+      const g = demoGhostFor(m.id, m.name, m.color, m.female, m.look);
       g.target.set(m.x, m.y, m.z);
       g.lastSeen = performance.now();
       const pr = demoState.presence.get(m.id);
       if (!pr) {
-        demoState.presence.set(m.id, { name: m.name, color: m.color, ts: Date.now() });
+        demoState.presence.set(m.id, { name: m.name, color: m.color, female: m.female, look: m.look, ts: Date.now() });
         demoSetOnline(demoState.presence.size + 1);
       }
     } catch (e) { /* ignore */ }
@@ -8867,10 +8873,18 @@ function demoClaimBot() {
 }
 
 // --- DEMO MODULE part 3: ghosts & bubbles ------------------------------------
-const DEMO_GHOST_MATS = [cavemanMatR, cavemanMatL, womanMatR, womanMatL];
+function demoMakeGhostMat(female, look) {
+  if (!look) return female ? womanMatR : cavemanMatR;
+  const cfg = (female ? FEMALE_STAGES : AGE_STAGES).adult;
+  const vArt = artVariant(cfg.art, female, look.style, look.beard);
+  const vp = lookPal(cfg.pal || CAVEMAN_PALETTE, look);
+  const [mr] = makeCavemanMats(vArt, vp);
+  return mr;
+}
 
-function demoMakeGhost(id, name, color) {
-  const spr = new THREE.Sprite(DEMO_GHOST_MATS[Math.floor(Math.random() * DEMO_GHOST_MATS.length)]);
+function demoMakeGhost(id, name, color, female = false, look = null) {
+  const mat = id === 'grunk' ? cavemanMatR : demoMakeGhostMat(female, look);
+  const spr = new THREE.Sprite(mat);
   spr.center.set(0.5, 0);
   spr.scale.set(2.7, 3.0, 1);
   spr.visible = false;
@@ -8880,7 +8894,7 @@ function demoMakeGhost(id, name, color) {
   const bubble = demoMakeBubble();
   scene.add(bubble);
   const g = {
-    id, name, color, spr, nameSpr, bubble,
+    id, name, color, female, look, spr, nameSpr, bubble,
     cur: new THREE.Vector3(),
     target: new THREE.Vector3(),
     lastSeen: performance.now(),
@@ -8891,10 +8905,19 @@ function demoMakeGhost(id, name, color) {
   return g;
 }
 
-function demoGhostFor(id, name, color) {
+function demoGhostFor(id, name, color, female = false, look = null) {
   let g = demoState.ghosts.get(id);
-  if (!g) g = demoMakeGhost(id, name, color);
-  else { g.name = name; g.color = color; }
+  if (!g) {
+    g = demoMakeGhost(id, name, color, female, look);
+  } else {
+    g.name = name;
+    g.color = color;
+    if (look && (!g.look || JSON.stringify(g.look) !== JSON.stringify(look) || g.female !== female)) {
+      g.female = female;
+      g.look = look;
+      g.spr.material = demoMakeGhostMat(female, look);
+    }
+  }
   return g;
 }
 
