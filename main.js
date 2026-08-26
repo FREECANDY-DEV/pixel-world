@@ -760,7 +760,7 @@ function buildChunkData(cx, cz, seed, lod) {
 const WORKER_SRC = [
   'const CHUNK=' + CHUNK + ',SEA_LEVEL=' + SEA_LEVEL + ',MAX_HEIGHT=' + MAX_HEIGHT + ';',
   'const BT_COLS=' + BT_COLS + ';',
-  'var HOME_FLAT=null;',
+  'var HOME_FLAT=null, EDEN_FLAT=null;',
   hash3.toString(),
   'const sstep=' + sstep.toString() + ';',
   'const lerp=' + lerp.toString() + ';',
@@ -781,6 +781,7 @@ const WORKER_SRC = [
     'try {' +
     'var d = e.data;' +
     'HOME_FLAT = d.home || null;' +
+    'EDEN_FLAT = d.eden || null;' +
     'var r = buildChunkData(d.cx, d.cz, d.seed, d.lod);' +
     'self.postMessage({' +
       'cx: d.cx, cz: d.cz, lod: d.lod, seed: d.seed,' +
@@ -1699,7 +1700,7 @@ function pumpChunks() {
     const w = workers.find((wk) => !busy.has(wk));
     busy.add(w);
     dbgDispatched++;
-    w.postMessage({ cx: job.cx, cz: job.cz, lod: job.lod, seed: SEED, home: HOME_FLAT });
+    w.postMessage({ cx: job.cx, cz: job.cz, lod: job.lod, seed: SEED, home: HOME_FLAT, eden: EDEN_FLAT });
   }
 }
 
@@ -6890,6 +6891,50 @@ function drawCampLabel() {
   campLabelTex.needsUpdate = true;
 }
 
+const heavenLabelCanvas = document.createElement('canvas');
+heavenLabelCanvas.width = 280;
+heavenLabelCanvas.height = 72;
+const heavenLabelTex = new THREE.CanvasTexture(heavenLabelCanvas);
+heavenLabelTex.magFilter = THREE.LinearFilter;
+const heavenLabelSpr = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: heavenLabelTex,
+  transparent: true,
+  depthWrite: false,
+}));
+heavenLabelSpr.renderOrder = 999;
+scene.add(heavenLabelSpr);
+
+function drawHeavenLabel() {
+  const c = heavenLabelCanvas.getContext('2d');
+  c.clearRect(0, 0, 280, 72);
+  // little pixel star/sun icon on left
+  c.fillStyle = '#ffd23f';
+  c.fillRect(18, 22, 12, 12);          // core
+  c.fillRect(22, 14, 4, 28);           // vertical beam
+  c.fillRect(10, 26, 28, 4);           // horizontal beam
+  c.fillStyle = '#ffffff';
+  c.fillRect(20, 24, 8, 8);            // glowing bright center
+  // text "HEAVEN"
+  c.font = 'bold 34px monospace';
+  c.textAlign = 'left';
+  c.textBaseline = 'middle';
+  c.fillStyle = '#ffd23f';
+  const txt = 'HEAVEN';
+  c.lineWidth = 7;
+  c.strokeStyle = 'rgba(10, 10, 14, 0.9)';
+  c.strokeText(txt, 44, 38);
+  c.fillText(txt, 44, 38);
+  // pixel person icon + live count (4)
+  c.fillStyle = '#ffe9a8';
+  c.fillRect(196, 22, 10, 10);         // head
+  c.fillRect(194, 34, 14, 16);         // body
+  const edenCount = cavemen.filter((cm) => cm.edenPos).length || 4;
+  const count = String(edenCount);
+  c.strokeText(count, 216, 38);
+  c.fillText(count, 216, 38);
+  heavenLabelTex.needsUpdate = true;
+}
+
 const placeHint = document.getElementById('place-hint');
 
 function setPlacing(kind) {
@@ -10034,6 +10079,16 @@ function animate() {
       campCountShown = cavemen.length;
       drawCampLabel();
     }
+  }
+
+  // heaven marker floats over the Eden campfire, styled exactly like the camp marker
+  if (EDEN_FLAT && heavenLabelSpr) {
+    const ey = groundYAt(EDEN_FLAT.x, EDEN_FLAT.z);
+    heavenLabelSpr.position.set(EDEN_FLAT.x, ey + 10, EDEN_FLAT.z);
+    const dl = camera.position.distanceTo(heavenLabelSpr.position);
+    const s = Math.max(2, dl * 0.05);
+    heavenLabelSpr.scale.set(s * 3.88, s, 1);
+    drawHeavenLabel();
   }
 
   for (let i = bolts.length - 1; i >= 0; i--) {
