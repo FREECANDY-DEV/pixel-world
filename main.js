@@ -8754,12 +8754,7 @@ function initDemoMode() {
     // 3. Apple Tree (Custom Painted Oak with Ripe Red Apples)
     spawnAppleTree(edenX + 3.2, edenZ - 2.2);
 
-    // 4. Floating 3D "HEAVEN" Label Text Sprite above the camp
-    const heavenLabel = makeFloatingLabel('✨ HEAVEN ✨', 'Adam, Eve, Cain & Abel', '#ffd23f');
-    heavenLabel.position.set(edenX, edenY + 7.5, edenZ);
-    scene.add(heavenLabel);
-
-    // 5. Adam & Eve & two children (Cain & Abel)
+    // 4. Adam & Eve & two children (Cain & Abel)
     const edenFamily = [
       { name: 'Adam', female: false, age: 32, look: { skin: '#e0aa7a', hair: '#3b2b1e', cloth: '#8a5a33', eyes: '#1a1a1a', style: 0, beard: 1 }, x: edenX - 2.2, z: edenZ + 1.5 },
       { name: 'Eve', female: true, age: 28, look: { skin: '#f2c99b', hair: '#b8863b', dress: '#5e7a46', eyes: '#2e4a2e', style: 1, beard: -1 }, x: edenX + 2.0, z: edenZ + 1.8 },
