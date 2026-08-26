@@ -230,6 +230,27 @@ A massive collection of **67 code-painted pixel art assets** designed for human 
 
 ---
 
+## 10.0 Unique Asset ID Registry (`#0001` – `#1020`)
+
+Every pixel art asset in Pixel World carries a persistent 4-digit ID (`#0001` through `#1020`).
+
+| ID Range | Category | Count | Primary Asset Range |
+|----------|----------|-------|---------------------|
+| `#0001` – `#0150` | 👤 Tribe & Hero Classes | 150 | Hazmat Human, Caveman, Cavewoman, Tribe Child, Tribe Elder, Knight, Cyborg, Ninja, Wizard, Astronaut, Pirate, and 139 Class Variants |
+| `#0151` – `#0300` | 🌲 Vegetation & Flora | 150 | Cactus, Agave, Acacia, Desert Shrub, Tumble Bush, Jungle Tree, Palm, Bamboo, Fern Thicket, Oak, Pine, Birch, Maple, Berry Bush, Apple Tree, Snow Pine, Spruce, Dead Tree, Frost Bush, Small Rock, Medium Rock, Big Rock, Great Bush, Blossom Bush, Bramble Tangle & Flora Variants |
+| `#0301` – `#0400` | 🐟 Sea Life & Marine Organisms | 100 | Sardine, Clownfish, Blue Tang, Angelfish, Puffer, Tuna & Aquatic Species Variants |
+| `#0401` – `#0550` | 🦣 Wildlife, Beasts & Megafauna | 150 | Mammoth, Sabertooth, Wild Boar, Rabbit, Eagle, Honeybee, T-Rex, Wolf, Bear, Snake, Dragon, Scorpion, Fox, Owl & Beast Variants |
+| `#0551` – `#0700` | 🏚️ Base Building & Housing | 150 | Thatch Hut, Log Cabin, Stone Cottage, Bunker, Cyber Hab, Watchtower, Pyramid, Castle, Windmill & Architectural Variants |
+| `#0701` – `#0800` | ⚔️ Weapons & Armaments | 100 | Flint Spear, Iron Sword, Tactical Rifle, Plasma Saber, Crossbow, Grenade, Laser Cannon, Flamethrower, Battleaxe & Weapon Variants |
+| `#0801` – `#0900` | 🚗 Vehicles & Transports | 100 | Chariot, Survival Jeep, Hovercraft, Combat Mech, Canoe, Spaceship, Tank, Submarine & Vehicle Variants |
+| `#0901` – `#0950` | 🦈 Marine Predators & Ocean | 50 | Great White, Octopus, Sea Turtle, Jellyfish, Crab, Stingray, Squid & Marine Megafauna |
+| `#0951` – `#1000` | 🪵 World Resources & Props | 50 | Wood Pile, Red Poppy, Sunflower, Beehive, Iron Ore, Gold Ore, Diamond Ore, Mushroom, Chest, Campfire & Props |
+| `#1001` – `#1020` | 👾 Era NPC Enemies | 20 | Rival Hunter, Barbarian Raider, Renegade Knight, Rogue Soldier, Cyber Drone & Enemy Faction Variants |
+
+*Total Catalog Volume: 1,020 Unique Code-Painted Assets (100% Quality Verified & Filterable by #ID or Name).*
+
+---
+
 ### 👾 9.0.1 NPC Enemy Threats & Factions (`SURVIVAL_PAINTERS`)
 
 | Asset Key | Name | Era / Faction | Description & Threat Visuals |

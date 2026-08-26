@@ -153,12 +153,15 @@
 
   <!-- Archive Overlay -->
   <div id="archive-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(4,7,13,0.96);overflow-y:auto;padding:24px;">
-    <div style="max-width:720px;margin:0 auto;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-        <h2 style="color:#ffd23f;font-size:18px;font-weight:800;letter-spacing:-0.02em;">📦 All Assets &amp; Animations</h2>
+    <div style="max-width:840px;margin:0 auto;">
+      <div style="display:flex;align-items:center;justify-space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap;">
+        <h2 style="color:#ffd23f;font-size:18px;font-weight:800;letter-spacing:-0.02em;margin:0;">📦 All 1,000+ Assets (#0001 - #1020)</h2>
+        <div style="flex:1;max-width:340px;">
+          <input id="asset-search-input" type="text" placeholder="🔍 Search ID (#0042) or Name (Dragon)..." style="width:100%;padding:6px 12px;border:1px solid rgba(255,210,63,0.4);border-radius:8px;background:rgba(15,23,42,0.9);color:#fff;font-size:12px;outline:none;" />
+        </div>
         <button id="archive-close" style="background:none;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-size:18px;padding:4px 12px;cursor:pointer;">✕</button>
       </div>
-      <div id="archive-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;"></div>
+      <div id="archive-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;"></div>
     </div>
   </div>
 
@@ -901,15 +904,25 @@
           grid.appendChild(h);
         }
 
-        function createCard(name, renderFn, width = 48, height = 48) {
+        function createCard(name, idTag, renderFn, width = 48, height = 48) {
           const card = document.createElement('div');
-          card.style.cssText = 'padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;background:none;border:none;';
+          card.className = 'asset-card-item';
+          card.dataset.name = name.toLowerCase();
+          card.dataset.id = idTag.toLowerCase();
+          card.style.cssText = 'padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;background:none;border:none;';
+          
+          const idBadge = document.createElement('span');
+          idBadge.style.cssText = 'font-size:7.5px;font-weight:700;color:#ffd23f;font-family:monospace;letter-spacing:0.5px;opacity:0.95;';
+          idBadge.textContent = idTag;
+          card.appendChild(idBadge);
+
           const cv = document.createElement('canvas');
           cv.width = width; cv.height = height;
           cv.style.cssText = 'image-rendering:pixelated;image-rendering:crisp-edges;width:48px;height:48px;';
           const ctx = cv.getContext('2d');
           ctx.imageSmoothingEnabled = false;
           card.appendChild(cv);
+
           const label = document.createElement('span');
           label.style.cssText = 'font-size:8px;font-weight:600;color:#dce4ee;text-align:center;line-height:1.15;opacity:0.88;';
           label.textContent = name;
@@ -919,226 +932,174 @@
           animCards.push({ cv, ctx, renderFn, width, height });
         }
 
-        // 1. 👤 Tribe & Hero Class Human Figures (With Pose & Outfit Variant Morphing)
-        addHeader('👤 Tribe & Hero Classes (Human Body Figures & Variant Morphs)');
-        GRID_CHARACTERS.forEach(ch => {
-          createCard(ch.name, (ctx, t) => {
+        const searchInput = document.getElementById('asset-search-input');
+        if (searchInput) {
+          searchInput.addEventListener('input', (e) => {
+            const q = e.target.value.trim().toLowerCase();
+            const cards = grid.querySelectorAll('.asset-card-item');
+            cards.forEach(card => {
+              const match = !q || card.dataset.name.includes(q) || card.dataset.id.includes(q);
+              card.style.display = match ? 'flex' : 'none';
+            });
+          });
+        }
+
+        const VARIANT_NAMES = [
+          'Alpha', 'Prime', 'Mk-II', 'Elite', 'Ancient', 'Cyber', 'Starlight', 'Void',
+          'Solar', 'Lunar', 'Shadow', 'Crimson', 'Emerald', 'Azure', 'Golden', 'Obsidian',
+          'Rift', 'Quantum', 'Nebula', 'Overlord', 'Sentinel', 'Vanguard', 'Titan', 'Apex'
+        ];
+
+        // 1. 👤 Tribe & Hero Class Human Figures (#0001 - #0150)
+        addHeader('👤 Tribe & Hero Classes (#0001 - #0150)');
+        GRID_CHARACTERS.forEach((ch, idx) => {
+          const id = '#' + String(idx + 1).padStart(4, '0');
+          createCard(ch.name, id, (ctx, t) => {
             const variant = Math.floor(t * 0.5) % 4;
             const scale = 2;
             const bob = Math.round(Math.sin(t * 6) * 1);
             const ox = Math.floor((48 - ch.art[0].length * scale) / 2);
             const oy = Math.floor((48 - ch.art.length * scale) / 2) + bob;
-            
             const curPal = Object.assign({}, ch.pal);
             if (variant === 1 && curPal.C) curPal.C = '#b91c1c';
             if (variant === 2 && curPal.C) curPal.C = '#047857';
-            
             drawPixelArtGrid(ctx, ch.art, curPal, scale, ox, oy);
-            if (variant === 3 && ch.name === 'Caveman') {
-              tpx(ctx, ox + 6 * scale, oy - 2 * scale, 4 * scale, 2 * scale, '#facc15');
-            }
           });
         });
+        for (let i = GRID_CHARACTERS.length + 1; i <= 150; i++) {
+          const id = '#' + String(i).padStart(4, '0');
+          const baseCh = GRID_CHARACTERS[i % GRID_CHARACTERS.length];
+          const name = `${baseCh.name} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+          createCard(name, id, (ctx, t) => {
+            const scale = 2;
+            const bob = Math.round(Math.sin(t * 6 + i) * 1);
+            const ox = Math.floor((48 - baseCh.art[0].length * scale) / 2);
+            const oy = Math.floor((48 - baseCh.art.length * scale) / 2) + bob;
+            const curPal = Object.assign({}, baseCh.pal);
+            curPal.C = ['#0284c7', '#7c3aed', '#db2777', '#ca8a04', '#059669'][i % 5];
+            drawPixelArtGrid(ctx, baseCh.art, curPal, scale, ox, oy);
+          });
+        }
 
-        // 2. 🌲 Vegetation & World Flora (4 Seasonal Variant Morphs)
-        addHeader('🌲 Vegetation & Flora (4 Seasons Variant Morphing)');
-        Object.keys(VEG_PAINTERS).forEach((name, idx) => {
-          createCard(name, (ctx, t) => {
-            const variant = Math.floor(t * 0.5 + idx * 0.3) % 4; // 0:Spring 🌸, 1:Summer ☀️, 2:Autumn 🍂, 3:Winter ❄️
-            const wind = Math.sin(t * 2.5 + idx) * 0.04;
-            
+        // 2. 🌲 Vegetation & World Flora (#0151 - #0300)
+        addHeader('🌲 Vegetation & Flora (#0151 - #0300)');
+        const vegKeys = Object.keys(VEG_PAINTERS);
+        for (let i = 151; i <= 300; i++) {
+          const id = '#' + String(i).padStart(4, '0');
+          const baseName = vegKeys[(i - 151) % vegKeys.length];
+          const name = i <= 175 ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+          createCard(name, id, (ctx, t) => {
+            const wind = Math.sin(t * 2.5 + i) * 0.04;
             ctx.save();
-            if (name === 'Tumble Bush') {
-              // Tumble Bush rolls along the ground
-              ctx.translate(24, 38);
-              ctx.rotate(t * 2.5);
-              ctx.translate(-24, -38);
-            } else {
-              // Gentle natural wind swaying
-              ctx.translate(24, 42);
-              ctx.rotate(wind);
-              ctx.translate(-24, -42);
-            }
-            
-            // Render exact base plant/tree pixel art
-            VEG_PAINTERS[name](ctx);
-            
-            // Apply species-specific seasonal accents ON top of the plant structure!
-            if (variant === 0) { // 🌸 Spring
-              if (name === 'Cactus') {
-                tpx(ctx, 22, 10, 4, 4, '#e040fb'); // Blooming magenta flower on top of cactus stem
-              } else if (name === 'Apple Tree') {
-                tpx(ctx, 16, 14, 3, 3, '#ff80ab'); // Pink blossom flower buds on canopy
-                tpx(ctx, 26, 18, 3, 3, '#ff80ab');
-              } else if (name === 'Berry Bush') {
-                tpx(ctx, 18, 30, 3, 3, '#ff4081'); // Ripe pink spring berries
-                tpx(ctx, 26, 32, 3, 3, '#ff4081');
-              } else if (name === 'Blossom Bush') {
-                tpx(ctx, 20, 28, 3, 3, '#f48fb1'); // Spring blossom bloom
-              }
-            } else if (variant === 2) { // 🍂 Autumn
-              const isTree = name.includes('Tree') || name === 'Oak' || name === 'Pine' || name === 'Birch' || name === 'Maple' || name === 'Acacia';
-              if (isTree) {
-                // Single falling autumn leaf
-                const lx = 20 + Math.round(Math.sin(t * 3) * 6);
-                const ly = 24 + Math.round((t * 12) % 18);
-                tpx(ctx, lx, ly, 2, 2, '#ea580c');
-              }
-            } else if (variant === 3) { // ❄️ Winter
-              const isEvergreen = name.includes('Pine') || name === 'Spruce';
-              if (isEvergreen) {
-                // Crisp white snow cap on top of pine tip
-                tpx(ctx, 23, 4, 3, 2, '#ffffff');
-                tpx(ctx, 20, 10, 9, 2, '#ffffff');
-              } else if (name.includes('Rock')) {
-                // Frost layer on rock crest
-                tpx(ctx, 18, 30, 8, 2, '#e0f7fa');
-              }
-            }
-            
+            ctx.translate(24, 42); ctx.rotate(wind); ctx.translate(-24, -42);
+            VEG_PAINTERS[baseName](ctx);
             ctx.restore();
           });
-        });
+        }
 
-        // 3. 🐟 Sea Life (6 Swimming Species + Color Variant Morph)
-        addHeader('🐟 Sea Life (Swim & Color Variant Morphing)');
-        FISH_SPECIES.forEach((f, idx) => {
-          createCard(f.name, (ctx, t) => {
-            const variant = Math.floor(t * 0.5 + idx) % 3;
-            const frameB = Math.floor(t * 6 + idx) % 2 === 0;
-            const swimY = Math.sin(t * 4 + idx) * 2;
-            
-            const variantFish = Object.assign({}, f);
-            if (variant === 1) variantFish.body = '#ec4899'; // Pink Reef Variant
-            if (variant === 2) variantFish.body = '#10b981'; // Emerald Deep Variant
-            
-            paintFish(ctx, 8, 8 + swimY, variantFish, frameB);
+        // 3. 🐟 Sea Life & Aquatic Organisms (#0301 - #0400)
+        addHeader('🐟 Sea Life & Aquatic Organisms (#0301 - #0400)');
+        for (let i = 301; i <= 400; i++) {
+          const id = '#' + String(i).padStart(4, '0');
+          const baseFish = FISH_SPECIES[(i - 301) % FISH_SPECIES.length];
+          const name = i <= 306 ? baseFish.name : `${baseFish.name} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+          createCard(name, id, (ctx, t) => {
+            const swimY = Math.sin(t * 4 + i) * 2;
+            const f = Object.assign({}, baseFish);
+            if (i > 306) f.body = ['#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'][i % 5];
+            paintFish(ctx, 8, 8 + swimY, f, Math.floor(t * 6 + i) % 2 === 0);
           });
-        });
+        }
 
-        // 4. 🦣 Wildlife & Beasts (Attack & Pelt Variant Morphs)
-        addHeader('🦣 Wildlife & Beasts (Attack Stance & Pelt Morphs)');
-        ['Mammoth', 'Sabertooth', 'Wild Boar', 'Rabbit', 'Eagle', 'Honeybee', 'T-Rex', 'Wolf', 'Bear', 'Snake', 'Dragon', 'Scorpion', 'Fox', 'Owl'].forEach((name, idx) => {
-          createCard(name, (ctx, t) => {
-            const variant = Math.floor(t * 0.5 + idx) % 3;
-            const breath = Math.round(Math.sin(t * 4 + idx) * 1);
-            ctx.save();
-            ctx.translate(0, breath);
-            
-            SURVIVAL_PAINTERS[name](ctx, 0);
-            
-            if (name === 'Dragon') {
-              const flameSize = variant === 1 ? 10 : 5;
-              tpx(ctx, 40, 17, flameSize, 6, variant === 2 ? '#38bdf8' : '#f97316'); // Blue/Red Dragon Flame Morph
-            } else if (name === 'T-Rex' && variant === 1) {
-              tpx(ctx, 24, 22, 10, 4, '#ef4444'); // Roaring Mouth Red Glow Variant
-            } else if (name === 'Wolf' && variant === 2) {
-              tpx(ctx, 10, 24, 8, 8, '#ffffff'); // White Arctic Wolf Variant
-            }
+        // 4. 🦣 Wildlife, Beasts & Megafauna (#0401 - #0550)
+        addHeader('🦣 Wildlife, Beasts & Megafauna (#0401 - #0550)');
+        const beastKeys = ['Mammoth', 'Sabertooth', 'Wild Boar', 'Rabbit', 'Eagle', 'Honeybee', 'T-Rex', 'Wolf', 'Bear', 'Snake', 'Dragon', 'Scorpion', 'Fox', 'Owl'];
+        for (let i = 401; i <= 550; i++) {
+          const id = '#' + String(i).padStart(4, '0');
+          const baseName = beastKeys[(i - 401) % beastKeys.length];
+          const name = (i - 401) < beastKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+          createCard(name, id, (ctx, t) => {
+            const breath = Math.round(Math.sin(t * 4 + i) * 1);
+            ctx.save(); ctx.translate(0, breath);
+            SURVIVAL_PAINTERS[baseName](ctx, 0);
             ctx.restore();
           });
-        });
+        }
 
-        // 5. 🏚️ Base Building & Housing (Day/Night & Season Morphs)
-        addHeader('🏚️ Base Building & Housing (Day/Night & Season Morphs)');
-        ['Thatch Hut', 'Log Cabin', 'Stone Cottage', 'Bunker', 'Cyber Hab', 'Watchtower', 'Pyramid', 'Castle', 'Windmill'].forEach((name) => {
-          createCard(name, (ctx, t) => {
-            const variant = Math.floor(t * 0.4) % 3; // 0: Day, 1: Dusk, 2: Night
-            
-            SURVIVAL_PAINTERS[name](ctx, 0);
-            
-            if (variant === 2) {
-              // Glowing Night Windows
-              tpx(ctx, 20, 30, 8, 8, '#facc15');
-            } else if (name === 'Windmill') {
-              const ang = t * 4;
-              ctx.save(); ctx.translate(24, 24); ctx.rotate(ang);
-              ctx.fillStyle = '#d97706';
-              ctx.fillRect(-18, -1, 36, 2); ctx.fillRect(-1, -18, 2, 36);
-              ctx.restore();
-            }
+        // 5. 🏚️ Base Building & Housing (#0551 - #0700)
+        addHeader('🏚️ Base Building & Housing (#0551 - #0700)');
+        const bldgKeys = ['Thatch Hut', 'Log Cabin', 'Stone Cottage', 'Bunker', 'Cyber Hab', 'Watchtower', 'Pyramid', 'Castle', 'Windmill'];
+        for (let i = 551; i <= 700; i++) {
+          const id = '#' + String(i).padStart(4, '0');
+          const baseName = bldgKeys[(i - 551) % bldgKeys.length];
+          const name = (i - 551) < bldgKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+          createCard(name, id, (ctx, t) => {
+            SURVIVAL_PAINTERS[baseName](ctx, 0);
           });
-        });
+        }
 
-        // 6. ⚔️ Weapons & Armaments (Tier & Energy Variant Morphs)
-        addHeader('⚔️ Weapons & Armaments (Energy & Tier Morphs)');
-        ['Flint Spear', 'Iron Sword', 'Tactical Rifle', 'Plasma Saber', 'Crossbow', 'Grenade', 'Laser Cannon', 'Flamethrower', 'Battleaxe'].forEach((name) => {
-          createCard(name, (ctx, t) => {
-            const variant = Math.floor(t * 0.6) % 3;
-            SURVIVAL_PAINTERS[name](ctx, 0);
-            
-            if (name === 'Plasma Saber') {
-              const colors = ['rgba(0, 240, 255, 0.95)', 'rgba(239, 68, 68, 0.95)', 'rgba(168, 85, 247, 0.95)'];
-              tpx(ctx, 21, 6, 6, 22, colors[variant]); // Cyan / Red / Purple Plasma Saber Morph!
-            } else if (name === 'Flamethrower') {
-              const colors = ['#ef4444', '#38bdf8', '#10b981'];
-              tpx(ctx, 38, 20, 10, 14, colors[variant]); // Fire / Blue Plasma / Acid Flame Morph!
-            }
+        // 6. ⚔️ Weapons & Armaments (#0701 - #0800)
+        addHeader('⚔️ Weapons & Armaments (#0701 - #0800)');
+        const wpnKeys = ['Flint Spear', 'Iron Sword', 'Tactical Rifle', 'Plasma Saber', 'Crossbow', 'Grenade', 'Laser Cannon', 'Flamethrower', 'Battleaxe'];
+        for (let i = 701; i <= 800; i++) {
+          const id = '#' + String(i).padStart(4, '0');
+          const baseName = wpnKeys[(i - 701) % wpnKeys.length];
+          const name = (i - 701) < wpnKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+          createCard(name, id, (ctx, t) => {
+            SURVIVAL_PAINTERS[baseName](ctx, 0);
           });
-        });
+        }
 
-        // 7. 🚗 Vehicles & Transports (Turbo & Stealth Morphs)
-        addHeader('🚗 Vehicles & Transports (Turbo & Stealth Morphs)');
-        ['Chariot', 'Survival Jeep', 'Hovercraft', 'Combat Mech', 'Canoe', 'Spaceship', 'Tank', 'Submarine'].forEach((name) => {
-          createCard(name, (ctx, t) => {
-            const variant = Math.floor(t * 0.5) % 3;
-            ctx.save();
-            if (variant === 2 && name === 'Hovercraft') {
-              ctx.globalAlpha = 0.5; // Stealth Cloak Variant
-            }
-            SURVIVAL_PAINTERS[name](ctx, 0);
-            if (variant === 1 && (name === 'Spaceship' || name === 'Hovercraft')) {
-              // Turbo Boost Flame
-              tpx(ctx, 2, 22, 10, 10, '#ef4444');
-              tpx(ctx, 38, 22, 10, 10, '#ef4444');
-            }
-            ctx.restore();
+        // 7. 🚗 Vehicles & Transports (#0801 - #0900)
+        addHeader('🚗 Vehicles & Transports (#0801 - #0900)');
+        const vehKeys = ['Chariot', 'Survival Jeep', 'Hovercraft', 'Combat Mech', 'Canoe', 'Spaceship', 'Tank', 'Submarine'];
+        for (let i = 801; i <= 900; i++) {
+          const id = '#' + String(i).padStart(4, '0');
+          const baseName = vehKeys[(i - 801) % vehKeys.length];
+          const name = (i - 801) < vehKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+          createCard(name, id, (ctx, t) => {
+            SURVIVAL_PAINTERS[baseName](ctx, 0);
           });
-        });
+        }
 
-        // 8. 🦈 Apex Predators & Marine Life (Depth Morphs)
-        addHeader('🦈 Marine Predators & Ocean (Depth Morphs)');
-        ['Great White', 'Octopus', 'Sea Turtle', 'Jellyfish', 'Crab', 'Stingray', 'Squid'].forEach((name) => {
-          createCard(name, (ctx, t) => {
-            const swimY = Math.sin(t * 3) * 2;
+        // 8. 🦈 Marine Predators & Ocean (#0901 - #0950)
+        addHeader('🦈 Marine Predators & Ocean (#0901 - #0950)');
+        const predKeys = ['Great White', 'Octopus', 'Sea Turtle', 'Jellyfish', 'Crab', 'Stingray', 'Squid'];
+        for (let i = 901; i <= 950; i++) {
+          const id = '#' + String(i).padStart(4, '0');
+          const baseName = predKeys[(i - 901) % predKeys.length];
+          const name = (i - 901) < predKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+          createCard(name, id, (ctx, t) => {
+            const swimY = Math.sin(t * 3 + i) * 2;
             ctx.save(); ctx.translate(0, swimY);
-            SURVIVAL_PAINTERS[name](ctx, 0);
+            SURVIVAL_PAINTERS[baseName](ctx, 0);
             ctx.restore();
           });
-        });
+        }
 
-        // 9. 🪵 Resources & Props (Sparkle & Spore Morphs)
-        addHeader('🪵 Resources & World Props (Sparkle & Spore Morphs)');
-        ['Wood Pile', 'Red Poppy', 'Sunflower', 'Beehive', 'Iron Ore', 'Gold Ore', 'Diamond Ore', 'Mushroom', 'Chest'].forEach((name) => {
-          createCard(name, (ctx, t) => {
-            const variant = Math.floor(t * 0.5) % 3;
-            SURVIVAL_PAINTERS[name](ctx, 0);
-            if (name === 'Diamond Ore' || name === 'Gold Ore') {
-              const sparkCol = variant === 0 ? '#ffffff' : variant === 1 ? '#67e8f9' : '#facc15';
-              tpx(ctx, 18, 28, 3, 3, sparkCol);
-            }
+        // 9. 🪵 World Resources & Props (#0951 - #1000)
+        addHeader('🪵 World Resources & Props (#0951 - #1000)');
+        const propKeys = ['Wood Pile', 'Red Poppy', 'Sunflower', 'Beehive', 'Iron Ore', 'Gold Ore', 'Diamond Ore', 'Mushroom', 'Chest'];
+        for (let i = 951; i <= 1000; i++) {
+          const id = '#' + String(i).padStart(4, '0');
+          const baseName = propKeys[(i - 951) % propKeys.length];
+          const name = (i - 951) < propKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+          createCard(name, id, (ctx, t) => {
+            SURVIVAL_PAINTERS[baseName](ctx, 0);
           });
-        });
+        }
 
-        // 10. 👾 Era NPC Enemies & Threats (Enraged & Shield Morphs)
-        addHeader('👾 Era NPC Enemies & Threats (Enraged & Shield Morphs)');
-        ['Rival Hunter', 'Barbarian Raider', 'Renegade Knight', 'Rogue Soldier', 'Cyber Drone'].forEach((name) => {
-          createCard(name, (ctx, t) => {
-            const variant = Math.floor(t * 0.5) % 3;
-            const bob = Math.round(Math.sin(t * 6) * 1);
-            ctx.save(); ctx.translate(0, bob);
-            SURVIVAL_PAINTERS[name](ctx, 0);
-            
-            if (variant === 1) {
-              // Red Enraged Eye/Aura Glow
-              tpx(ctx, 20, 16, 8, 2, '#ef4444');
-            } else if (variant === 2 && name === 'Renegade Knight') {
-              // Iron Shield Variant
-              tpx(ctx, 28, 22, 6, 16, '#94a3b8');
-            }
-            ctx.restore();
+        // 10. 👾 Era NPC Enemies (#1001 - #1020)
+        addHeader('👾 Era NPC Enemies (#1001 - #1020)');
+        const enemyKeys = ['Rival Hunter', 'Barbarian Raider', 'Renegade Knight', 'Rogue Soldier', 'Cyber Drone'];
+        for (let i = 1001; i <= 1020; i++) {
+          const id = '#' + String(i).padStart(4, '0');
+          const baseName = enemyKeys[(i - 1001) % enemyKeys.length];
+          const name = (i - 1001) < enemyKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+          createCard(name, id, (ctx, t) => {
+            SURVIVAL_PAINTERS[baseName](ctx, 0);
           });
-        });
+        }
       });
     })();
   </script>

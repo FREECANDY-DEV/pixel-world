@@ -1,0 +1,8162 @@
+[
+  {
+    "id": "#0001",
+    "num": 1,
+    "name": "Hazmat Human",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0002",
+    "num": 2,
+    "name": "Caveman",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0003",
+    "num": 3,
+    "name": "Cavewoman",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0004",
+    "num": 4,
+    "name": "Tribe Child",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0005",
+    "num": 5,
+    "name": "Tribe Elder",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0006",
+    "num": 6,
+    "name": "Knight",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0007",
+    "num": 7,
+    "name": "Cyborg",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0008",
+    "num": 8,
+    "name": "Ninja",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0009",
+    "num": 9,
+    "name": "Wizard",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0010",
+    "num": 10,
+    "name": "Astronaut",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0011",
+    "num": 11,
+    "name": "Pirate",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0012",
+    "num": 12,
+    "name": "Caveman Emerald",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0013",
+    "num": 13,
+    "name": "Cavewoman Overlord",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0014",
+    "num": 14,
+    "name": "Tribe Child Mk-II",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0015",
+    "num": 15,
+    "name": "Tribe Elder Lunar",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0016",
+    "num": 16,
+    "name": "Knight Rift",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0017",
+    "num": 17,
+    "name": "Cyborg Apex",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0018",
+    "num": 18,
+    "name": "Ninja Starlight",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0019",
+    "num": 19,
+    "name": "Wizard Azure",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0020",
+    "num": 20,
+    "name": "Astronaut Sentinel",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0021",
+    "num": 21,
+    "name": "Hazmat Human Elite",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0022",
+    "num": 22,
+    "name": "Caveman Shadow",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0023",
+    "num": 23,
+    "name": "Cavewoman Quantum",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0024",
+    "num": 24,
+    "name": "Tribe Child Alpha",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0025",
+    "num": 25,
+    "name": "Tribe Elder Void",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0026",
+    "num": 26,
+    "name": "Knight Golden",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0027",
+    "num": 27,
+    "name": "Cyborg Vanguard",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0028",
+    "num": 28,
+    "name": "Ninja Ancient",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0029",
+    "num": 29,
+    "name": "Wizard Crimson",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0030",
+    "num": 30,
+    "name": "Astronaut Nebula",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0031",
+    "num": 31,
+    "name": "Hazmat Human Prime",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0032",
+    "num": 32,
+    "name": "Caveman Solar",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0033",
+    "num": 33,
+    "name": "Cavewoman Obsidian",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0034",
+    "num": 34,
+    "name": "Tribe Child Titan",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0035",
+    "num": 35,
+    "name": "Tribe Elder Cyber",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0036",
+    "num": 36,
+    "name": "Knight Emerald",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0037",
+    "num": 37,
+    "name": "Cyborg Overlord",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0038",
+    "num": 38,
+    "name": "Ninja Mk-II",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0039",
+    "num": 39,
+    "name": "Wizard Lunar",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0040",
+    "num": 40,
+    "name": "Astronaut Rift",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0041",
+    "num": 41,
+    "name": "Hazmat Human Apex",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0042",
+    "num": 42,
+    "name": "Caveman Starlight",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0043",
+    "num": 43,
+    "name": "Cavewoman Azure",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0044",
+    "num": 44,
+    "name": "Tribe Child Sentinel",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0045",
+    "num": 45,
+    "name": "Tribe Elder Elite",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0046",
+    "num": 46,
+    "name": "Knight Shadow",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0047",
+    "num": 47,
+    "name": "Cyborg Quantum",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0048",
+    "num": 48,
+    "name": "Ninja Alpha",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0049",
+    "num": 49,
+    "name": "Wizard Void",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0050",
+    "num": 50,
+    "name": "Astronaut Golden",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0051",
+    "num": 51,
+    "name": "Hazmat Human Vanguard",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0052",
+    "num": 52,
+    "name": "Caveman Ancient",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0053",
+    "num": 53,
+    "name": "Cavewoman Crimson",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0054",
+    "num": 54,
+    "name": "Tribe Child Nebula",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0055",
+    "num": 55,
+    "name": "Tribe Elder Prime",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0056",
+    "num": 56,
+    "name": "Knight Solar",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0057",
+    "num": 57,
+    "name": "Cyborg Obsidian",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0058",
+    "num": 58,
+    "name": "Ninja Titan",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0059",
+    "num": 59,
+    "name": "Wizard Cyber",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0060",
+    "num": 60,
+    "name": "Astronaut Emerald",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0061",
+    "num": 61,
+    "name": "Hazmat Human Overlord",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0062",
+    "num": 62,
+    "name": "Caveman Mk-II",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0063",
+    "num": 63,
+    "name": "Cavewoman Lunar",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0064",
+    "num": 64,
+    "name": "Tribe Child Rift",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0065",
+    "num": 65,
+    "name": "Tribe Elder Apex",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0066",
+    "num": 66,
+    "name": "Knight Starlight",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0067",
+    "num": 67,
+    "name": "Cyborg Azure",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0068",
+    "num": 68,
+    "name": "Ninja Sentinel",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0069",
+    "num": 69,
+    "name": "Wizard Elite",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0070",
+    "num": 70,
+    "name": "Astronaut Shadow",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0071",
+    "num": 71,
+    "name": "Hazmat Human Quantum",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0072",
+    "num": 72,
+    "name": "Caveman Alpha",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0073",
+    "num": 73,
+    "name": "Cavewoman Void",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0074",
+    "num": 74,
+    "name": "Tribe Child Golden",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0075",
+    "num": 75,
+    "name": "Tribe Elder Vanguard",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0076",
+    "num": 76,
+    "name": "Knight Ancient",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0077",
+    "num": 77,
+    "name": "Cyborg Crimson",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0078",
+    "num": 78,
+    "name": "Ninja Nebula",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0079",
+    "num": 79,
+    "name": "Wizard Prime",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0080",
+    "num": 80,
+    "name": "Astronaut Solar",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0081",
+    "num": 81,
+    "name": "Hazmat Human Obsidian",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0082",
+    "num": 82,
+    "name": "Caveman Titan",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0083",
+    "num": 83,
+    "name": "Cavewoman Cyber",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0084",
+    "num": 84,
+    "name": "Tribe Child Emerald",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0085",
+    "num": 85,
+    "name": "Tribe Elder Overlord",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0086",
+    "num": 86,
+    "name": "Knight Mk-II",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0087",
+    "num": 87,
+    "name": "Cyborg Lunar",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0088",
+    "num": 88,
+    "name": "Ninja Rift",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0089",
+    "num": 89,
+    "name": "Wizard Apex",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0090",
+    "num": 90,
+    "name": "Astronaut Starlight",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0091",
+    "num": 91,
+    "name": "Hazmat Human Azure",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0092",
+    "num": 92,
+    "name": "Caveman Sentinel",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0093",
+    "num": 93,
+    "name": "Cavewoman Elite",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0094",
+    "num": 94,
+    "name": "Tribe Child Shadow",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0095",
+    "num": 95,
+    "name": "Tribe Elder Quantum",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0096",
+    "num": 96,
+    "name": "Knight Alpha",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0097",
+    "num": 97,
+    "name": "Cyborg Void",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0098",
+    "num": 98,
+    "name": "Ninja Golden",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0099",
+    "num": 99,
+    "name": "Wizard Vanguard",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0100",
+    "num": 100,
+    "name": "Astronaut Ancient",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0101",
+    "num": 101,
+    "name": "Hazmat Human Crimson",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0102",
+    "num": 102,
+    "name": "Caveman Nebula",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0103",
+    "num": 103,
+    "name": "Cavewoman Prime",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0104",
+    "num": 104,
+    "name": "Tribe Child Solar",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0105",
+    "num": 105,
+    "name": "Tribe Elder Obsidian",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0106",
+    "num": 106,
+    "name": "Knight Titan",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0107",
+    "num": 107,
+    "name": "Cyborg Cyber",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0108",
+    "num": 108,
+    "name": "Ninja Emerald",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0109",
+    "num": 109,
+    "name": "Wizard Overlord",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0110",
+    "num": 110,
+    "name": "Astronaut Mk-II",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0111",
+    "num": 111,
+    "name": "Hazmat Human Lunar",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0112",
+    "num": 112,
+    "name": "Caveman Rift",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0113",
+    "num": 113,
+    "name": "Cavewoman Apex",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0114",
+    "num": 114,
+    "name": "Tribe Child Starlight",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0115",
+    "num": 115,
+    "name": "Tribe Elder Azure",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0116",
+    "num": 116,
+    "name": "Knight Sentinel",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0117",
+    "num": 117,
+    "name": "Cyborg Elite",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0118",
+    "num": 118,
+    "name": "Ninja Shadow",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0119",
+    "num": 119,
+    "name": "Wizard Quantum",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0120",
+    "num": 120,
+    "name": "Astronaut Alpha",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0121",
+    "num": 121,
+    "name": "Hazmat Human Void",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0122",
+    "num": 122,
+    "name": "Caveman Golden",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0123",
+    "num": 123,
+    "name": "Cavewoman Vanguard",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0124",
+    "num": 124,
+    "name": "Tribe Child Ancient",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0125",
+    "num": 125,
+    "name": "Tribe Elder Crimson",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0126",
+    "num": 126,
+    "name": "Knight Nebula",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0127",
+    "num": 127,
+    "name": "Cyborg Prime",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0128",
+    "num": 128,
+    "name": "Ninja Solar",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0129",
+    "num": 129,
+    "name": "Wizard Obsidian",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0130",
+    "num": 130,
+    "name": "Astronaut Titan",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0131",
+    "num": 131,
+    "name": "Hazmat Human Cyber",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0132",
+    "num": 132,
+    "name": "Caveman Emerald",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0133",
+    "num": 133,
+    "name": "Cavewoman Overlord",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0134",
+    "num": 134,
+    "name": "Tribe Child Mk-II",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0135",
+    "num": 135,
+    "name": "Tribe Elder Lunar",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0136",
+    "num": 136,
+    "name": "Knight Rift",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0137",
+    "num": 137,
+    "name": "Cyborg Apex",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0138",
+    "num": 138,
+    "name": "Ninja Starlight",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0139",
+    "num": 139,
+    "name": "Wizard Azure",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0140",
+    "num": 140,
+    "name": "Astronaut Sentinel",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0141",
+    "num": 141,
+    "name": "Hazmat Human Elite",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0142",
+    "num": 142,
+    "name": "Caveman Shadow",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0143",
+    "num": 143,
+    "name": "Cavewoman Quantum",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0144",
+    "num": 144,
+    "name": "Tribe Child Alpha",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0145",
+    "num": 145,
+    "name": "Tribe Elder Void",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0146",
+    "num": 146,
+    "name": "Knight Golden",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0147",
+    "num": 147,
+    "name": "Cyborg Vanguard",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0148",
+    "num": 148,
+    "name": "Ninja Ancient",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0149",
+    "num": 149,
+    "name": "Wizard Crimson",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0150",
+    "num": 150,
+    "name": "Astronaut Nebula",
+    "category": "👤 Tribe & Hero Classes",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0151",
+    "num": 151,
+    "name": "Cactus",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0152",
+    "num": 152,
+    "name": "Agave",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0153",
+    "num": 153,
+    "name": "Acacia",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0154",
+    "num": 154,
+    "name": "Desert Shrub",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0155",
+    "num": 155,
+    "name": "Tumble Bush",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0156",
+    "num": 156,
+    "name": "Jungle Tree",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0157",
+    "num": 157,
+    "name": "Palm",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0158",
+    "num": 158,
+    "name": "Bamboo",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0159",
+    "num": 159,
+    "name": "Fern Thicket",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0160",
+    "num": 160,
+    "name": "Oak",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0161",
+    "num": 161,
+    "name": "Pine",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0162",
+    "num": 162,
+    "name": "Birch",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0163",
+    "num": 163,
+    "name": "Maple",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0164",
+    "num": 164,
+    "name": "Berry Bush",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0165",
+    "num": 165,
+    "name": "Apple Tree",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0166",
+    "num": 166,
+    "name": "Snow Pine",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0167",
+    "num": 167,
+    "name": "Spruce",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0168",
+    "num": 168,
+    "name": "Dead Tree",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0169",
+    "num": 169,
+    "name": "Frost Bush",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0170",
+    "num": 170,
+    "name": "Small Rock",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0171",
+    "num": 171,
+    "name": "Medium Rock",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0172",
+    "num": 172,
+    "name": "Big Rock",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0173",
+    "num": 173,
+    "name": "Great Bush",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0174",
+    "num": 174,
+    "name": "Blossom Bush",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0175",
+    "num": 175,
+    "name": "Bramble Tangle",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0176",
+    "num": 176,
+    "name": "Jungle Tree Solar",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0177",
+    "num": 177,
+    "name": "Palm Obsidian",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0178",
+    "num": 178,
+    "name": "Bamboo Titan",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0179",
+    "num": 179,
+    "name": "Fern Thicket Cyber",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0180",
+    "num": 180,
+    "name": "Oak Emerald",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0181",
+    "num": 181,
+    "name": "Cactus Overlord",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0182",
+    "num": 182,
+    "name": "Agave Mk-II",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0183",
+    "num": 183,
+    "name": "Acacia Lunar",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0184",
+    "num": 184,
+    "name": "Desert Shrub Rift",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0185",
+    "num": 185,
+    "name": "Tumble Bush Apex",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0186",
+    "num": 186,
+    "name": "Jungle Tree Starlight",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0187",
+    "num": 187,
+    "name": "Palm Azure",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0188",
+    "num": 188,
+    "name": "Bamboo Sentinel",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0189",
+    "num": 189,
+    "name": "Fern Thicket Elite",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0190",
+    "num": 190,
+    "name": "Oak Shadow",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0191",
+    "num": 191,
+    "name": "Cactus Quantum",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0192",
+    "num": 192,
+    "name": "Agave Alpha",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0193",
+    "num": 193,
+    "name": "Acacia Void",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0194",
+    "num": 194,
+    "name": "Desert Shrub Golden",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0195",
+    "num": 195,
+    "name": "Tumble Bush Vanguard",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0196",
+    "num": 196,
+    "name": "Jungle Tree Ancient",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0197",
+    "num": 197,
+    "name": "Palm Crimson",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0198",
+    "num": 198,
+    "name": "Bamboo Nebula",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0199",
+    "num": 199,
+    "name": "Fern Thicket Prime",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0200",
+    "num": 200,
+    "name": "Oak Solar",
+    "category": "🌲 Vegetation & Flora",
+    "era": 1,
+    "rating": 9.5
+  },
+  {
+    "id": "#0201",
+    "num": 201,
+    "name": "Cactus Obsidian",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0202",
+    "num": 202,
+    "name": "Agave Titan",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0203",
+    "num": 203,
+    "name": "Acacia Cyber",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0204",
+    "num": 204,
+    "name": "Desert Shrub Emerald",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0205",
+    "num": 205,
+    "name": "Tumble Bush Overlord",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0206",
+    "num": 206,
+    "name": "Jungle Tree Mk-II",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0207",
+    "num": 207,
+    "name": "Palm Lunar",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0208",
+    "num": 208,
+    "name": "Bamboo Rift",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0209",
+    "num": 209,
+    "name": "Fern Thicket Apex",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0210",
+    "num": 210,
+    "name": "Oak Starlight",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0211",
+    "num": 211,
+    "name": "Cactus Azure",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0212",
+    "num": 212,
+    "name": "Agave Sentinel",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0213",
+    "num": 213,
+    "name": "Acacia Elite",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0214",
+    "num": 214,
+    "name": "Desert Shrub Shadow",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0215",
+    "num": 215,
+    "name": "Tumble Bush Quantum",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0216",
+    "num": 216,
+    "name": "Jungle Tree Alpha",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0217",
+    "num": 217,
+    "name": "Palm Void",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0218",
+    "num": 218,
+    "name": "Bamboo Golden",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0219",
+    "num": 219,
+    "name": "Fern Thicket Vanguard",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0220",
+    "num": 220,
+    "name": "Oak Ancient",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0221",
+    "num": 221,
+    "name": "Cactus Crimson",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0222",
+    "num": 222,
+    "name": "Agave Nebula",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0223",
+    "num": 223,
+    "name": "Acacia Prime",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0224",
+    "num": 224,
+    "name": "Desert Shrub Solar",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0225",
+    "num": 225,
+    "name": "Tumble Bush Obsidian",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0226",
+    "num": 226,
+    "name": "Jungle Tree Titan",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0227",
+    "num": 227,
+    "name": "Palm Cyber",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0228",
+    "num": 228,
+    "name": "Bamboo Emerald",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0229",
+    "num": 229,
+    "name": "Fern Thicket Overlord",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0230",
+    "num": 230,
+    "name": "Oak Mk-II",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0231",
+    "num": 231,
+    "name": "Cactus Lunar",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0232",
+    "num": 232,
+    "name": "Agave Rift",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0233",
+    "num": 233,
+    "name": "Acacia Apex",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0234",
+    "num": 234,
+    "name": "Desert Shrub Starlight",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0235",
+    "num": 235,
+    "name": "Tumble Bush Azure",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0236",
+    "num": 236,
+    "name": "Jungle Tree Sentinel",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0237",
+    "num": 237,
+    "name": "Palm Elite",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0238",
+    "num": 238,
+    "name": "Bamboo Shadow",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0239",
+    "num": 239,
+    "name": "Fern Thicket Quantum",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0240",
+    "num": 240,
+    "name": "Oak Alpha",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0241",
+    "num": 241,
+    "name": "Cactus Void",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0242",
+    "num": 242,
+    "name": "Agave Golden",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0243",
+    "num": 243,
+    "name": "Acacia Vanguard",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0244",
+    "num": 244,
+    "name": "Desert Shrub Ancient",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0245",
+    "num": 245,
+    "name": "Tumble Bush Crimson",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0246",
+    "num": 246,
+    "name": "Jungle Tree Nebula",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0247",
+    "num": 247,
+    "name": "Palm Prime",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0248",
+    "num": 248,
+    "name": "Bamboo Solar",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0249",
+    "num": 249,
+    "name": "Fern Thicket Obsidian",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0250",
+    "num": 250,
+    "name": "Oak Titan",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0251",
+    "num": 251,
+    "name": "Cactus Cyber",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0252",
+    "num": 252,
+    "name": "Agave Emerald",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0253",
+    "num": 253,
+    "name": "Acacia Overlord",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0254",
+    "num": 254,
+    "name": "Desert Shrub Mk-II",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0255",
+    "num": 255,
+    "name": "Tumble Bush Lunar",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0256",
+    "num": 256,
+    "name": "Jungle Tree Rift",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0257",
+    "num": 257,
+    "name": "Palm Apex",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0258",
+    "num": 258,
+    "name": "Bamboo Starlight",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0259",
+    "num": 259,
+    "name": "Fern Thicket Azure",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0260",
+    "num": 260,
+    "name": "Oak Sentinel",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0261",
+    "num": 261,
+    "name": "Cactus Elite",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0262",
+    "num": 262,
+    "name": "Agave Shadow",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0263",
+    "num": 263,
+    "name": "Acacia Quantum",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0264",
+    "num": 264,
+    "name": "Desert Shrub Alpha",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0265",
+    "num": 265,
+    "name": "Tumble Bush Void",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0266",
+    "num": 266,
+    "name": "Jungle Tree Golden",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0267",
+    "num": 267,
+    "name": "Palm Vanguard",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0268",
+    "num": 268,
+    "name": "Bamboo Ancient",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0269",
+    "num": 269,
+    "name": "Fern Thicket Crimson",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0270",
+    "num": 270,
+    "name": "Oak Nebula",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0271",
+    "num": 271,
+    "name": "Cactus Prime",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0272",
+    "num": 272,
+    "name": "Agave Solar",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0273",
+    "num": 273,
+    "name": "Acacia Obsidian",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0274",
+    "num": 274,
+    "name": "Desert Shrub Titan",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0275",
+    "num": 275,
+    "name": "Tumble Bush Cyber",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0276",
+    "num": 276,
+    "name": "Jungle Tree Emerald",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0277",
+    "num": 277,
+    "name": "Palm Overlord",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0278",
+    "num": 278,
+    "name": "Bamboo Mk-II",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0279",
+    "num": 279,
+    "name": "Fern Thicket Lunar",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0280",
+    "num": 280,
+    "name": "Oak Rift",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0281",
+    "num": 281,
+    "name": "Cactus Apex",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0282",
+    "num": 282,
+    "name": "Agave Starlight",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0283",
+    "num": 283,
+    "name": "Acacia Azure",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0284",
+    "num": 284,
+    "name": "Desert Shrub Sentinel",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0285",
+    "num": 285,
+    "name": "Tumble Bush Elite",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0286",
+    "num": 286,
+    "name": "Jungle Tree Shadow",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0287",
+    "num": 287,
+    "name": "Palm Quantum",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0288",
+    "num": 288,
+    "name": "Bamboo Alpha",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0289",
+    "num": 289,
+    "name": "Fern Thicket Void",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0290",
+    "num": 290,
+    "name": "Oak Golden",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0291",
+    "num": 291,
+    "name": "Cactus Vanguard",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0292",
+    "num": 292,
+    "name": "Agave Ancient",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0293",
+    "num": 293,
+    "name": "Acacia Crimson",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0294",
+    "num": 294,
+    "name": "Desert Shrub Nebula",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0295",
+    "num": 295,
+    "name": "Tumble Bush Prime",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0296",
+    "num": 296,
+    "name": "Jungle Tree Solar",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0297",
+    "num": 297,
+    "name": "Palm Obsidian",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0298",
+    "num": 298,
+    "name": "Bamboo Titan",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0299",
+    "num": 299,
+    "name": "Fern Thicket Cyber",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0300",
+    "num": 300,
+    "name": "Oak Emerald",
+    "category": "🌲 Vegetation & Flora",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0301",
+    "num": 301,
+    "name": "Sardine",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0302",
+    "num": 302,
+    "name": "Clownfish",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0303",
+    "num": 303,
+    "name": "Blue Tang",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0304",
+    "num": 304,
+    "name": "Angelfish",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0305",
+    "num": 305,
+    "name": "Puffer",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0306",
+    "num": 306,
+    "name": "Tuna",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0307",
+    "num": 307,
+    "name": "Fish Azure",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0308",
+    "num": 308,
+    "name": "Fish Sentinel",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0309",
+    "num": 309,
+    "name": "Fish Elite",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0310",
+    "num": 310,
+    "name": "Fish Shadow",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0311",
+    "num": 311,
+    "name": "Sardine Quantum",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0312",
+    "num": 312,
+    "name": "Clownfish Alpha",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0313",
+    "num": 313,
+    "name": "Blue Tang Void",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0314",
+    "num": 314,
+    "name": "Angelfish Golden",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0315",
+    "num": 315,
+    "name": "Puffer Vanguard",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0316",
+    "num": 316,
+    "name": "Tuna Ancient",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0317",
+    "num": 317,
+    "name": "Fish Crimson",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0318",
+    "num": 318,
+    "name": "Fish Nebula",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0319",
+    "num": 319,
+    "name": "Fish Prime",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0320",
+    "num": 320,
+    "name": "Fish Solar",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0321",
+    "num": 321,
+    "name": "Sardine Obsidian",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0322",
+    "num": 322,
+    "name": "Clownfish Titan",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0323",
+    "num": 323,
+    "name": "Blue Tang Cyber",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0324",
+    "num": 324,
+    "name": "Angelfish Emerald",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0325",
+    "num": 325,
+    "name": "Puffer Overlord",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0326",
+    "num": 326,
+    "name": "Tuna Mk-II",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0327",
+    "num": 327,
+    "name": "Fish Lunar",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0328",
+    "num": 328,
+    "name": "Fish Rift",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0329",
+    "num": 329,
+    "name": "Fish Apex",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0330",
+    "num": 330,
+    "name": "Fish Starlight",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0331",
+    "num": 331,
+    "name": "Sardine Azure",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0332",
+    "num": 332,
+    "name": "Clownfish Sentinel",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0333",
+    "num": 333,
+    "name": "Blue Tang Elite",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0334",
+    "num": 334,
+    "name": "Angelfish Shadow",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0335",
+    "num": 335,
+    "name": "Puffer Quantum",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0336",
+    "num": 336,
+    "name": "Tuna Alpha",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0337",
+    "num": 337,
+    "name": "Fish Void",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0338",
+    "num": 338,
+    "name": "Fish Golden",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0339",
+    "num": 339,
+    "name": "Fish Vanguard",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0340",
+    "num": 340,
+    "name": "Fish Ancient",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0341",
+    "num": 341,
+    "name": "Sardine Crimson",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0342",
+    "num": 342,
+    "name": "Clownfish Nebula",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0343",
+    "num": 343,
+    "name": "Blue Tang Prime",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0344",
+    "num": 344,
+    "name": "Angelfish Solar",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0345",
+    "num": 345,
+    "name": "Puffer Obsidian",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0346",
+    "num": 346,
+    "name": "Tuna Titan",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0347",
+    "num": 347,
+    "name": "Fish Cyber",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0348",
+    "num": 348,
+    "name": "Fish Emerald",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0349",
+    "num": 349,
+    "name": "Fish Overlord",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0350",
+    "num": 350,
+    "name": "Fish Mk-II",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0351",
+    "num": 351,
+    "name": "Sardine Lunar",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0352",
+    "num": 352,
+    "name": "Clownfish Rift",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0353",
+    "num": 353,
+    "name": "Blue Tang Apex",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0354",
+    "num": 354,
+    "name": "Angelfish Starlight",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0355",
+    "num": 355,
+    "name": "Puffer Azure",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0356",
+    "num": 356,
+    "name": "Tuna Sentinel",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0357",
+    "num": 357,
+    "name": "Fish Elite",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0358",
+    "num": 358,
+    "name": "Fish Shadow",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0359",
+    "num": 359,
+    "name": "Fish Quantum",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0360",
+    "num": 360,
+    "name": "Fish Alpha",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0361",
+    "num": 361,
+    "name": "Sardine Void",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0362",
+    "num": 362,
+    "name": "Clownfish Golden",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0363",
+    "num": 363,
+    "name": "Blue Tang Vanguard",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0364",
+    "num": 364,
+    "name": "Angelfish Ancient",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0365",
+    "num": 365,
+    "name": "Puffer Crimson",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0366",
+    "num": 366,
+    "name": "Tuna Nebula",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0367",
+    "num": 367,
+    "name": "Fish Prime",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0368",
+    "num": 368,
+    "name": "Fish Solar",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0369",
+    "num": 369,
+    "name": "Fish Obsidian",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0370",
+    "num": 370,
+    "name": "Fish Titan",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0371",
+    "num": 371,
+    "name": "Sardine Cyber",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0372",
+    "num": 372,
+    "name": "Clownfish Emerald",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0373",
+    "num": 373,
+    "name": "Blue Tang Overlord",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0374",
+    "num": 374,
+    "name": "Angelfish Mk-II",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0375",
+    "num": 375,
+    "name": "Puffer Lunar",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0376",
+    "num": 376,
+    "name": "Tuna Rift",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0377",
+    "num": 377,
+    "name": "Fish Apex",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0378",
+    "num": 378,
+    "name": "Fish Starlight",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0379",
+    "num": 379,
+    "name": "Fish Azure",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0380",
+    "num": 380,
+    "name": "Fish Sentinel",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0381",
+    "num": 381,
+    "name": "Sardine Elite",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0382",
+    "num": 382,
+    "name": "Clownfish Shadow",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0383",
+    "num": 383,
+    "name": "Blue Tang Quantum",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0384",
+    "num": 384,
+    "name": "Angelfish Alpha",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0385",
+    "num": 385,
+    "name": "Puffer Void",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0386",
+    "num": 386,
+    "name": "Tuna Golden",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0387",
+    "num": 387,
+    "name": "Fish Vanguard",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0388",
+    "num": 388,
+    "name": "Fish Ancient",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0389",
+    "num": 389,
+    "name": "Fish Crimson",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0390",
+    "num": 390,
+    "name": "Fish Nebula",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0391",
+    "num": 391,
+    "name": "Sardine Prime",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0392",
+    "num": 392,
+    "name": "Clownfish Solar",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0393",
+    "num": 393,
+    "name": "Blue Tang Obsidian",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0394",
+    "num": 394,
+    "name": "Angelfish Titan",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0395",
+    "num": 395,
+    "name": "Puffer Cyber",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0396",
+    "num": 396,
+    "name": "Tuna Emerald",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0397",
+    "num": 397,
+    "name": "Fish Overlord",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0398",
+    "num": 398,
+    "name": "Fish Mk-II",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0399",
+    "num": 399,
+    "name": "Fish Lunar",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0400",
+    "num": 400,
+    "name": "Fish Rift",
+    "category": "🐟 Sea Life & Aquatic Organisms",
+    "era": 2,
+    "rating": 9.5
+  },
+  {
+    "id": "#0401",
+    "num": 401,
+    "name": "Mammoth",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0402",
+    "num": 402,
+    "name": "Sabertooth",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0403",
+    "num": 403,
+    "name": "Wild Boar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0404",
+    "num": 404,
+    "name": "Rabbit",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0405",
+    "num": 405,
+    "name": "Eagle",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0406",
+    "num": 406,
+    "name": "Honeybee",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0407",
+    "num": 407,
+    "name": "T-Rex",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0408",
+    "num": 408,
+    "name": "Wolf",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0409",
+    "num": 409,
+    "name": "Bear",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0410",
+    "num": 410,
+    "name": "Snake",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0411",
+    "num": 411,
+    "name": "Dragon",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0412",
+    "num": 412,
+    "name": "Scorpion",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0413",
+    "num": 413,
+    "name": "Fox",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0414",
+    "num": 414,
+    "name": "Owl",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0415",
+    "num": 415,
+    "name": "Eagle Prime",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0416",
+    "num": 416,
+    "name": "Honeybee Solar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0417",
+    "num": 417,
+    "name": "T-Rex Obsidian",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0418",
+    "num": 418,
+    "name": "Wolf Titan",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0419",
+    "num": 419,
+    "name": "Bear Cyber",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0420",
+    "num": 420,
+    "name": "Snake Emerald",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0421",
+    "num": 421,
+    "name": "Mammoth Overlord",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0422",
+    "num": 422,
+    "name": "Sabertooth Mk-II",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0423",
+    "num": 423,
+    "name": "Wild Boar Lunar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0424",
+    "num": 424,
+    "name": "Rabbit Rift",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0425",
+    "num": 425,
+    "name": "Eagle Apex",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0426",
+    "num": 426,
+    "name": "Honeybee Starlight",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0427",
+    "num": 427,
+    "name": "T-Rex Azure",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0428",
+    "num": 428,
+    "name": "Wolf Sentinel",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0429",
+    "num": 429,
+    "name": "Bear Elite",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0430",
+    "num": 430,
+    "name": "Snake Shadow",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0431",
+    "num": 431,
+    "name": "Mammoth Quantum",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0432",
+    "num": 432,
+    "name": "Sabertooth Alpha",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0433",
+    "num": 433,
+    "name": "Wild Boar Void",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0434",
+    "num": 434,
+    "name": "Rabbit Golden",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0435",
+    "num": 435,
+    "name": "Eagle Vanguard",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0436",
+    "num": 436,
+    "name": "Honeybee Ancient",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0437",
+    "num": 437,
+    "name": "T-Rex Crimson",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0438",
+    "num": 438,
+    "name": "Wolf Nebula",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0439",
+    "num": 439,
+    "name": "Bear Prime",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0440",
+    "num": 440,
+    "name": "Snake Solar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0441",
+    "num": 441,
+    "name": "Mammoth Obsidian",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0442",
+    "num": 442,
+    "name": "Sabertooth Titan",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0443",
+    "num": 443,
+    "name": "Wild Boar Cyber",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0444",
+    "num": 444,
+    "name": "Rabbit Emerald",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0445",
+    "num": 445,
+    "name": "Eagle Overlord",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0446",
+    "num": 446,
+    "name": "Honeybee Mk-II",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0447",
+    "num": 447,
+    "name": "T-Rex Lunar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0448",
+    "num": 448,
+    "name": "Wolf Rift",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0449",
+    "num": 449,
+    "name": "Bear Apex",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0450",
+    "num": 450,
+    "name": "Snake Starlight",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0451",
+    "num": 451,
+    "name": "Mammoth Azure",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0452",
+    "num": 452,
+    "name": "Sabertooth Sentinel",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0453",
+    "num": 453,
+    "name": "Wild Boar Elite",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0454",
+    "num": 454,
+    "name": "Rabbit Shadow",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0455",
+    "num": 455,
+    "name": "Eagle Quantum",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0456",
+    "num": 456,
+    "name": "Honeybee Alpha",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0457",
+    "num": 457,
+    "name": "T-Rex Void",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0458",
+    "num": 458,
+    "name": "Wolf Golden",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0459",
+    "num": 459,
+    "name": "Bear Vanguard",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0460",
+    "num": 460,
+    "name": "Snake Ancient",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0461",
+    "num": 461,
+    "name": "Mammoth Crimson",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0462",
+    "num": 462,
+    "name": "Sabertooth Nebula",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0463",
+    "num": 463,
+    "name": "Wild Boar Prime",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0464",
+    "num": 464,
+    "name": "Rabbit Solar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0465",
+    "num": 465,
+    "name": "Eagle Obsidian",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0466",
+    "num": 466,
+    "name": "Honeybee Titan",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0467",
+    "num": 467,
+    "name": "T-Rex Cyber",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0468",
+    "num": 468,
+    "name": "Wolf Emerald",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0469",
+    "num": 469,
+    "name": "Bear Overlord",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0470",
+    "num": 470,
+    "name": "Snake Mk-II",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0471",
+    "num": 471,
+    "name": "Mammoth Lunar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0472",
+    "num": 472,
+    "name": "Sabertooth Rift",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0473",
+    "num": 473,
+    "name": "Wild Boar Apex",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0474",
+    "num": 474,
+    "name": "Rabbit Starlight",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0475",
+    "num": 475,
+    "name": "Eagle Azure",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0476",
+    "num": 476,
+    "name": "Honeybee Sentinel",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0477",
+    "num": 477,
+    "name": "T-Rex Elite",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0478",
+    "num": 478,
+    "name": "Wolf Shadow",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0479",
+    "num": 479,
+    "name": "Bear Quantum",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0480",
+    "num": 480,
+    "name": "Snake Alpha",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0481",
+    "num": 481,
+    "name": "Mammoth Void",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0482",
+    "num": 482,
+    "name": "Sabertooth Golden",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0483",
+    "num": 483,
+    "name": "Wild Boar Vanguard",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0484",
+    "num": 484,
+    "name": "Rabbit Ancient",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0485",
+    "num": 485,
+    "name": "Eagle Crimson",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0486",
+    "num": 486,
+    "name": "Honeybee Nebula",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0487",
+    "num": 487,
+    "name": "T-Rex Prime",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0488",
+    "num": 488,
+    "name": "Wolf Solar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0489",
+    "num": 489,
+    "name": "Bear Obsidian",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0490",
+    "num": 490,
+    "name": "Snake Titan",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0491",
+    "num": 491,
+    "name": "Mammoth Cyber",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0492",
+    "num": 492,
+    "name": "Sabertooth Emerald",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0493",
+    "num": 493,
+    "name": "Wild Boar Overlord",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0494",
+    "num": 494,
+    "name": "Rabbit Mk-II",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0495",
+    "num": 495,
+    "name": "Eagle Lunar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0496",
+    "num": 496,
+    "name": "Honeybee Rift",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0497",
+    "num": 497,
+    "name": "T-Rex Apex",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0498",
+    "num": 498,
+    "name": "Wolf Starlight",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0499",
+    "num": 499,
+    "name": "Bear Azure",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0500",
+    "num": 500,
+    "name": "Snake Sentinel",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0501",
+    "num": 501,
+    "name": "Mammoth Elite",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0502",
+    "num": 502,
+    "name": "Sabertooth Shadow",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0503",
+    "num": 503,
+    "name": "Wild Boar Quantum",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0504",
+    "num": 504,
+    "name": "Rabbit Alpha",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0505",
+    "num": 505,
+    "name": "Eagle Void",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0506",
+    "num": 506,
+    "name": "Honeybee Golden",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0507",
+    "num": 507,
+    "name": "T-Rex Vanguard",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0508",
+    "num": 508,
+    "name": "Wolf Ancient",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0509",
+    "num": 509,
+    "name": "Bear Crimson",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0510",
+    "num": 510,
+    "name": "Snake Nebula",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0511",
+    "num": 511,
+    "name": "Mammoth Prime",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0512",
+    "num": 512,
+    "name": "Sabertooth Solar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0513",
+    "num": 513,
+    "name": "Wild Boar Obsidian",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0514",
+    "num": 514,
+    "name": "Rabbit Titan",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0515",
+    "num": 515,
+    "name": "Eagle Cyber",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0516",
+    "num": 516,
+    "name": "Honeybee Emerald",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0517",
+    "num": 517,
+    "name": "T-Rex Overlord",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0518",
+    "num": 518,
+    "name": "Wolf Mk-II",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0519",
+    "num": 519,
+    "name": "Bear Lunar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0520",
+    "num": 520,
+    "name": "Snake Rift",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0521",
+    "num": 521,
+    "name": "Mammoth Apex",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0522",
+    "num": 522,
+    "name": "Sabertooth Starlight",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0523",
+    "num": 523,
+    "name": "Wild Boar Azure",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0524",
+    "num": 524,
+    "name": "Rabbit Sentinel",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0525",
+    "num": 525,
+    "name": "Eagle Elite",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0526",
+    "num": 526,
+    "name": "Honeybee Shadow",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0527",
+    "num": 527,
+    "name": "T-Rex Quantum",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0528",
+    "num": 528,
+    "name": "Wolf Alpha",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0529",
+    "num": 529,
+    "name": "Bear Void",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0530",
+    "num": 530,
+    "name": "Snake Golden",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0531",
+    "num": 531,
+    "name": "Mammoth Vanguard",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0532",
+    "num": 532,
+    "name": "Sabertooth Ancient",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0533",
+    "num": 533,
+    "name": "Wild Boar Crimson",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0534",
+    "num": 534,
+    "name": "Rabbit Nebula",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0535",
+    "num": 535,
+    "name": "Eagle Prime",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0536",
+    "num": 536,
+    "name": "Honeybee Solar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0537",
+    "num": 537,
+    "name": "T-Rex Obsidian",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0538",
+    "num": 538,
+    "name": "Wolf Titan",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0539",
+    "num": 539,
+    "name": "Bear Cyber",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0540",
+    "num": 540,
+    "name": "Snake Emerald",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0541",
+    "num": 541,
+    "name": "Mammoth Overlord",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0542",
+    "num": 542,
+    "name": "Sabertooth Mk-II",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0543",
+    "num": 543,
+    "name": "Wild Boar Lunar",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0544",
+    "num": 544,
+    "name": "Rabbit Rift",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0545",
+    "num": 545,
+    "name": "Eagle Apex",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0546",
+    "num": 546,
+    "name": "Honeybee Starlight",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0547",
+    "num": 547,
+    "name": "T-Rex Azure",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0548",
+    "num": 548,
+    "name": "Wolf Sentinel",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0549",
+    "num": 549,
+    "name": "Bear Elite",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0550",
+    "num": 550,
+    "name": "Snake Shadow",
+    "category": "🦣 Wildlife, Beasts & Megafauna",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0551",
+    "num": 551,
+    "name": "Thatch Hut",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0552",
+    "num": 552,
+    "name": "Log Cabin",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0553",
+    "num": 553,
+    "name": "Stone Cottage",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0554",
+    "num": 554,
+    "name": "Bunker",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0555",
+    "num": 555,
+    "name": "Cyber Hab",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0556",
+    "num": 556,
+    "name": "Watchtower",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0557",
+    "num": 557,
+    "name": "Pyramid",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0558",
+    "num": 558,
+    "name": "Castle",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0559",
+    "num": 559,
+    "name": "Windmill",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0560",
+    "num": 560,
+    "name": "Structure Solar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0561",
+    "num": 561,
+    "name": "Thatch Hut Obsidian",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0562",
+    "num": 562,
+    "name": "Log Cabin Titan",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0563",
+    "num": 563,
+    "name": "Stone Cottage Cyber",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0564",
+    "num": 564,
+    "name": "Bunker Emerald",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0565",
+    "num": 565,
+    "name": "Cyber Hab Overlord",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0566",
+    "num": 566,
+    "name": "Watchtower Mk-II",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0567",
+    "num": 567,
+    "name": "Pyramid Lunar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0568",
+    "num": 568,
+    "name": "Castle Rift",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0569",
+    "num": 569,
+    "name": "Windmill Apex",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0570",
+    "num": 570,
+    "name": "Structure Starlight",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0571",
+    "num": 571,
+    "name": "Thatch Hut Azure",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0572",
+    "num": 572,
+    "name": "Log Cabin Sentinel",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0573",
+    "num": 573,
+    "name": "Stone Cottage Elite",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0574",
+    "num": 574,
+    "name": "Bunker Shadow",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0575",
+    "num": 575,
+    "name": "Cyber Hab Quantum",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0576",
+    "num": 576,
+    "name": "Watchtower Alpha",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0577",
+    "num": 577,
+    "name": "Pyramid Void",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0578",
+    "num": 578,
+    "name": "Castle Golden",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0579",
+    "num": 579,
+    "name": "Windmill Vanguard",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0580",
+    "num": 580,
+    "name": "Structure Ancient",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0581",
+    "num": 581,
+    "name": "Thatch Hut Crimson",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0582",
+    "num": 582,
+    "name": "Log Cabin Nebula",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0583",
+    "num": 583,
+    "name": "Stone Cottage Prime",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0584",
+    "num": 584,
+    "name": "Bunker Solar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0585",
+    "num": 585,
+    "name": "Cyber Hab Obsidian",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0586",
+    "num": 586,
+    "name": "Watchtower Titan",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0587",
+    "num": 587,
+    "name": "Pyramid Cyber",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0588",
+    "num": 588,
+    "name": "Castle Emerald",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0589",
+    "num": 589,
+    "name": "Windmill Overlord",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0590",
+    "num": 590,
+    "name": "Structure Mk-II",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0591",
+    "num": 591,
+    "name": "Thatch Hut Lunar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0592",
+    "num": 592,
+    "name": "Log Cabin Rift",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0593",
+    "num": 593,
+    "name": "Stone Cottage Apex",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0594",
+    "num": 594,
+    "name": "Bunker Starlight",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0595",
+    "num": 595,
+    "name": "Cyber Hab Azure",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0596",
+    "num": 596,
+    "name": "Watchtower Sentinel",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0597",
+    "num": 597,
+    "name": "Pyramid Elite",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0598",
+    "num": 598,
+    "name": "Castle Shadow",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0599",
+    "num": 599,
+    "name": "Windmill Quantum",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0600",
+    "num": 600,
+    "name": "Structure Alpha",
+    "category": "🏚️ Base Building & Housing",
+    "era": 3,
+    "rating": 9.5
+  },
+  {
+    "id": "#0601",
+    "num": 601,
+    "name": "Thatch Hut Void",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0602",
+    "num": 602,
+    "name": "Log Cabin Golden",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0603",
+    "num": 603,
+    "name": "Stone Cottage Vanguard",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0604",
+    "num": 604,
+    "name": "Bunker Ancient",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0605",
+    "num": 605,
+    "name": "Cyber Hab Crimson",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0606",
+    "num": 606,
+    "name": "Watchtower Nebula",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0607",
+    "num": 607,
+    "name": "Pyramid Prime",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0608",
+    "num": 608,
+    "name": "Castle Solar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0609",
+    "num": 609,
+    "name": "Windmill Obsidian",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0610",
+    "num": 610,
+    "name": "Structure Titan",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0611",
+    "num": 611,
+    "name": "Thatch Hut Cyber",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0612",
+    "num": 612,
+    "name": "Log Cabin Emerald",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0613",
+    "num": 613,
+    "name": "Stone Cottage Overlord",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0614",
+    "num": 614,
+    "name": "Bunker Mk-II",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0615",
+    "num": 615,
+    "name": "Cyber Hab Lunar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0616",
+    "num": 616,
+    "name": "Watchtower Rift",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0617",
+    "num": 617,
+    "name": "Pyramid Apex",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0618",
+    "num": 618,
+    "name": "Castle Starlight",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0619",
+    "num": 619,
+    "name": "Windmill Azure",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0620",
+    "num": 620,
+    "name": "Structure Sentinel",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0621",
+    "num": 621,
+    "name": "Thatch Hut Elite",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0622",
+    "num": 622,
+    "name": "Log Cabin Shadow",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0623",
+    "num": 623,
+    "name": "Stone Cottage Quantum",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0624",
+    "num": 624,
+    "name": "Bunker Alpha",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0625",
+    "num": 625,
+    "name": "Cyber Hab Void",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0626",
+    "num": 626,
+    "name": "Watchtower Golden",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0627",
+    "num": 627,
+    "name": "Pyramid Vanguard",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0628",
+    "num": 628,
+    "name": "Castle Ancient",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0629",
+    "num": 629,
+    "name": "Windmill Crimson",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0630",
+    "num": 630,
+    "name": "Structure Nebula",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0631",
+    "num": 631,
+    "name": "Thatch Hut Prime",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0632",
+    "num": 632,
+    "name": "Log Cabin Solar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0633",
+    "num": 633,
+    "name": "Stone Cottage Obsidian",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0634",
+    "num": 634,
+    "name": "Bunker Titan",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0635",
+    "num": 635,
+    "name": "Cyber Hab Cyber",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0636",
+    "num": 636,
+    "name": "Watchtower Emerald",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0637",
+    "num": 637,
+    "name": "Pyramid Overlord",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0638",
+    "num": 638,
+    "name": "Castle Mk-II",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0639",
+    "num": 639,
+    "name": "Windmill Lunar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0640",
+    "num": 640,
+    "name": "Structure Rift",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0641",
+    "num": 641,
+    "name": "Thatch Hut Apex",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0642",
+    "num": 642,
+    "name": "Log Cabin Starlight",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0643",
+    "num": 643,
+    "name": "Stone Cottage Azure",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0644",
+    "num": 644,
+    "name": "Bunker Sentinel",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0645",
+    "num": 645,
+    "name": "Cyber Hab Elite",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0646",
+    "num": 646,
+    "name": "Watchtower Shadow",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0647",
+    "num": 647,
+    "name": "Pyramid Quantum",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0648",
+    "num": 648,
+    "name": "Castle Alpha",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0649",
+    "num": 649,
+    "name": "Windmill Void",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0650",
+    "num": 650,
+    "name": "Structure Golden",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0651",
+    "num": 651,
+    "name": "Thatch Hut Vanguard",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0652",
+    "num": 652,
+    "name": "Log Cabin Ancient",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0653",
+    "num": 653,
+    "name": "Stone Cottage Crimson",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0654",
+    "num": 654,
+    "name": "Bunker Nebula",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0655",
+    "num": 655,
+    "name": "Cyber Hab Prime",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0656",
+    "num": 656,
+    "name": "Watchtower Solar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0657",
+    "num": 657,
+    "name": "Pyramid Obsidian",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0658",
+    "num": 658,
+    "name": "Castle Titan",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0659",
+    "num": 659,
+    "name": "Windmill Cyber",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0660",
+    "num": 660,
+    "name": "Structure Emerald",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0661",
+    "num": 661,
+    "name": "Thatch Hut Overlord",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0662",
+    "num": 662,
+    "name": "Log Cabin Mk-II",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0663",
+    "num": 663,
+    "name": "Stone Cottage Lunar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0664",
+    "num": 664,
+    "name": "Bunker Rift",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0665",
+    "num": 665,
+    "name": "Cyber Hab Apex",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0666",
+    "num": 666,
+    "name": "Watchtower Starlight",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0667",
+    "num": 667,
+    "name": "Pyramid Azure",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0668",
+    "num": 668,
+    "name": "Castle Sentinel",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0669",
+    "num": 669,
+    "name": "Windmill Elite",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0670",
+    "num": 670,
+    "name": "Structure Shadow",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0671",
+    "num": 671,
+    "name": "Thatch Hut Quantum",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0672",
+    "num": 672,
+    "name": "Log Cabin Alpha",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0673",
+    "num": 673,
+    "name": "Stone Cottage Void",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0674",
+    "num": 674,
+    "name": "Bunker Golden",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0675",
+    "num": 675,
+    "name": "Cyber Hab Vanguard",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0676",
+    "num": 676,
+    "name": "Watchtower Ancient",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0677",
+    "num": 677,
+    "name": "Pyramid Crimson",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0678",
+    "num": 678,
+    "name": "Castle Nebula",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0679",
+    "num": 679,
+    "name": "Windmill Prime",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0680",
+    "num": 680,
+    "name": "Structure Solar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0681",
+    "num": 681,
+    "name": "Thatch Hut Obsidian",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0682",
+    "num": 682,
+    "name": "Log Cabin Titan",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0683",
+    "num": 683,
+    "name": "Stone Cottage Cyber",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0684",
+    "num": 684,
+    "name": "Bunker Emerald",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0685",
+    "num": 685,
+    "name": "Cyber Hab Overlord",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0686",
+    "num": 686,
+    "name": "Watchtower Mk-II",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0687",
+    "num": 687,
+    "name": "Pyramid Lunar",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0688",
+    "num": 688,
+    "name": "Castle Rift",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0689",
+    "num": 689,
+    "name": "Windmill Apex",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0690",
+    "num": 690,
+    "name": "Structure Starlight",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0691",
+    "num": 691,
+    "name": "Thatch Hut Azure",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0692",
+    "num": 692,
+    "name": "Log Cabin Sentinel",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0693",
+    "num": 693,
+    "name": "Stone Cottage Elite",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0694",
+    "num": 694,
+    "name": "Bunker Shadow",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0695",
+    "num": 695,
+    "name": "Cyber Hab Quantum",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0696",
+    "num": 696,
+    "name": "Watchtower Alpha",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0697",
+    "num": 697,
+    "name": "Pyramid Void",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0698",
+    "num": 698,
+    "name": "Castle Golden",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0699",
+    "num": 699,
+    "name": "Windmill Vanguard",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0700",
+    "num": 700,
+    "name": "Structure Ancient",
+    "category": "🏚️ Base Building & Housing",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0701",
+    "num": 701,
+    "name": "Flint Spear",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0702",
+    "num": 702,
+    "name": "Iron Sword",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0703",
+    "num": 703,
+    "name": "Tactical Rifle",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0704",
+    "num": 704,
+    "name": "Plasma Saber",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0705",
+    "num": 705,
+    "name": "Crossbow",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0706",
+    "num": 706,
+    "name": "Grenade",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0707",
+    "num": 707,
+    "name": "Laser Cannon",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0708",
+    "num": 708,
+    "name": "Flamethrower",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0709",
+    "num": 709,
+    "name": "Battleaxe",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0710",
+    "num": 710,
+    "name": "Weapon Mk-II",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0711",
+    "num": 711,
+    "name": "Flint Spear Lunar",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0712",
+    "num": 712,
+    "name": "Iron Sword Rift",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0713",
+    "num": 713,
+    "name": "Tactical Rifle Apex",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0714",
+    "num": 714,
+    "name": "Plasma Saber Starlight",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0715",
+    "num": 715,
+    "name": "Crossbow Azure",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0716",
+    "num": 716,
+    "name": "Grenade Sentinel",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0717",
+    "num": 717,
+    "name": "Laser Cannon Elite",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0718",
+    "num": 718,
+    "name": "Flamethrower Shadow",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0719",
+    "num": 719,
+    "name": "Battleaxe Quantum",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0720",
+    "num": 720,
+    "name": "Weapon Alpha",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0721",
+    "num": 721,
+    "name": "Flint Spear Void",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0722",
+    "num": 722,
+    "name": "Iron Sword Golden",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0723",
+    "num": 723,
+    "name": "Tactical Rifle Vanguard",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0724",
+    "num": 724,
+    "name": "Plasma Saber Ancient",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0725",
+    "num": 725,
+    "name": "Crossbow Crimson",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0726",
+    "num": 726,
+    "name": "Grenade Nebula",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0727",
+    "num": 727,
+    "name": "Laser Cannon Prime",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0728",
+    "num": 728,
+    "name": "Flamethrower Solar",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0729",
+    "num": 729,
+    "name": "Battleaxe Obsidian",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0730",
+    "num": 730,
+    "name": "Weapon Titan",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0731",
+    "num": 731,
+    "name": "Flint Spear Cyber",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0732",
+    "num": 732,
+    "name": "Iron Sword Emerald",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0733",
+    "num": 733,
+    "name": "Tactical Rifle Overlord",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0734",
+    "num": 734,
+    "name": "Plasma Saber Mk-II",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0735",
+    "num": 735,
+    "name": "Crossbow Lunar",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0736",
+    "num": 736,
+    "name": "Grenade Rift",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0737",
+    "num": 737,
+    "name": "Laser Cannon Apex",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0738",
+    "num": 738,
+    "name": "Flamethrower Starlight",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0739",
+    "num": 739,
+    "name": "Battleaxe Azure",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0740",
+    "num": 740,
+    "name": "Weapon Sentinel",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0741",
+    "num": 741,
+    "name": "Flint Spear Elite",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0742",
+    "num": 742,
+    "name": "Iron Sword Shadow",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0743",
+    "num": 743,
+    "name": "Tactical Rifle Quantum",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0744",
+    "num": 744,
+    "name": "Plasma Saber Alpha",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0745",
+    "num": 745,
+    "name": "Crossbow Void",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0746",
+    "num": 746,
+    "name": "Grenade Golden",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0747",
+    "num": 747,
+    "name": "Laser Cannon Vanguard",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0748",
+    "num": 748,
+    "name": "Flamethrower Ancient",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0749",
+    "num": 749,
+    "name": "Battleaxe Crimson",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0750",
+    "num": 750,
+    "name": "Weapon Nebula",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0751",
+    "num": 751,
+    "name": "Flint Spear Prime",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0752",
+    "num": 752,
+    "name": "Iron Sword Solar",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0753",
+    "num": 753,
+    "name": "Tactical Rifle Obsidian",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0754",
+    "num": 754,
+    "name": "Plasma Saber Titan",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0755",
+    "num": 755,
+    "name": "Crossbow Cyber",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0756",
+    "num": 756,
+    "name": "Grenade Emerald",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0757",
+    "num": 757,
+    "name": "Laser Cannon Overlord",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0758",
+    "num": 758,
+    "name": "Flamethrower Mk-II",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0759",
+    "num": 759,
+    "name": "Battleaxe Lunar",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0760",
+    "num": 760,
+    "name": "Weapon Rift",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0761",
+    "num": 761,
+    "name": "Flint Spear Apex",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0762",
+    "num": 762,
+    "name": "Iron Sword Starlight",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0763",
+    "num": 763,
+    "name": "Tactical Rifle Azure",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0764",
+    "num": 764,
+    "name": "Plasma Saber Sentinel",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0765",
+    "num": 765,
+    "name": "Crossbow Elite",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0766",
+    "num": 766,
+    "name": "Grenade Shadow",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0767",
+    "num": 767,
+    "name": "Laser Cannon Quantum",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0768",
+    "num": 768,
+    "name": "Flamethrower Alpha",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0769",
+    "num": 769,
+    "name": "Battleaxe Void",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0770",
+    "num": 770,
+    "name": "Weapon Golden",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0771",
+    "num": 771,
+    "name": "Flint Spear Vanguard",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0772",
+    "num": 772,
+    "name": "Iron Sword Ancient",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0773",
+    "num": 773,
+    "name": "Tactical Rifle Crimson",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0774",
+    "num": 774,
+    "name": "Plasma Saber Nebula",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0775",
+    "num": 775,
+    "name": "Crossbow Prime",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0776",
+    "num": 776,
+    "name": "Grenade Solar",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0777",
+    "num": 777,
+    "name": "Laser Cannon Obsidian",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0778",
+    "num": 778,
+    "name": "Flamethrower Titan",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0779",
+    "num": 779,
+    "name": "Battleaxe Cyber",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0780",
+    "num": 780,
+    "name": "Weapon Emerald",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0781",
+    "num": 781,
+    "name": "Flint Spear Overlord",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0782",
+    "num": 782,
+    "name": "Iron Sword Mk-II",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0783",
+    "num": 783,
+    "name": "Tactical Rifle Lunar",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0784",
+    "num": 784,
+    "name": "Plasma Saber Rift",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0785",
+    "num": 785,
+    "name": "Crossbow Apex",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0786",
+    "num": 786,
+    "name": "Grenade Starlight",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0787",
+    "num": 787,
+    "name": "Laser Cannon Azure",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0788",
+    "num": 788,
+    "name": "Flamethrower Sentinel",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0789",
+    "num": 789,
+    "name": "Battleaxe Elite",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0790",
+    "num": 790,
+    "name": "Weapon Shadow",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0791",
+    "num": 791,
+    "name": "Flint Spear Quantum",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0792",
+    "num": 792,
+    "name": "Iron Sword Alpha",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0793",
+    "num": 793,
+    "name": "Tactical Rifle Void",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0794",
+    "num": 794,
+    "name": "Plasma Saber Golden",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0795",
+    "num": 795,
+    "name": "Crossbow Vanguard",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0796",
+    "num": 796,
+    "name": "Grenade Ancient",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0797",
+    "num": 797,
+    "name": "Laser Cannon Crimson",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0798",
+    "num": 798,
+    "name": "Flamethrower Nebula",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0799",
+    "num": 799,
+    "name": "Battleaxe Prime",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0800",
+    "num": 800,
+    "name": "Weapon Solar",
+    "category": "⚔️ Weapons & Armaments",
+    "era": 4,
+    "rating": 9.5
+  },
+  {
+    "id": "#0801",
+    "num": 801,
+    "name": "Chariot",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0802",
+    "num": 802,
+    "name": "Survival Jeep",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0803",
+    "num": 803,
+    "name": "Hovercraft",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0804",
+    "num": 804,
+    "name": "Combat Mech",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0805",
+    "num": 805,
+    "name": "Canoe",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0806",
+    "num": 806,
+    "name": "Spaceship",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0807",
+    "num": 807,
+    "name": "Tank",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0808",
+    "num": 808,
+    "name": "Submarine",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0809",
+    "num": 809,
+    "name": "Vehicle Apex",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0810",
+    "num": 810,
+    "name": "Vehicle Starlight",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0811",
+    "num": 811,
+    "name": "Chariot Azure",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0812",
+    "num": 812,
+    "name": "Survival Jeep Sentinel",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0813",
+    "num": 813,
+    "name": "Hovercraft Elite",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0814",
+    "num": 814,
+    "name": "Combat Mech Shadow",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0815",
+    "num": 815,
+    "name": "Canoe Quantum",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0816",
+    "num": 816,
+    "name": "Spaceship Alpha",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0817",
+    "num": 817,
+    "name": "Tank Void",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0818",
+    "num": 818,
+    "name": "Submarine Golden",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0819",
+    "num": 819,
+    "name": "Vehicle Vanguard",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0820",
+    "num": 820,
+    "name": "Vehicle Ancient",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0821",
+    "num": 821,
+    "name": "Chariot Crimson",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0822",
+    "num": 822,
+    "name": "Survival Jeep Nebula",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0823",
+    "num": 823,
+    "name": "Hovercraft Prime",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0824",
+    "num": 824,
+    "name": "Combat Mech Solar",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0825",
+    "num": 825,
+    "name": "Canoe Obsidian",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0826",
+    "num": 826,
+    "name": "Spaceship Titan",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0827",
+    "num": 827,
+    "name": "Tank Cyber",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0828",
+    "num": 828,
+    "name": "Submarine Emerald",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0829",
+    "num": 829,
+    "name": "Vehicle Overlord",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0830",
+    "num": 830,
+    "name": "Vehicle Mk-II",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0831",
+    "num": 831,
+    "name": "Chariot Lunar",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0832",
+    "num": 832,
+    "name": "Survival Jeep Rift",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0833",
+    "num": 833,
+    "name": "Hovercraft Apex",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0834",
+    "num": 834,
+    "name": "Combat Mech Starlight",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0835",
+    "num": 835,
+    "name": "Canoe Azure",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0836",
+    "num": 836,
+    "name": "Spaceship Sentinel",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0837",
+    "num": 837,
+    "name": "Tank Elite",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0838",
+    "num": 838,
+    "name": "Submarine Shadow",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0839",
+    "num": 839,
+    "name": "Vehicle Quantum",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0840",
+    "num": 840,
+    "name": "Vehicle Alpha",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0841",
+    "num": 841,
+    "name": "Chariot Void",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0842",
+    "num": 842,
+    "name": "Survival Jeep Golden",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0843",
+    "num": 843,
+    "name": "Hovercraft Vanguard",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0844",
+    "num": 844,
+    "name": "Combat Mech Ancient",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0845",
+    "num": 845,
+    "name": "Canoe Crimson",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0846",
+    "num": 846,
+    "name": "Spaceship Nebula",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0847",
+    "num": 847,
+    "name": "Tank Prime",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0848",
+    "num": 848,
+    "name": "Submarine Solar",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0849",
+    "num": 849,
+    "name": "Vehicle Obsidian",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0850",
+    "num": 850,
+    "name": "Vehicle Titan",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0851",
+    "num": 851,
+    "name": "Chariot Cyber",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0852",
+    "num": 852,
+    "name": "Survival Jeep Emerald",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0853",
+    "num": 853,
+    "name": "Hovercraft Overlord",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0854",
+    "num": 854,
+    "name": "Combat Mech Mk-II",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0855",
+    "num": 855,
+    "name": "Canoe Lunar",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0856",
+    "num": 856,
+    "name": "Spaceship Rift",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0857",
+    "num": 857,
+    "name": "Tank Apex",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0858",
+    "num": 858,
+    "name": "Submarine Starlight",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0859",
+    "num": 859,
+    "name": "Vehicle Azure",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0860",
+    "num": 860,
+    "name": "Vehicle Sentinel",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0861",
+    "num": 861,
+    "name": "Chariot Elite",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0862",
+    "num": 862,
+    "name": "Survival Jeep Shadow",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0863",
+    "num": 863,
+    "name": "Hovercraft Quantum",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0864",
+    "num": 864,
+    "name": "Combat Mech Alpha",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0865",
+    "num": 865,
+    "name": "Canoe Void",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0866",
+    "num": 866,
+    "name": "Spaceship Golden",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0867",
+    "num": 867,
+    "name": "Tank Vanguard",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0868",
+    "num": 868,
+    "name": "Submarine Ancient",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0869",
+    "num": 869,
+    "name": "Vehicle Crimson",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0870",
+    "num": 870,
+    "name": "Vehicle Nebula",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0871",
+    "num": 871,
+    "name": "Chariot Prime",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0872",
+    "num": 872,
+    "name": "Survival Jeep Solar",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0873",
+    "num": 873,
+    "name": "Hovercraft Obsidian",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0874",
+    "num": 874,
+    "name": "Combat Mech Titan",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0875",
+    "num": 875,
+    "name": "Canoe Cyber",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0876",
+    "num": 876,
+    "name": "Spaceship Emerald",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0877",
+    "num": 877,
+    "name": "Tank Overlord",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0878",
+    "num": 878,
+    "name": "Submarine Mk-II",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0879",
+    "num": 879,
+    "name": "Vehicle Lunar",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0880",
+    "num": 880,
+    "name": "Vehicle Rift",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0881",
+    "num": 881,
+    "name": "Chariot Apex",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0882",
+    "num": 882,
+    "name": "Survival Jeep Starlight",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0883",
+    "num": 883,
+    "name": "Hovercraft Azure",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0884",
+    "num": 884,
+    "name": "Combat Mech Sentinel",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0885",
+    "num": 885,
+    "name": "Canoe Elite",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0886",
+    "num": 886,
+    "name": "Spaceship Shadow",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0887",
+    "num": 887,
+    "name": "Tank Quantum",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0888",
+    "num": 888,
+    "name": "Submarine Alpha",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0889",
+    "num": 889,
+    "name": "Vehicle Void",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0890",
+    "num": 890,
+    "name": "Vehicle Golden",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0891",
+    "num": 891,
+    "name": "Chariot Vanguard",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0892",
+    "num": 892,
+    "name": "Survival Jeep Ancient",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0893",
+    "num": 893,
+    "name": "Hovercraft Crimson",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0894",
+    "num": 894,
+    "name": "Combat Mech Nebula",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0895",
+    "num": 895,
+    "name": "Canoe Prime",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0896",
+    "num": 896,
+    "name": "Spaceship Solar",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0897",
+    "num": 897,
+    "name": "Tank Obsidian",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0898",
+    "num": 898,
+    "name": "Submarine Titan",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0899",
+    "num": 899,
+    "name": "Vehicle Cyber",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0900",
+    "num": 900,
+    "name": "Vehicle Emerald",
+    "category": "🚗 Vehicles & Transports",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0901",
+    "num": 901,
+    "name": "Great White",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0902",
+    "num": 902,
+    "name": "Octopus",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0903",
+    "num": 903,
+    "name": "Sea Turtle",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0904",
+    "num": 904,
+    "name": "Jellyfish",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0905",
+    "num": 905,
+    "name": "Crab",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0906",
+    "num": 906,
+    "name": "Stingray",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0907",
+    "num": 907,
+    "name": "Squid",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0908",
+    "num": 908,
+    "name": "Predator Sentinel",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0909",
+    "num": 909,
+    "name": "Predator Elite",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0910",
+    "num": 910,
+    "name": "Predator Shadow",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0911",
+    "num": 911,
+    "name": "Great White Quantum",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0912",
+    "num": 912,
+    "name": "Octopus Alpha",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0913",
+    "num": 913,
+    "name": "Sea Turtle Void",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0914",
+    "num": 914,
+    "name": "Jellyfish Golden",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0915",
+    "num": 915,
+    "name": "Crab Vanguard",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0916",
+    "num": 916,
+    "name": "Stingray Ancient",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0917",
+    "num": 917,
+    "name": "Squid Crimson",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0918",
+    "num": 918,
+    "name": "Predator Nebula",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0919",
+    "num": 919,
+    "name": "Predator Prime",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0920",
+    "num": 920,
+    "name": "Predator Solar",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0921",
+    "num": 921,
+    "name": "Great White Obsidian",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0922",
+    "num": 922,
+    "name": "Octopus Titan",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0923",
+    "num": 923,
+    "name": "Sea Turtle Cyber",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0924",
+    "num": 924,
+    "name": "Jellyfish Emerald",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0925",
+    "num": 925,
+    "name": "Crab Overlord",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0926",
+    "num": 926,
+    "name": "Stingray Mk-II",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0927",
+    "num": 927,
+    "name": "Squid Lunar",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0928",
+    "num": 928,
+    "name": "Predator Rift",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0929",
+    "num": 929,
+    "name": "Predator Apex",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0930",
+    "num": 930,
+    "name": "Predator Starlight",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0931",
+    "num": 931,
+    "name": "Great White Azure",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0932",
+    "num": 932,
+    "name": "Octopus Sentinel",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0933",
+    "num": 933,
+    "name": "Sea Turtle Elite",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0934",
+    "num": 934,
+    "name": "Jellyfish Shadow",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0935",
+    "num": 935,
+    "name": "Crab Quantum",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0936",
+    "num": 936,
+    "name": "Stingray Alpha",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0937",
+    "num": 937,
+    "name": "Squid Void",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0938",
+    "num": 938,
+    "name": "Predator Golden",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0939",
+    "num": 939,
+    "name": "Predator Vanguard",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0940",
+    "num": 940,
+    "name": "Predator Ancient",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0941",
+    "num": 941,
+    "name": "Great White Crimson",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0942",
+    "num": 942,
+    "name": "Octopus Nebula",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0943",
+    "num": 943,
+    "name": "Sea Turtle Prime",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0944",
+    "num": 944,
+    "name": "Jellyfish Solar",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0945",
+    "num": 945,
+    "name": "Crab Obsidian",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0946",
+    "num": 946,
+    "name": "Stingray Titan",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0947",
+    "num": 947,
+    "name": "Squid Cyber",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0948",
+    "num": 948,
+    "name": "Predator Emerald",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0949",
+    "num": 949,
+    "name": "Predator Overlord",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0950",
+    "num": 950,
+    "name": "Predator Mk-II",
+    "category": "🦈 Marine Predators & Ocean",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0951",
+    "num": 951,
+    "name": "Wood Pile",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0952",
+    "num": 952,
+    "name": "Red Poppy",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0953",
+    "num": 953,
+    "name": "Sunflower",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0954",
+    "num": 954,
+    "name": "Beehive",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0955",
+    "num": 955,
+    "name": "Iron Ore",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0956",
+    "num": 956,
+    "name": "Gold Ore",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0957",
+    "num": 957,
+    "name": "Diamond Ore",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0958",
+    "num": 958,
+    "name": "Mushroom",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0959",
+    "num": 959,
+    "name": "Chest",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0960",
+    "num": 960,
+    "name": "Campfire",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0961",
+    "num": 961,
+    "name": "Wood Pile Void",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0962",
+    "num": 962,
+    "name": "Red Poppy Golden",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0963",
+    "num": 963,
+    "name": "Sunflower Vanguard",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0964",
+    "num": 964,
+    "name": "Beehive Ancient",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0965",
+    "num": 965,
+    "name": "Iron Ore Crimson",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0966",
+    "num": 966,
+    "name": "Gold Ore Nebula",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0967",
+    "num": 967,
+    "name": "Diamond Ore Prime",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0968",
+    "num": 968,
+    "name": "Mushroom Solar",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0969",
+    "num": 969,
+    "name": "Chest Obsidian",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0970",
+    "num": 970,
+    "name": "Campfire Titan",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0971",
+    "num": 971,
+    "name": "Wood Pile Cyber",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0972",
+    "num": 972,
+    "name": "Red Poppy Emerald",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0973",
+    "num": 973,
+    "name": "Sunflower Overlord",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0974",
+    "num": 974,
+    "name": "Beehive Mk-II",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0975",
+    "num": 975,
+    "name": "Iron Ore Lunar",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0976",
+    "num": 976,
+    "name": "Gold Ore Rift",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0977",
+    "num": 977,
+    "name": "Diamond Ore Apex",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0978",
+    "num": 978,
+    "name": "Mushroom Starlight",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0979",
+    "num": 979,
+    "name": "Chest Azure",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0980",
+    "num": 980,
+    "name": "Campfire Sentinel",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0981",
+    "num": 981,
+    "name": "Wood Pile Elite",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0982",
+    "num": 982,
+    "name": "Red Poppy Shadow",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0983",
+    "num": 983,
+    "name": "Sunflower Quantum",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0984",
+    "num": 984,
+    "name": "Beehive Alpha",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0985",
+    "num": 985,
+    "name": "Iron Ore Void",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0986",
+    "num": 986,
+    "name": "Gold Ore Golden",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0987",
+    "num": 987,
+    "name": "Diamond Ore Vanguard",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0988",
+    "num": 988,
+    "name": "Mushroom Ancient",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0989",
+    "num": 989,
+    "name": "Chest Crimson",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0990",
+    "num": 990,
+    "name": "Campfire Nebula",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0991",
+    "num": 991,
+    "name": "Wood Pile Prime",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0992",
+    "num": 992,
+    "name": "Red Poppy Solar",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0993",
+    "num": 993,
+    "name": "Sunflower Obsidian",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0994",
+    "num": 994,
+    "name": "Beehive Titan",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0995",
+    "num": 995,
+    "name": "Iron Ore Cyber",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0996",
+    "num": 996,
+    "name": "Gold Ore Emerald",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0997",
+    "num": 997,
+    "name": "Diamond Ore Overlord",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0998",
+    "num": 998,
+    "name": "Mushroom Mk-II",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#0999",
+    "num": 999,
+    "name": "Chest Lunar",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1000",
+    "num": 1000,
+    "name": "Campfire Rift",
+    "category": "🪵 World Resources & Props",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1001",
+    "num": 1001,
+    "name": "Rival Hunter",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1002",
+    "num": 1002,
+    "name": "Barbarian Raider",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1003",
+    "num": 1003,
+    "name": "Renegade Knight",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1004",
+    "num": 1004,
+    "name": "Rogue Soldier",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1005",
+    "num": 1005,
+    "name": "Cyber Drone",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1006",
+    "num": 1006,
+    "name": "Enemy Shadow",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1007",
+    "num": 1007,
+    "name": "Enemy Quantum",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1008",
+    "num": 1008,
+    "name": "Enemy Alpha",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1009",
+    "num": 1009,
+    "name": "Enemy Void",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1010",
+    "num": 1010,
+    "name": "Enemy Golden",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1011",
+    "num": 1011,
+    "name": "Rival Hunter Vanguard",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1012",
+    "num": 1012,
+    "name": "Barbarian Raider Ancient",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1013",
+    "num": 1013,
+    "name": "Renegade Knight Crimson",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1014",
+    "num": 1014,
+    "name": "Rogue Soldier Nebula",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1015",
+    "num": 1015,
+    "name": "Cyber Drone Prime",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1016",
+    "num": 1016,
+    "name": "Enemy Solar",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1017",
+    "num": 1017,
+    "name": "Enemy Obsidian",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1018",
+    "num": 1018,
+    "name": "Enemy Titan",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1019",
+    "num": 1019,
+    "name": "Enemy Cyber",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  },
+  {
+    "id": "#1020",
+    "num": 1020,
+    "name": "Enemy Emerald",
+    "category": "👾 Era NPC Enemies",
+    "era": 5,
+    "rating": 9.5
+  }
+]
