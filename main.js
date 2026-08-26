@@ -6655,32 +6655,32 @@ function updateCavemen(dt, t) {
         }
 
         // Eden Haven family members (Adam, Eve, Cain, Abel):
-        // If the player approaches close (< 6.0 units), they become afraid,
-        // trigger a fear reaction '!', and flee away while staying leashed to Eden Camp (4.5 units radius)!
+        // If the player approaches close (< 7.0 units), they become afraid,
+        // spawn a fear reaction '!', and flee away while staying leashed to Eden Camp (5.0 units radius)!
         if (cm.edenPos && demoState.me && demoState.me.spr && cm !== demoState.me) {
           const px = demoState.me.spr.position.x;
           const pz = demoState.me.spr.position.z;
-          const dPlayer = Math.hypot(cm.spr.position.x - px, cm.spr.position.z - pz);
-          if (dPlayer < 6.0) {
+          const dx = cm.spr.position.x - px;
+          const dz = cm.spr.position.z - pz;
+          const dPlayer = Math.hypot(dx, dz);
+          if (dPlayer < 7.0) {
             if (!cm.react || t > cm.react.t + 2.0) {
-              triggerReaction(cm, '!'); // Exclamation fear symbol
+              spawnReaction(cm, '!'); // Exclamation fear symbol
             }
-            const fx = cm.spr.position.x - px;
-            const fz = cm.spr.position.z - pz;
-            const fl = Math.hypot(fx, fz) || 1.0;
-            let tx = cm.spr.position.x + (fx / fl) * 3.5;
-            let tz = cm.spr.position.z + (fz / fl) * 3.5;
+            const fl = dPlayer || 1.0;
+            let tx = cm.spr.position.x + (dx / fl) * 4.0;
+            let tz = cm.spr.position.z + (dz / fl) * 4.0;
 
-            // Keep strictly leashed within 4.5 units of Eden campfire
+            // Keep strictly leashed within 5.0 units of Eden campfire
             const hx = cm.edenPos.x, hz = cm.edenPos.z;
             const ed = Math.hypot(tx - hx, tz - hz);
-            if (ed > 4.5) {
-              tx = hx + ((tx - hx) / ed) * 4.5;
-              tz = hz + ((tz - hz) / ed) * 4.5;
+            if (ed > 5.0) {
+              tx = hx + ((tx - hx) / ed) * 5.0;
+              tz = hz + ((tz - hz) / ed) * 5.0;
             }
             cm.target = { x: tx, z: tz };
             cm.wait = 0;
-            cm.speed = 3.0; // Run fast when afraid!
+            cm.speed = 3.2; // Run fast when afraid!
           } else {
             pickWanderTarget(cm);
           }
