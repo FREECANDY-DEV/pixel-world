@@ -111,7 +111,8 @@
   </style>
 </head>
 <body>
-  <canvas id="starfield-bg" style="position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
+  <div id="space-bg" style="position:fixed;inset:0;background:radial-gradient(circle at 50% 30%, #0c1424 0%, #03060c 100%);z-index:-2;pointer-events:none;"></div>
+  <canvas id="starfield-bg" style="position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></canvas>
   <div id="loading-overlay"><div class="loader-ring"></div><div class="loader-text">Entering the world…</div></div>
 
   <div id="globe-wrap">

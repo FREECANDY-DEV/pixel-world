@@ -1276,7 +1276,7 @@ function makeStars(n, size, color) {
     fog: false,
     sizeAttenuation: false,
   }));
-  p.renderOrder = -5;
+  p.renderOrder = -100;
   p.frustumCulled = false;
   scene.add(p);
   return p;
