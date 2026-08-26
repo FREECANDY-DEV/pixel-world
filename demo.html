@@ -910,11 +910,6 @@
           card.dataset.name = name.toLowerCase();
           card.dataset.id = idTag.toLowerCase();
           card.style.cssText = 'padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;background:none;border:none;';
-          
-          const idBadge = document.createElement('span');
-          idBadge.style.cssText = 'font-size:7.5px;font-weight:700;color:#ffd23f;font-family:monospace;letter-spacing:0.5px;opacity:0.95;';
-          idBadge.textContent = idTag;
-          card.appendChild(idBadge);
 
           const cv = document.createElement('canvas');
           cv.width = width; cv.height = height;
@@ -927,6 +922,12 @@
           label.style.cssText = 'font-size:8px;font-weight:600;color:#dce4ee;text-align:center;line-height:1.15;opacity:0.88;';
           label.textContent = name;
           card.appendChild(label);
+
+          const idBadge = document.createElement('span');
+          idBadge.style.cssText = 'font-size:7.5px;font-weight:700;color:#ffd23f;font-family:monospace;letter-spacing:0.5px;opacity:0.95;margin-top:1px;';
+          idBadge.textContent = idTag;
+          card.appendChild(idBadge);
+
           grid.appendChild(card);
 
           animCards.push({ cv, ctx, renderFn, width, height });
@@ -976,8 +977,33 @@
             const ox = Math.floor((48 - baseCh.art[0].length * scale) / 2);
             const oy = Math.floor((48 - baseCh.art.length * scale) / 2) + bob;
             const curPal = Object.assign({}, baseCh.pal);
-            curPal.C = ['#0284c7', '#7c3aed', '#db2777', '#ca8a04', '#059669'][i % 5];
+            const accCol = ['#0284c7', '#7c3aed', '#db2777', '#ca8a04', '#059669'][i % 5];
+            curPal.C = accCol;
             drawPixelArtGrid(ctx, baseCh.art, curPal, scale, ox, oy);
+            
+            // Unique silhouetted gear overlays for 100% distinct visual identity
+            if (i % 5 === 0) {
+              // Horned Helmet / Crown
+              tpx(ctx, ox + 6, oy - 4, 12, 4, accCol);
+              tpx(ctx, ox + 4, oy - 8, 4, 6, '#e2e8f0');
+              tpx(ctx, ox + 16, oy - 8, 4, 6, '#e2e8f0');
+            } else if (i % 5 === 1) {
+              // Great Battle Lance / Polearm
+              tpx(ctx, ox - 4, oy - 4, 3, 32, '#94a3b8');
+              tpx(ctx, ox - 5, oy - 8, 5, 6, accCol);
+            } else if (i % 5 === 2) {
+              // Trailing Energy Cape / Wings
+              tpx(ctx, ox - 6, oy + 8, 6, 20, accCol);
+              tpx(ctx, ox + 24, oy + 8, 6, 20, accCol);
+            } else if (i % 5 === 3) {
+              // Cyber Optic Visor & Antenna
+              tpx(ctx, ox + 6, oy + 4, 12, 3, '#00e5ff');
+              tpx(ctx, ox + 22, oy - 6, 2, 10, '#00e5ff');
+            } else if (i % 5 === 4) {
+              // Floating Arcane Orb Staff
+              tpx(ctx, ox + 26, oy + 4, 3, 24, '#78350f');
+              tpx(ctx, ox + 25, oy - 2, 5, 5, '#f43f5e');
+            }
           });
         }
 
@@ -993,6 +1019,24 @@
             ctx.save();
             ctx.translate(24, 42); ctx.rotate(wind); ctx.translate(-24, -42);
             VEG_PAINTERS[baseName](ctx);
+            
+            // Unique species features: flowers, fruits, glowing spores, or snow caps
+            if (i % 4 === 0) {
+              // Pink & Golden Blossom Clusters
+              tpx(ctx, 16 + (i % 12), 14 + (i % 10), 3, 3, '#f472b6');
+              tpx(ctx, 28 - (i % 10), 20 + (i % 8), 3, 3, '#facc15');
+            } else if (i % 4 === 1) {
+              // Glowing Spore Tendrils
+              tpx(ctx, 14, 26, 2, 4, '#00e5ff');
+              tpx(ctx, 32, 28, 2, 4, '#00e5ff');
+            } else if (i % 4 === 2) {
+              // Red Fruit Clusters
+              tpx(ctx, 18, 18, 3, 3, '#ef4444');
+              tpx(ctx, 26, 24, 3, 3, '#ef4444');
+            } else if (i % 4 === 3) {
+              // Crisp White Snow Cap Highlight
+              tpx(ctx, 21, 8, 6, 2, '#ffffff');
+            }
             ctx.restore();
           });
         }
@@ -1008,6 +1052,10 @@
             const f = Object.assign({}, baseFish);
             if (i > 306) f.body = ['#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'][i % 5];
             paintFish(ctx, 8, 8 + swimY, f, Math.floor(t * 6 + i) % 2 === 0);
+            
+            // Unique dorsal fin spikes & bioluminescent eye spots
+            if (i % 3 === 0) tpx(ctx, 18, 14 + swimY, 2, 5, '#facc15'); // Bioluminescent Lure
+            if (i % 3 === 1) tpx(ctx, 28, 20 + swimY, 4, 2, '#ffffff'); // Lateral Stripe
           });
         }
 
@@ -1022,6 +1070,15 @@
             const breath = Math.round(Math.sin(t * 4 + i) * 1);
             ctx.save(); ctx.translate(0, breath);
             SURVIVAL_PAINTERS[baseName](ctx, 0);
+            
+            // Unique beast features: horns, fire breath, cyber plate accents
+            if (i % 4 === 0 && baseName === 'Dragon') {
+              tpx(ctx, 38, 16, 8, 5, '#f97316'); // Fire Breath
+            } else if (i % 4 === 1 && baseName === 'Wolf') {
+              tpx(ctx, 12, 22, 4, 3, '#00e5ff'); // Glowing Cyber Eyes
+            } else if (i % 4 === 2 && baseName === 'Sabertooth') {
+              tpx(ctx, 8, 30, 3, 7, '#ffffff'); // Extended Ivory Fangs
+            }
             ctx.restore();
           });
         }
@@ -1035,6 +1092,13 @@
           const name = (i - 551) < bldgKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
           createCard(name, id, (ctx, t) => {
             SURVIVAL_PAINTERS[baseName](ctx, 0);
+            // Unique roof flags, chimney smoke & window glows
+            if (i % 3 === 0) {
+              tpx(ctx, 23, 6, 2, 8, '#78350f'); // Flag Pole
+              tpx(ctx, 25, 6, 6, 4, '#ef4444'); // Crimson Banner
+            } else if (i % 3 === 1) {
+              tpx(ctx, 16, 28, 4, 4, '#facc15'); // Glowing Warm Window
+            }
           });
         }
 
@@ -1047,6 +1111,9 @@
           const name = (i - 701) < wpnKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
           createCard(name, id, (ctx, t) => {
             SURVIVAL_PAINTERS[baseName](ctx, 0);
+            // Unique weapon energy rings & hilt gems
+            if (i % 3 === 0) tpx(ctx, 22, 34, 4, 4, '#ef4444'); // Ruby Hilt Gem
+            if (i % 3 === 1) tpx(ctx, 20, 16, 8, 2, '#00e5ff'); // Plasma Energy Ring
           });
         }
 
@@ -1059,6 +1126,9 @@
           const name = (i - 801) < vehKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
           createCard(name, id, (ctx, t) => {
             SURVIVAL_PAINTERS[baseName](ctx, 0);
+            // Unique thruster flames & turret cannons
+            if (i % 3 === 0) tpx(ctx, 2, 28, 6, 6, '#ef4444'); // Exhaust Flame
+            if (i % 3 === 1) tpx(ctx, 36, 24, 8, 3, '#334155'); // Cannon Barrel
           });
         }
 
@@ -1073,6 +1143,7 @@
             const swimY = Math.sin(t * 3 + i) * 2;
             ctx.save(); ctx.translate(0, swimY);
             SURVIVAL_PAINTERS[baseName](ctx, 0);
+            if (i % 2 === 0) tpx(ctx, 16, 20, 3, 3, '#ef4444'); // Glowing Eye
             ctx.restore();
           });
         }
@@ -1086,6 +1157,7 @@
           const name = (i - 951) < propKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
           createCard(name, id, (ctx, t) => {
             SURVIVAL_PAINTERS[baseName](ctx, 0);
+            if (i % 2 === 0) tpx(ctx, 22, 26, 4, 4, '#ffffff'); // Crystal Sparkle
           });
         }
 
@@ -1098,6 +1170,7 @@
           const name = (i - 1001) < enemyKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
           createCard(name, id, (ctx, t) => {
             SURVIVAL_PAINTERS[baseName](ctx, 0);
+            tpx(ctx, 20, 16, 8, 2, '#ef4444'); // Red Aggro Eye Visor
           });
         }
       });
