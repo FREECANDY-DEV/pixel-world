@@ -254,7 +254,7 @@ function classifyBlock(wx, y, wz, surfY, seed) {
 function buildBlockAtlas() {
   const c = document.createElement('canvas');
   c.width = BT_W; c.height = BT_H;
-  const g = c.getContext('2d');
+  const g = c.getContext('2d', { willReadFrequently: true });
   g.imageSmoothingEnabled = false;
 
   // helper: fill a tile at column col with a procedural pattern
@@ -3256,7 +3256,7 @@ let atlasBuilt = false;
 // share the same bounds — seasons only recolour or sprinkle onto the base).
 const TREE_CELL_BOUNDS = [];
 function buildTreeAtlas() {
-  const ac = treeAtlasCanvas.getContext('2d');
+  const ac = treeAtlasCanvas.getContext('2d', { willReadFrequently: true });
   KIND_ORDER.forEach((kind, col) => {
     const x0 = col * ATLAS_CELL;
     // paint the summer base straight into the atlas (row 1). Painters use
@@ -3308,7 +3308,6 @@ treeAtlasTex.minFilter = THREE.NearestFilter;
 const treeMat = new THREE.ShaderMaterial({
   transparent: true,
   depthWrite: false,
-  renderOrder: 2,
   uniforms: {
     uTex: { value: treeAtlasTex },
     uFogColor: { value: new THREE.Color(0x8fb7d9) },
@@ -3631,6 +3630,7 @@ function buildChunkTrees(cx, cz, lod = 0) {
     CHUNK + Math.max(14, (maxY - SEA_LEVEL) / 2 + 8)
   );
   const mesh = new THREE.Mesh(g, treeMat);
+  mesh.renderOrder = 2;
   mesh.userData.cols = cols;
   mesh.userData.sampleTree = sample;
   // h = per-tree sprite height, so zoomed-out markers can float above
@@ -4128,7 +4128,6 @@ let iconAtlasTex = null;
 const ICON_MAT = new THREE.ShaderMaterial({
   transparent: true,
   depthWrite: false,
-  renderOrder: 4,
   uniforms: {
     uTex: { value: null },
     uCell: { value: 1 / ICON_COLS },
@@ -4204,7 +4203,7 @@ function paintSeasonalTreeChips(g) {
 }
 
 function buildIconAtlas() {
-  const g = iconAtlasCanvas.getContext('2d');
+  const g = iconAtlasCanvas.getContext('2d', { willReadFrequently: true });
   g.imageSmoothingEnabled = false;
   g.clearRect(0, 0, iconAtlasCanvas.width, ICON_CELL);
   paintSeasonalTreeChips(g);
@@ -4375,6 +4374,7 @@ function ensureChunkIcons(ch) {
   g.setAttribute('aCol', new THREE.BufferAttribute(pcol, 1));
   g.boundingSphere = ch.trees.geometry.boundingSphere.clone();
   const pts = new THREE.Points(g, ICON_MAT);
+  pts.renderOrder = 4;
   pts.visible = false;
   scene.add(pts);
   ch.icons = pts;
@@ -4550,7 +4550,6 @@ function fishIconMatRef() {
       transparent: true,
       depthWrite: false,
       depthTest: true,
-      renderOrder: 4,
       uniforms: {
         uTex: { value: null },
         uCell: { value: 1 / ICON_COLS },
