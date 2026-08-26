@@ -398,59 +398,55 @@
       '....DDDDDD......','....SS..SS......','....SS..SS......','....SS..SS......',
     ];
     const CAVEWOMAN_PAL = { H:'#5a3a22', S:'#d29a66', E:'#1a1a1a', C:'#9a6a3f', D:'#6b8f3f' };
-    const M_NAMES = ['Grok','Uga','Zog','Bruk','Tonk','Ogg','Kru','Mog'];
-    const F_NAMES = ['Aya','Sula','Neya','Mara','Ika','Ona','Tia','Ula'];
-    const SKINS = ['#f2c99b','#e0aa7a','#c78d5a','#a9714b','#8a5a3a','#6e452c'];
-    const HAIRS = ['#191919','#3b2b1e','#5a3a22','#7a5230','#96613a','#b8863b','#a33c2a'];
-    const CLOTHS = ['#8a5a33','#6b8f3f','#7a5230','#96613a','#5e7a46','#8f6a4a'];
-    const DRESSES = ['#6b8f3f','#5e7a46','#7fa04a','#4f6f3a','#b07850'];
-    const EYES = ['#1a1a1a','#2e3a5e','#2e4a2e','#5e3a1e'];
+    const SUBJECT_CODES = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Echo', 'Zeta', 'Zero', 'Prime', 'Apex', 'Nova', 'Orion', 'Vortex', '704', '912', '308', '007'];
 
-    function mulberry32(a) {
-      return function () { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-    }
-    function pick(arr, rnd) { return arr[Math.floor(rnd() * arr.length)]; }
+    const HAZMAT = [
+      '.....YYYYYY.....', // Yellow helmet top
+      '....YYYYYYYY....', // Yellow helmet
+      '....YYYYYYYY....',
+      '....YVVVVVVY....', // Dark Glass Visor
+      '....YVVVVVVY....',
+      '....YYYYYYYY....', // Yellow Chin
+      '....YYYYYYYY....',
+      '.....YYYYYY.....',
+      '......YY........',
+      '.....YYYY.......',
+      '....YYYYYY......',
+      '...YYYYYYYY.....', // Yellow Suit Body
+      '...YYYYYYYY.....',
+      '...YYYYYYYY.....',
+      '....YYYYYY......',
+      '....KK..KK......', // Black Rubber Boots
+      '....KK..KK......',
+      '....KK..KK......',
+      '....KK..KK......',
+    ];
+    const HAZMAT_PAL = { Y:'#ffd23f', V:'#111827', K:'#1a1a1a' };
+
+    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
     let currentLook = null;
     function rollHuman() {
-      const rnd = mulberry32((Math.random() * 0xffffffff) >>> 0);
-      const female = Math.random() < 0.5;
-      const skin = pick(SKINS, rnd), hair = pick(HAIRS, rnd), cloth = pick(CLOTHS, rnd), eye = pick(EYES, rnd);
-      const dress = female ? pick(DRESSES, rnd) : null;
-      const style = Math.floor(rnd() * (female ? 3 : 4));
-      const beard = female ? -1 : Math.floor(rnd() * 3);
-      const name = pick(female ? F_NAMES : M_NAMES, rnd);
-      const age = 18 + Math.floor(rnd() * 35);
-      const base = female ? CAVEWOMAN : CAVEMAN;
-      const pal = { ...(female ? CAVEWOMAN_PAL : CAVEMAN_PAL) };
-      pal.S = skin; pal.H = hair; pal.E = eye;
-      if (female) pal.D = dress; else pal.C = cloth;
-      const g = base.map(r => r.split(''));
-      const put = (r, c, ch) => { if (r >= 0 && r < g.length && c >= 0 && c < g[0].length && g[r][c] === '.') g[r][c] = ch; };
-      if (!female) {
-        if (style === 1) for (let r = 1; r <= 4; r++) put(r, 12, 'H');
-        if (style === 2) for (let r = 7; r <= 9; r++) { put(r, 3, 'H'); put(r, 12, 'H'); }
-        if (style === 3) for (let c = 5; c <= 10; c++) if (g[2] && g[2][c] === 'H') g[2][c] = 'C';
-        if (beard === 1) { put(8, 6, 'H'); put(8, 7, 'H'); }
-        if (beard === 2) put(8, 7, 'H');
-      } else {
-        if (style === 1) for (let r = 9; r <= 12; r++) put(r, 12, 'H');
-        if (style === 2) put(1, 12, 'D');
-      }
-      const art = g.map(r => r.join(''));
+      const code = pick(SUBJECT_CODES);
+      const name = 'Subject-' + code;
+      const age = 25;
+      const female = false;
+      const skin = '#ffd23f', hair = '#111827', cloth = '#ffd23f', eye = '#111827', dress = null;
+      const style = 0, beard = -1;
+
       const cv = document.getElementById('human');
       const ctx = cv.getContext('2d');
       ctx.imageSmoothingEnabled = false;
       ctx.clearRect(0, 0, cv.width, cv.height);
-      const cols = art[0].length, rows = art.length, s = 2;
+      const cols = HAZMAT[0].length, rows = HAZMAT.length, s = 2;
       const ox = Math.floor((cv.width - cols * s) / 2);
       const oy = Math.floor((cv.height - rows * s) / 2);
       for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
-        const c = pal[art[y][x]]; if (!c) continue;
+        const c = HAZMAT_PAL[HAZMAT[y][x]]; if (!c) continue;
         ctx.fillStyle = c; ctx.fillRect(ox + x * s, oy + y * s, s, s);
       }
       document.getElementById('human-name').textContent = name;
-      document.getElementById('human-desc').textContent = (female ? 'cavewoman' : 'caveman') + ' · ' + age + ' yrs';
+      document.getElementById('human-desc').textContent = 'Yellow Hazard Suit · Hazmat Unit';
       currentLook = { female, name, age, skin, hair, grey: '#c9c9c9', cloth, dress, eyes: eye, style, beard };
     }
     document.getElementById('reroll').addEventListener('click', rollHuman);

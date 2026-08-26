@@ -8595,9 +8595,9 @@ const demoState = {
 
 function demoPickName() {
   const saved = (localStorage.getItem('pw-demo-name') || '').trim();
-  if (saved) return saved.slice(0, 14);
-  const all = [...CAVEMAN_NAMES, ...CAVEWOMAN_NAMES];
-  return all[Math.floor(Math.random() * all.length)];
+  if (saved && saved.startsWith('Subject')) return saved.slice(0, 16);
+  const codes = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Echo', 'Zeta', 'Zero', 'Prime', 'Apex', 'Nova', 'Orion', 'Vortex', '704', '912', '308', '007'];
+  return 'Subject-' + codes[Math.floor(Math.random() * codes.length)];
 }
 
 function demoEl(id) { return document.getElementById(id); }
@@ -8650,25 +8650,30 @@ function initDemoMode() {
   }
 
   demoState.id = 'p' + Math.random().toString(36).slice(2, 10);
-  // the landing page can pass a picked human (?n=name&f=0/1&a=age&skin=..&hair=..
-  // &eyes=..&cloth=..&style=..&beard=..); without it, roll a fresh random one
   const q = new URLSearchParams(location.search);
-  demoState.name = (q.get('n') || demoPickName()).slice(0, 14);
+  let rawName = (q.get('n') || demoPickName()).slice(0, 16);
+  if (!rawName.startsWith('Subject')) rawName = 'Subject-' + rawName;
+  demoState.name = rawName;
   demoState.color = DEMO_COLORS[Math.floor(Math.random() * DEMO_COLORS.length)];
-  const demoFemale = q.has('f') ? q.get('f') === '1' : Math.random() < 0.5;
-  const demoAge = q.has('a') ? Math.max(12, Math.min(65, parseInt(q.get('a')) || 30)) : 20 + Math.floor(Math.random() * 30);
-  let demoLook = null;
+  const demoFemale = q.has('f') ? q.get('f') === '1' : false;
+  const demoAge = 25;
+
+  // Default Player Appearance: Yellow Hazard Suit
+  let demoLook = {
+    skin: '#ffd23f',
+    hair: '#111827',
+    grey: '#c9c9c9',
+    cloth: '#ffd23f',
+    dress: null,
+    eyes: '#111827',
+    style: 0,
+    beard: -1,
+  };
   if (q.has('skin')) {
-    demoLook = {
-      skin: q.get('skin'),
-      hair: q.get('hair') || '#3b2b1e',
-      grey: q.get('grey') || '#c9c9c9',
-      cloth: q.get('cloth') || '#8a5a33',
-      dress: q.has('dress') ? q.get('dress') : (demoFemale ? '#6b8f3f' : null),
-      eyes: q.get('eyes') || '#1a1a1a',
-      style: parseInt(q.get('style')) || 0,
-      beard: demoFemale ? -1 : (parseInt(q.get('beard')) || 0),
-    };
+    demoLook.skin = q.get('skin');
+    demoLook.hair = q.get('hair') || '#111827';
+    demoLook.cloth = q.get('cloth') || '#ffd23f';
+    demoLook.eyes = q.get('eyes') || '#111827';
   }
 
   // --- the player's own caveman, spawned on dry ground near the fire ---
