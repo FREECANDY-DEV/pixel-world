@@ -944,30 +944,71 @@
         addHeader('🌲 Vegetation & Flora (4 Seasons Variant Morphing)');
         Object.keys(VEG_PAINTERS).forEach((name, idx) => {
           createCard(name, (ctx, t) => {
-            const variant = Math.floor(t * 0.4 + idx * 0.2) % 4; // 0:Spring, 1:Summer, 2:Autumn, 3:Winter
-            const wind = Math.sin(t * 3 + idx) * 1.5;
-            ctx.save();
-            ctx.translate(24, 44);
-            ctx.rotate((wind * Math.PI) / 180);
-            ctx.translate(-24, -44);
+            const variant = Math.floor(t * 0.5 + idx * 0.3) % 4; // 0:Spring 🌸, 1:Summer ☀️, 2:Autumn 🍂, 3:Winter ❄️
+            const wind = Math.sin(t * 2.5 + idx) * 0.04;
             
+            ctx.save();
+            ctx.translate(24, 42);
+            ctx.rotate(wind);
+            ctx.translate(-24, -42);
+            
+            // Render base tree/plant
             VEG_PAINTERS[name](ctx);
             
-            // Apply Seasonal Overlays according to variant
-            if (variant === 0) {
-              // Spring blossoms
-              ctx.fillStyle = '#f5b8cf';
-              for (let i = 0; i < 5; i++) ctx.fillRect(16 + ((i * 7) % 18), 16 + ((i * 5) % 14), 2, 2);
-            } else if (variant === 2) {
-              // Autumn Tint Overlay
-              ctx.fillStyle = 'rgba(217, 119, 6, 0.45)';
-              ctx.fillRect(10, 10, 28, 26);
+            if (variant === 2) {
+              // Autumn 🍂: Color overlay using source-atop so it only colors the drawn tree pixels!
+              ctx.globalCompositeOperation = 'source-atop';
+              ctx.fillStyle = 'rgba(217, 119, 6, 0.45)'; // Amber autumn tint
+              ctx.fillRect(0, 0, 48, 48);
+              ctx.globalCompositeOperation = 'source-over';
+              
+              // Falling autumn leaves
+              ctx.fillStyle = '#ea580c';
+              for (let i = 0; i < 3; i++) {
+                const lx = (12 + (i * 11 + Math.floor(t * 15)) % 24);
+                const ly = (14 + (i * 9 + Math.floor(t * 20)) % 26);
+                ctx.fillRect(lx, ly, 2, 2);
+              }
+            } else if (variant === 0) {
+              // Spring 🌸: Cherry blossoms on canopy & falling petals
+              ctx.fillStyle = '#f472b6';
+              const blossomSpots = [[18, 16], [26, 14], [22, 22], [30, 20], [16, 24], [28, 26]];
+              blossomSpots.forEach(([bx, by]) => {
+                ctx.fillRect(bx, by, 2, 2);
+              });
+              ctx.fillStyle = '#fb7185';
+              for (let i = 0; i < 3; i++) {
+                const px = (14 + (i * 13 + Math.floor(t * 12)) % 20);
+                const py = (16 + (i * 7 + Math.floor(t * 18)) % 24);
+                ctx.fillRect(px, py, 2, 2);
+              }
             } else if (variant === 3) {
-              // Winter Snow Caps
-              ctx.fillStyle = '#eef4f8';
-              ctx.fillRect(18, 12, 12, 3);
-              ctx.fillRect(14, 20, 20, 2);
+              // Winter ❄️: Snow caps on canopy & falling snowflakes
+              ctx.globalCompositeOperation = 'source-atop';
+              ctx.fillStyle = 'rgba(226, 232, 240, 0.35)'; // Frost tint
+              ctx.fillRect(0, 0, 48, 48);
+              ctx.globalCompositeOperation = 'source-over';
+              
+              // Snow cap highlights
+              ctx.fillStyle = '#f8fafc';
+              ctx.fillRect(16, 12, 16, 3);
+              ctx.fillRect(14, 18, 20, 2);
+              
+              // Falling snowflakes
+              for (let i = 0; i < 4; i++) {
+                const sx = (10 + (i * 9 + Math.floor(t * 10)) % 28);
+                const sy = (8 + (i * 11 + Math.floor(t * 16)) % 32);
+                ctx.fillRect(sx, sy, 2, 2);
+              }
+            } else if (variant === 1) {
+              // Summer ☀️: Sunbeam sheen sweep across canopy
+              const sweepX = (t * 20) % 60 - 10;
+              ctx.globalCompositeOperation = 'source-atop';
+              ctx.fillStyle = 'rgba(253, 224, 71, 0.25)';
+              ctx.fillRect(sweepX, 0, 10, 48);
+              ctx.globalCompositeOperation = 'source-over';
             }
+            
             ctx.restore();
           });
         });
