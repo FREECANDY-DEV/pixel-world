@@ -817,8 +817,33 @@
       ];
 
       let built = false;
+      let animRunning = false;
+      let startT = performance.now();
+      const animCards = [];
+
+      function animLoop() {
+        if (overlay.style.display === 'none') {
+          animRunning = false;
+          return;
+        }
+        requestAnimationFrame(animLoop);
+        const t = (performance.now() - startT) * 0.001;
+        for (let i = 0; i < animCards.length; i++) {
+          const c = animCards[i];
+          c.ctx.clearRect(0, 0, c.width, c.height);
+          c.renderFn(c.ctx, t);
+        }
+      }
+
+      function startAnimLoop() {
+        if (animRunning) return;
+        animRunning = true;
+        requestAnimationFrame(animLoop);
+      }
+
       btn.addEventListener('click', () => {
         overlay.style.display = 'block';
+        startAnimLoop();
         if (built) return;
         built = true;
 
@@ -829,11 +854,9 @@
           grid.appendChild(h);
         }
 
-        const animCards = [];
-
         function createCard(name, renderFn, width = 48, height = 48) {
           const card = document.createElement('div');
-          card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;';
+          card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;overflow:hidden;';
           const cv = document.createElement('canvas');
           cv.width = width; cv.height = height;
           cv.style.cssText = 'image-rendering:pixelated;image-rendering:crisp-edges;width:48px;height:48px;';
@@ -849,265 +872,227 @@
           animCards.push({ cv, ctx, renderFn, width, height });
         }
 
-        // 1. 👤 Tribe & Characters
-        addHeader('👤 Tribe & Characters (Animated)');
+        // 1. 👤 Tribe & Characters (With Pose & Outfit Variant Morphing)
+        addHeader('👤 Tribe & Characters (Random Variant Morphing & Animated)');
         GRID_CHARACTERS.forEach(ch => {
           createCard(ch.name, (ctx, t) => {
+            const variant = Math.floor(t * 0.5) % 4; // Morphs variant every 2s
             const scale = 2;
-            const bob = Math.round(Math.sin(t * 5) * 1);
+            const bob = Math.round(Math.sin(t * 6) * 1);
             const ox = Math.floor((48 - ch.art[0].length * scale) / 2);
             const oy = Math.floor((48 - ch.art.length * scale) / 2) + bob;
-            drawPixelArtGrid(ctx, ch.art, ch.pal, scale, ox, oy);
-            // Eye blink
-            if (Math.floor(t * 2) % 6 === 0) {
-              ctx.fillStyle = ch.pal.S || '#c78d5a';
-              ctx.fillRect(ox + 5 * scale, oy + 4 * scale, 6 * scale, scale);
+            
+            // Custom palette morph per variant
+            const curPal = Object.assign({}, ch.pal);
+            if (variant === 1) curPal.C = '#b91c1c'; // Red Tribe Attire
+            if (variant === 2) curPal.C = '#047857'; // Forest Scout Attire
+            if (variant === 3) curPal.C = '#1d4ed8'; // Royal Blue Attire
+            
+            drawPixelArtGrid(ctx, ch.art, curPal, scale, ox, oy);
+            // Eye blink & variant crown
+            if (variant === 3) {
+              tpx(ctx, ox + 6 * scale, oy - 2 * scale, 4 * scale, 2 * scale, '#facc15'); // Gold Crown
             }
           });
         });
         
-        createCard('Knight', (ctx, t) => {
-          const sway = Math.sin(t * 3) * 1;
-          ctx.save(); ctx.translate(sway, 0);
-          SURVIVAL_PAINTERS['knight'](ctx, 0);
-          // Sword gleam animation
-          const gleamY = 14 + (Math.floor(t * 20) % 20);
-          tpx(ctx, 12, gleamY, 4, 2, '#ffffff');
-          ctx.restore();
+        ['Knight', 'Cyborg', 'Ninja', 'Wizard', 'Astronaut', 'Pirate'].forEach(name => {
+          createCard(name, (ctx, t) => {
+            const variant = Math.floor(t * 0.6) % 3;
+            const sway = Math.sin(t * 4) * 1;
+            ctx.save(); ctx.translate(sway, 0);
+            SURVIVAL_PAINTERS[name](ctx, 0);
+            
+            if (name === 'Knight' && variant === 1) {
+              tpx(ctx, 14, 20, 20, 2, '#facc15'); // Gold Trim Armor Variant
+            } else if (name === 'Cyborg') {
+              const glow = variant === 1 ? '#00e5ff' : variant === 2 ? '#a855f7' : '#ff1744';
+              tpx(ctx, 24, 18, 4, 2, glow); // Visor Color Variant Morph
+            } else if (name === 'Wizard') {
+              const orbCol = ['#38bdf8', '#ef4444', '#10b981'][variant];
+              tpx(ctx, 31, 5 + Math.round(Math.sin(t * 4) * 1), 5, 5, orbCol); // Spell Element Morph
+            }
+            ctx.restore();
+          });
         });
 
-        createCard('Cyborg', (ctx, t) => {
-          SURVIVAL_PAINTERS['cyborg'](ctx, 0);
-          // Red eye optic pulse & cyan arm glow
-          const glow = Math.sin(t * 8) > 0 ? '#ff1744' : '#ff5252';
-          tpx(ctx, 24, 18, 4, 2, glow);
-          if (Math.floor(t * 10) % 2 === 0) {
-            tpx(ctx, 6 + Math.floor(Math.random() * 6), 28, 2, 2, '#00e5ff');
-          }
-        });
-
-        createCard('Ninja', (ctx, t) => {
-          const bob = Math.round(Math.sin(t * 6) * 1);
-          ctx.save(); ctx.translate(0, bob);
-          SURVIVAL_PAINTERS['ninja'](ctx, 0);
-          // Red headband streamer wave
-          const wave = Math.round(Math.sin(t * 10) * 2);
-          tpx(ctx, 30 + wave, 18, 4, 2, '#dc2626');
-          ctx.restore();
-        });
-
-        createCard('Wizard', (ctx, t) => {
-          SURVIVAL_PAINTERS['wizard'](ctx, 0);
-          // Staff orb floating & pulsing spark
-          const pulseCol = ['#38bdf8', '#818cf8', '#c084fc'][Math.floor(t * 6) % 3];
-          tpx(ctx, 31, 5 + Math.round(Math.sin(t * 4) * 1), 5, 5, pulseCol);
-        });
-
-        createCard('Astronaut', (ctx, t) => {
-          // Zero-g floating
-          const floatY = Math.sin(t * 2) * 3;
-          ctx.save(); ctx.translate(0, floatY);
-          SURVIVAL_PAINTERS['astronaut'](ctx, 0);
-          // Gold visor shine
-          tpx(ctx, 19 + Math.floor((t * 6) % 8), 15, 2, 4, '#ffffff');
-          ctx.restore();
-        });
-
-        createCard('Pirate', (ctx, t) => {
-          SURVIVAL_PAINTERS['pirate'](ctx, 0);
-          // Cutlass shine
-          if (Math.floor(t * 4) % 3 === 0) {
-            tpx(ctx, 10, 28, 2, 4, '#ffffff');
-          }
-        });
-
-        // 2. 🌲 Vegetation & World Flora (25 species Animated)
-        addHeader('🌲 Vegetation & Flora (25 Species - Swaying & Seasons)');
+        // 2. 🌲 Vegetation & World Flora (4 Seasonal Variant Morphs)
+        addHeader('🌲 Vegetation & Flora (4 Seasons Variant Morphing)');
         Object.keys(VEG_PAINTERS).forEach((name, idx) => {
           createCard(name, (ctx, t) => {
+            const variant = Math.floor(t * 0.4 + idx * 0.2) % 4; // 0:Spring, 1:Summer, 2:Autumn, 3:Winter
             const wind = Math.sin(t * 3 + idx) * 1.5;
             ctx.save();
             ctx.translate(24, 44);
             ctx.rotate((wind * Math.PI) / 180);
             ctx.translate(-24, -44);
+            
             VEG_PAINTERS[name](ctx);
+            
+            // Apply Seasonal Overlays according to variant
+            if (variant === 0) {
+              // Spring blossoms
+              c.fillStyle = '#f5b8cf';
+              for (let i = 0; i < 5; i++) ctx.fillRect(16 + ((i * 7) % 18), 16 + ((i * 5) % 14), 2, 2);
+            } else if (variant === 2) {
+              // Autumn Tint Overlay
+              ctx.fillStyle = 'rgba(217, 119, 6, 0.45)';
+              ctx.fillRect(10, 10, 28, 26);
+            } else if (variant === 3) {
+              // Winter Snow Caps
+              ctx.fillStyle = '#eef4f8';
+              ctx.fillRect(18, 12, 12, 3);
+              ctx.fillRect(14, 20, 20, 2);
+            }
             ctx.restore();
           });
         });
 
-        // 3. 🐟 Sea Life (6 Swimming Species Animated)
-        addHeader('🐟 Sea Life (6 Swimming Species Animated)');
+        // 3. 🐟 Sea Life (6 Swimming Species + Color Variant Morph)
+        addHeader('🐟 Sea Life (Swim & Color Variant Morphing)');
         FISH_SPECIES.forEach((f, idx) => {
           createCard(f.name, (ctx, t) => {
+            const variant = Math.floor(t * 0.5 + idx) % 3;
             const frameB = Math.floor(t * 6 + idx) % 2 === 0;
             const swimY = Math.sin(t * 4 + idx) * 2;
-            paintFish(ctx, 8, 8 + swimY, f, frameB);
+            
+            const variantFish = Object.assign({}, f);
+            if (variant === 1) variantFish.body = '#ec4899'; // Pink Reef Variant
+            if (variant === 2) variantFish.body = '#10b981'; // Emerald Deep Variant
+            
+            paintFish(ctx, 8, 8 + swimY, variantFish, frameB);
           });
         });
 
-        // 4. 🦣 Wildlife & Beasts Animated
-        addHeader('🦣 Wildlife & Beasts (Animated)');
+        // 4. 🦣 Wildlife & Beasts (Attack & Pelt Variant Morphs)
+        addHeader('🦣 Wildlife & Beasts (Attack Stance & Pelt Morphs)');
         ['Mammoth', 'Sabertooth', 'Wild Boar', 'Rabbit', 'Eagle', 'Honeybee', 'T-Rex', 'Wolf', 'Bear', 'Snake', 'Dragon', 'Scorpion', 'Fox', 'Owl'].forEach((name, idx) => {
           createCard(name, (ctx, t) => {
+            const variant = Math.floor(t * 0.5 + idx) % 3;
             const breath = Math.round(Math.sin(t * 4 + idx) * 1);
             ctx.save();
-            if (name === 'Eagle' || name === 'Dragon') {
-              ctx.translate(0, Math.sin(t * 6) * 3);
-            } else if (name === 'Honeybee') {
-              ctx.translate(Math.sin(t * 12) * 2, Math.cos(t * 12) * 2);
-            } else {
-              ctx.translate(0, breath);
-            }
-            SURVIVAL_PAINTERS[name](ctx);
+            ctx.translate(0, breath);
+            
+            SURVIVAL_PAINTERS[name](ctx, 0);
+            
             if (name === 'Dragon') {
-              // Fire breathing flame tip
-              if (Math.floor(t * 8) % 2 === 0) {
-                tpx(ctx, 40, 17, 6, 5, '#f97316');
-                tpx(ctx, 44, 18, 4, 3, '#facc15');
-              }
+              const flameSize = variant === 1 ? 10 : 5;
+              tpx(ctx, 40, 17, flameSize, 6, variant === 2 ? '#38bdf8' : '#f97316'); // Blue/Red Dragon Flame Morph
+            } else if (name === 'T-Rex' && variant === 1) {
+              tpx(ctx, 24, 22, 10, 4, '#ef4444'); // Roaring Mouth Red Glow Variant
+            } else if (name === 'Wolf' && variant === 2) {
+              tpx(ctx, 10, 24, 8, 8, '#ffffff'); // White Arctic Wolf Variant
             }
             ctx.restore();
           });
         });
 
-        // 5. 🏚️ Housing & Base Building (Animated)
-        addHeader('🏚️ Housing & Base Building (Animated)');
-        ['Thatch Hut', 'Log Cabin', 'Stone Cottage', 'Bunker', 'Cyber Hab', 'Watchtower', 'Pyramid', 'Castle', 'Windmill'].forEach((name, idx) => {
+        // 5. 🏚️ Base Building & Housing (Day/Night & Season Morphs)
+        addHeader('🏚️ Base Building & Housing (Day/Night & Season Morphs)');
+        ['Thatch Hut', 'Log Cabin', 'Stone Cottage', 'Bunker', 'Cyber Hab', 'Watchtower', 'Pyramid', 'Castle', 'Windmill'].forEach((name) => {
           createCard(name, (ctx, t) => {
-            SURVIVAL_PAINTERS[name](ctx);
-            if (name === 'Windmill') {
-              // Rotating 4 sails
-              const ang = t * 3;
+            const variant = Math.floor(t * 0.4) % 3; // 0: Day, 1: Dusk, 2: Night
+            
+            if (variant === 2) {
+              // Dark Night Backdrop
+              ctx.fillStyle = '#0f172a';
+              ctx.fillRect(0, 0, 48, 48);
+            }
+            
+            SURVIVAL_PAINTERS[name](ctx, 0);
+            
+            if (variant === 2) {
+              // Glowing Night Windows
+              tpx(ctx, 20, 30, 8, 8, '#facc15');
+            } else if (name === 'Windmill') {
+              const ang = t * 4;
               ctx.save(); ctx.translate(24, 24); ctx.rotate(ang);
               ctx.fillStyle = '#d97706';
-              ctx.fillRect(-18, -1, 36, 2);
-              ctx.fillRect(-1, -18, 2, 36);
+              ctx.fillRect(-18, -1, 36, 2); ctx.fillRect(-1, -18, 2, 36);
               ctx.restore();
-            } else if (name === 'Thatch Hut' || name === 'Log Cabin') {
-              // Rising smoke puff
-              const smokeY = 10 - (Math.floor(t * 8) % 8);
-              tpx(ctx, 22 + Math.sin(t * 4) * 2, smokeY, 3, 3, 'rgba(200,200,200,0.6)');
-            } else if (name === 'Cyber Hab') {
-              // Glowing neon strip
-              const neon = Math.sin(t * 6) > 0 ? '#ff9f43' : '#fecca3';
-              tpx(ctx, 10, 28, 28, 2, neon);
             }
           });
         });
 
-        // 6. ⚔️ Weapons & Armaments (Animated)
-        addHeader('⚔️ Weapons & Armaments (Animated)');
+        // 6. ⚔️ Weapons & Armaments (Tier & Energy Variant Morphs)
+        addHeader('⚔️ Weapons & Armaments (Energy & Tier Morphs)');
         ['Flint Spear', 'Iron Sword', 'Tactical Rifle', 'Plasma Saber', 'Crossbow', 'Grenade', 'Laser Cannon', 'Flamethrower', 'Battleaxe'].forEach((name) => {
           createCard(name, (ctx, t) => {
-            SURVIVAL_PAINTERS[name](ctx);
+            const variant = Math.floor(t * 0.6) % 3;
+            SURVIVAL_PAINTERS[name](ctx, 0);
+            
             if (name === 'Plasma Saber') {
-              // Beam aura pulse
-              const pCol = Math.sin(t * 10) > 0 ? 'rgba(0, 240, 255, 0.95)' : 'rgba(180, 250, 255, 0.95)';
-              tpx(ctx, 21, 6, 6, 22, pCol);
+              const colors = ['rgba(0, 240, 255, 0.95)', 'rgba(239, 68, 68, 0.95)', 'rgba(168, 85, 247, 0.95)'];
+              tpx(ctx, 21, 6, 6, 22, colors[variant]); // Cyan / Red / Purple Plasma Saber Morph!
             } else if (name === 'Flamethrower') {
-              // Roaring flame cone
-              const fW = 8 + Math.floor(Math.random() * 4);
-              tpx(ctx, 38, 20 + Math.floor(Math.random() * 2), fW, 14, '#ef4444');
-              tpx(ctx, 40, 22, 6, 10, '#f97316');
-              tpx(ctx, 42, 24, 4, 6, '#facc15');
-            } else if (name === 'Laser Cannon') {
-              // Laser ring charge
-              if (Math.floor(t * 10) % 2 === 0) {
-                tpx(ctx, 38, 22, 8, 10, '#38bdf8');
-              }
+              const colors = ['#ef4444', '#38bdf8', '#10b981'];
+              tpx(ctx, 38, 20, 10, 14, colors[variant]); // Fire / Blue Plasma / Acid Flame Morph!
             }
           });
         });
 
-        // 7. 🚗 Vehicles & Transports (Animated)
-        addHeader('🚗 Vehicles & Transports (Animated)');
+        // 7. 🚗 Vehicles & Transports (Turbo & Stealth Morphs)
+        addHeader('🚗 Vehicles & Transports (Turbo & Stealth Morphs)');
         ['Chariot', 'Survival Jeep', 'Hovercraft', 'Combat Mech', 'Canoe', 'Spaceship', 'Tank', 'Submarine'].forEach((name) => {
           createCard(name, (ctx, t) => {
+            const variant = Math.floor(t * 0.5) % 3;
             ctx.save();
-            if (name === 'Hovercraft' || name === 'Spaceship' || name === 'Submarine') {
-              ctx.translate(0, Math.sin(t * 4) * 2);
+            if (variant === 2 && name === 'Hovercraft') {
+              ctx.globalAlpha = 0.5; // Stealth Cloak Variant
             }
-            SURVIVAL_PAINTERS[name](ctx);
-            if (name === 'Hovercraft') {
-              // Anti-grav glow skirt
-              const gCol = Math.sin(t * 8) > 0 ? 'rgba(0, 229, 255, 0.9)' : 'rgba(0, 180, 255, 0.6)';
-              tpx(ctx, 10, 34, 28, 4, gCol);
-            } else if (name === 'Spaceship') {
-              // Plasma thrusters flame
-              const flameL = 6 + Math.floor(Math.random() * 4);
-              tpx(ctx, 2, 24, flameL, 6, '#f97316');
-              tpx(ctx, 40, 24, flameL, 6, '#f97316');
+            SURVIVAL_PAINTERS[name](ctx, 0);
+            if (variant === 1 && (name === 'Spaceship' || name === 'Hovercraft')) {
+              // Turbo Boost Flame
+              tpx(ctx, 2, 22, 10, 10, '#ef4444');
+              tpx(ctx, 38, 22, 10, 10, '#ef4444');
             }
             ctx.restore();
           });
         });
 
-        // 8. 🦈 Apex Predators & Marine Life (Animated)
-        addHeader('🦈 Marine Predators & Ocean (Animated)');
+        // 8. 🦈 Apex Predators & Marine Life (Depth Morphs)
+        addHeader('🦈 Marine Predators & Ocean (Depth Morphs)');
         ['Great White', 'Octopus', 'Sea Turtle', 'Jellyfish', 'Crab', 'Stingray', 'Squid'].forEach((name) => {
           createCard(name, (ctx, t) => {
-            ctx.save();
-            ctx.translate(0, Math.sin(t * 3) * 2);
-            SURVIVAL_PAINTERS[name](ctx);
-            if (name === 'Crab') {
-              // Claws opening/closing
-              if (Math.floor(t * 4) % 2 === 0) {
-                tpx(ctx, 8, 20, 4, 4, '#ff3d00');
-                tpx(ctx, 36, 20, 4, 4, '#ff3d00');
-              }
-            }
+            const swimY = Math.sin(t * 3) * 2;
+            ctx.save(); ctx.translate(0, swimY);
+            SURVIVAL_PAINTERS[name](ctx, 0);
             ctx.restore();
           });
         });
 
-        // 9. 🪵 Resources & Props (Animated)
-        addHeader('🪵 Resources & World Props (Animated)');
+        // 9. 🪵 Resources & Props (Sparkle & Spore Morphs)
+        addHeader('🪵 Resources & World Props (Sparkle & Spore Morphs)');
         ['Wood Pile', 'Red Poppy', 'Sunflower', 'Beehive', 'Iron Ore', 'Gold Ore', 'Diamond Ore', 'Mushroom', 'Chest'].forEach((name) => {
           createCard(name, (ctx, t) => {
-            SURVIVAL_PAINTERS[name](ctx);
-            if (name === 'Gold Ore' || name === 'Diamond Ore') {
-              // Sparkle effect
-              const sparkX = 14 + (Math.floor(t * 12) % 20);
-              const sparkY = 28 + (Math.floor(t * 7) % 10);
-              const sCol = name === 'Gold Ore' ? '#ffffff' : '#e0f7fa';
-              tpx(ctx, sparkX, sparkY, 2, 2, sCol);
-            } else if (name === 'Chest') {
-              // Chest lid glow pulse
-              if (Math.floor(t * 5) % 4 === 0) {
-                tpx(ctx, 10, 22, 28, 2, '#fde047');
-              }
+            const variant = Math.floor(t * 0.5) % 3;
+            SURVIVAL_PAINTERS[name](ctx, 0);
+            if (name === 'Diamond Ore' || name === 'Gold Ore') {
+              const sparkCol = variant === 0 ? '#ffffff' : variant === 1 ? '#67e8f9' : '#facc15';
+              tpx(ctx, 18, 28, 3, 3, sparkCol);
             }
           });
         });
 
-        // 10. 👾 Era NPC Enemies & Threats
-        addHeader('👾 Era NPC Enemies & Threats (Animated)');
+        // 10. 👾 Era NPC Enemies & Threats (Enraged & Shield Morphs)
+        addHeader('👾 Era NPC Enemies & Threats (Enraged & Shield Morphs)');
         ['Rival Hunter', 'Barbarian Raider', 'Renegade Knight', 'Rogue Soldier', 'Cyber Drone'].forEach((name) => {
           createCard(name, (ctx, t) => {
+            const variant = Math.floor(t * 0.5) % 3;
             const bob = Math.round(Math.sin(t * 6) * 1);
             ctx.save(); ctx.translate(0, bob);
             SURVIVAL_PAINTERS[name](ctx, 0);
-            if (name === 'Cyber Drone') {
-              const sweepX = 18 + Math.floor((t * 12) % 12);
-              tpx(ctx, sweepX, 21, 2, 2, '#ffffff');
+            
+            if (variant === 1) {
+              // Red Enraged Eye/Aura Glow
+              tpx(ctx, 20, 16, 8, 2, '#ef4444');
+            } else if (variant === 2 && name === 'Renegade Knight') {
+              // Iron Shield Variant
+              tpx(ctx, 28, 22, 6, 16, '#94a3b8');
             }
             ctx.restore();
           });
         });
-
-        // Animation Loop Driver
-        let startT = performance.now();
-        function animLoop() {
-          if (overlay.style.display === 'none') return;
-          requestAnimationFrame(animLoop);
-          const t = (performance.now() - startT) * 0.001;
-          for (let i = 0; i < animCards.length; i++) {
-            const c = animCards[i];
-            c.ctx.clearRect(0, 0, c.width, c.height);
-            c.renderFn(c.ctx, t);
-          }
-        }
-        animLoop();
       });
     })();
   </script>
