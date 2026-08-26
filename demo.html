@@ -780,6 +780,7 @@
       ];
 
       // Grid-based character pixel arts
+      // Grid-based character pixel arts (Using exact Human Body Figure base)
       const GRID_CHARACTERS = [
         { name: 'Hazmat Human', art: [
           '.....YYYYYY.....', '....YYYYYYYY....', '....YVVVVVVY....', '....YVVGGVVY....',
@@ -813,7 +814,49 @@
           '.....SSS........', '....SSSSS.......', '...SSCCCCS......', '...SSCCCCCS.....',
           '...SCCCCCCW.....', '...CCCCCCSW.....', '....CCCCCC......', '....SS.SS.......',
           '....SS.SS.......', '....SS..SS......'
-        ], pal: {H:'#3b2b1e',S:'#c78d5a',E:'#1a1a1a',C:'#8a5a33',G:'#c9c9c9',W:'#7a5230'} }
+        ], pal: {H:'#3b2b1e',S:'#c78d5a',E:'#1a1a1a',C:'#8a5a33',G:'#c9c9c9',W:'#7a5230'} },
+        { name: 'Knight', art: [
+          '.....HHHHHH.....', '....HHHHHHHH....', '....HAAAAAAH....', '....HAAVVAAH....',
+          '....HAAAAAAH....', '.....HHHHH......', '......SS........', '...SSSSSSSS.....',
+          '...SCCCCCCS.....', '...SCCRCCCS.....', '...SCCRCCCS.....', '...SCCCCCCS.....',
+          '...WCCCCCCW.....', '....CCCCCC......', '....SS..SS......', '....SS..SS......',
+          '....AA..AA......', '....AA..AA......'
+        ], pal: {H:'#475569',A:'#94a3b8',V:'#0f172a',S:'#64748b',C:'#cbd5e1',R:'#dc2626',W:'#f8fafc'} },
+        { name: 'Cyborg', art: [
+          '.....CCCCCC.....', '....CCCCCCCC....', '....CMMMMMMC....', '....CMVRRVMC....',
+          '....CMMMMMMC....', '.....CCCCC......', '......SS........', '...SSSSSSSS.....',
+          '...SAAAAAAS.....', '...SAACCAAS.....', '...SAACCAAS.....', '...SAAAAAAS.....',
+          '...PAAAAAAP.....', '....AAAAAA......', '....SS..SS......', '....SS..SS......',
+          '....CC..CC......', '....CC..CC......'
+        ], pal: {C:'#0f172a',M:'#334155',V:'#0f172a',R:'#ff1744',S:'#475569',A:'#64748b',P:'#00e5ff'} },
+        { name: 'Ninja', art: [
+          '.....NNNNNN.....', '....NNNNNNNN....', '....NNRRRRNN....', '....NNSESSNS....',
+          '....NNNNNNNN....', '.....NNNNN......', '......SS........', '...SSSSSSSS.....',
+          '...SCCCCCCB.....', '...SCCCCCCB.....', '...SCCCCCCB.....', '...SCCCCCCB.....',
+          '...SCCCCCCB.....', '....CCCCCC......', '....SS..SS......', '....SS..SS......',
+          '....NN..NN......', '....NN..NN......'
+        ], pal: {N:'#111827',R:'#dc2626',S:'#d29a66',E:'#fde047',C:'#1f2937',B:'#9ca3af'} },
+        { name: 'Wizard', art: [
+          '.......PP.......', '......PPPP......', '.....PPPPPP.....', '....PPPPPPPP....',
+          '....PFFFFFFP....', '....PFEFFEFP....', '....PFFFFFFP....', '....PGGGGGGP....',
+          '....PGGGGGGP....', '...GGGGGGGGGG...', '...GGVVVVVVGG...', '...GGVVVVVVGG...',
+          '...GGVVVVVVGGO..', '...GGVVVVVVGG.O.', '...GGVVVVVVGG.O.', '....VVVVVV....O.',
+          '....VV..VV....O.'
+        ], pal: {P:'#6b21a8',F:'#fde047',E:'#1a1a1a',G:'#f8fafc',V:'#7e22ce',O:'#38bdf8'} },
+        { name: 'Astronaut', art: [
+          '.....WWWWWW.....', '....WWWWWWWW....', '....WGGGGGGW....', '....WGGGGGGW....',
+          '....WGGGGGGW....', '....WWWWWWWW....', '......WW........', '...WWWWWWWW.....',
+          '...WCCCCCCW.....', '...WCCFFAAW.....', '...WCCCCCCW.....', '...WCCCCCCW.....',
+          '...WCCCCCCW.....', '....CCCCCC......', '....WW..WW......', '....WW..WW......',
+          '....BB..BB......', '....BB..BB......'
+        ], pal: {W:'#f8fafc',G:'#f59e0b',C:'#e2e8f0',F:'#38bdf8',A:'#e11d48',B:'#94a3b8'} },
+        { name: 'Pirate', art: [
+          '....TTTTTTTT....', '...TTTTTTTTTT...', '...TTSSSSSSTT...', '...TSPEPPSTT....',
+          '...TSSSSSSST....', '....SSBBBBSS....', '......SS........', '...SSSSSSSS.....',
+          '...SCCCCCCCS....', '...SCCGGCCCS....', '...SCCGGCCCS....', '...SCCCCCCCS....',
+          '...KCCCCCCCS....', '....CCCCCC......', '....SS..SS......', '....SS..SS......',
+          '....TT..TT......', '....TT..TT......'
+        ], pal: {T:'#0f172a',S:'#d29a66',P:'#000000',E:'#1a1a1a',B:'#7a5230',C:'#991b1b',G:'#facc15',K:'#cbd5e1'} }
       ];
 
       let built = false;
@@ -872,47 +915,24 @@
           animCards.push({ cv, ctx, renderFn, width, height });
         }
 
-        // 1. 👤 Tribe & Characters (With Pose & Outfit Variant Morphing)
-        addHeader('👤 Tribe & Characters (Random Variant Morphing & Animated)');
+        // 1. 👤 Tribe & Hero Class Human Figures (With Pose & Outfit Variant Morphing)
+        addHeader('👤 Tribe & Hero Classes (Human Body Figures & Variant Morphs)');
         GRID_CHARACTERS.forEach(ch => {
           createCard(ch.name, (ctx, t) => {
-            const variant = Math.floor(t * 0.5) % 4; // Morphs variant every 2s
+            const variant = Math.floor(t * 0.5) % 4;
             const scale = 2;
             const bob = Math.round(Math.sin(t * 6) * 1);
             const ox = Math.floor((48 - ch.art[0].length * scale) / 2);
             const oy = Math.floor((48 - ch.art.length * scale) / 2) + bob;
             
-            // Custom palette morph per variant
             const curPal = Object.assign({}, ch.pal);
-            if (variant === 1) curPal.C = '#b91c1c'; // Red Tribe Attire
-            if (variant === 2) curPal.C = '#047857'; // Forest Scout Attire
-            if (variant === 3) curPal.C = '#1d4ed8'; // Royal Blue Attire
+            if (variant === 1 && curPal.C) curPal.C = '#b91c1c';
+            if (variant === 2 && curPal.C) curPal.C = '#047857';
             
             drawPixelArtGrid(ctx, ch.art, curPal, scale, ox, oy);
-            // Eye blink & variant crown
-            if (variant === 3) {
-              tpx(ctx, ox + 6 * scale, oy - 2 * scale, 4 * scale, 2 * scale, '#facc15'); // Gold Crown
+            if (variant === 3 && ch.name === 'Caveman') {
+              tpx(ctx, ox + 6 * scale, oy - 2 * scale, 4 * scale, 2 * scale, '#facc15');
             }
-          });
-        });
-        
-        ['Knight', 'Cyborg', 'Ninja', 'Wizard', 'Astronaut', 'Pirate'].forEach(name => {
-          createCard(name, (ctx, t) => {
-            const variant = Math.floor(t * 0.6) % 3;
-            const sway = Math.sin(t * 4) * 1;
-            ctx.save(); ctx.translate(sway, 0);
-            SURVIVAL_PAINTERS[name](ctx, 0);
-            
-            if (name === 'Knight' && variant === 1) {
-              tpx(ctx, 14, 20, 20, 2, '#facc15'); // Gold Trim Armor Variant
-            } else if (name === 'Cyborg') {
-              const glow = variant === 1 ? '#00e5ff' : variant === 2 ? '#a855f7' : '#ff1744';
-              tpx(ctx, 24, 18, 4, 2, glow); // Visor Color Variant Morph
-            } else if (name === 'Wizard') {
-              const orbCol = ['#38bdf8', '#ef4444', '#10b981'][variant];
-              tpx(ctx, 31, 5 + Math.round(Math.sin(t * 4) * 1), 5, 5, orbCol); // Spell Element Morph
-            }
-            ctx.restore();
           });
         });
 

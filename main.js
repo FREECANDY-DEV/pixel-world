@@ -3624,59 +3624,75 @@ function paintMushroom(c, ox) {
 }
 
 function paintKnight(c, ox) {
-  tpx(c, ox + 18, 14, 12, 10, '#b0bec5');
-  tpx(c, ox + 20, 18, 8, 2, '#37474f');
-  tpx(c, ox + 16, 24, 16, 14, '#78909c');
-  tpx(c, ox + 18, 38, 5, 8, '#455a64');
-  tpx(c, ox + 25, 38, 5, 8, '#455a64');
-  tpx(c, ox + 12, 24, 4, 12, '#ff1744');
+  const art = [
+    '.....HHHHHH.....', '....HHHHHHHH....', '....HAAAAAAH....', '....HAAVVAAH....',
+    '....HAAAAAAH....', '.....HHHHH......', '......SS........', '...SSSSSSSS.....',
+    '...SCCCCCCS.....', '...SCCRCCCS.....', '...SCCRCCCS.....', '...SCCCCCCS.....',
+    '...WCCCCCCW.....', '....CCCCCC......', '....SS..SS......', '....SS..SS......',
+    '....AA..AA......', '....AA..AA......'
+  ];
+  const pal = {H:'#475569',A:'#94a3b8',V:'#0f172a',S:'#64748b',C:'#cbd5e1',R:'#dc2626',W:'#f8fafc'};
+  drawPixelArtGrid(c, art, pal, 2, ox + 8, 6);
 }
 
 function paintCyborg(c, ox) {
-  tpx(c, ox + 18, 14, 12, 10, '#37474f');
-  tpx(c, ox + 24, 18, 4, 2, '#ff1744');
-  tpx(c, ox + 16, 24, 16, 14, '#263238');
-  tpx(c, ox + 10, 24, 6, 12, '#00e5ff');
-  tpx(c, ox + 18, 38, 5, 8, '#1a237e');
-  tpx(c, ox + 25, 38, 5, 8, '#1a237e');
+  const art = [
+    '.....CCCCCC.....', '....CCCCCCCC....', '....CMMMMMMC....', '....CMVRRVMC....',
+    '....CMMMMMMC....', '.....CCCCC......', '......SS........', '...SSSSSSSS.....',
+    '...SAAAAAAS.....', '...SAACCAAS.....', '...SAACCAAS.....', '...SAAAAAAS.....',
+    '...PAAAAAAP.....', '....AAAAAA......', '....SS..SS......', '....SS..SS......',
+    '....CC..CC......', '....CC..CC......'
+  ];
+  const pal = {C:'#0f172a',M:'#334155',V:'#0f172a',R:'#ff1744',S:'#475569',A:'#64748b',P:'#00e5ff'};
+  drawPixelArtGrid(c, art, pal, 2, ox + 8, 6);
 }
 
 function paintNinja(c, ox) {
-  tpx(c, ox + 18, 14, 12, 10, '#111827');
-  tpx(c, ox + 18, 18, 12, 2, '#dc2626');
-  tpx(c, ox + 20, 16, 4, 2, '#fde047');
-  tpx(c, ox + 16, 24, 16, 14, '#1f2937');
-  tpx(c, ox + 10, 22, 4, 16, '#9ca3af');
-  tpx(c, ox + 18, 38, 5, 8, '#111827');
-  tpx(c, ox + 25, 38, 5, 8, '#111827');
+  const art = [
+    '.....NNNNNN.....', '....NNNNNNNN....', '....NNRRRRNN....', '....NNSESSNS....',
+    '....NNNNNNNN....', '.....NNNNN......', '......SS........', '...SSSSSSSS.....',
+    '...SCCCCCCB.....', '...SCCCCCCB.....', '...SCCCCCCB.....', '...SCCCCCCB.....',
+    '...SCCCCCCB.....', '....CCCCCC......', '....SS..SS......', '....SS..SS......',
+    '....NN..NN......', '....NN..NN......'
+  ];
+  const pal = {N:'#111827',R:'#dc2626',S:'#d29a66',E:'#fde047',C:'#1f2937',B:'#9ca3af'};
+  drawPixelArtGrid(c, art, pal, 2, ox + 8, 6);
 }
 
 function paintWizard(c, ox) {
-  tpx(c, ox + 16, 8, 16, 4, '#581c87');
-  tpx(c, ox + 20, 2, 8, 8, '#6b21a8');
-  tpx(c, ox + 18, 12, 12, 10, '#fde047');
-  tpx(c, ox + 14, 22, 20, 18, '#7e22ce');
-  tpx(c, ox + 32, 10, 3, 30, '#78350f');
-  tpx(c, ox + 31, 6, 5, 5, '#38bdf8');
+  const art = [
+    '.......PP.......', '......PPPP......', '.....PPPPPP.....', '....PPPPPPPP....',
+    '....PFFFFFFP....', '....PFEFFEFP....', '....PFFFFFFP....', '....PGGGGGGP....',
+    '....PGGGGGGP....', '...GGGGGGGGGG...', '...GGVVVVVVGG...', '...GGVVVVVVGG...',
+    '...GGVVVVVVGGO..', '...GGVVVVVVGG.O.', '...GGVVVVVVGG.O.', '....VVVVVV....O.',
+    '....VV..VV....O.'
+  ];
+  const pal = {P:'#6b21a8',F:'#fde047',E:'#1a1a1a',G:'#f8fafc',V:'#7e22ce',O:'#38bdf8'};
+  drawPixelArtGrid(c, art, pal, 2, ox + 8, 6);
 }
 
 function paintAstronaut(c, ox) {
-  tpx(c, ox + 16, 12, 16, 12, '#f8fafc');
-  tpx(c, ox + 18, 14, 12, 6, '#f59e0b');
-  tpx(c, ox + 14, 24, 20, 14, '#e2e8f0');
-  tpx(c, ox + 10, 22, 4, 12, '#cbd5e1');
-  tpx(c, ox + 18, 38, 5, 8, '#94a3b8');
-  tpx(c, ox + 25, 38, 5, 8, '#94a3b8');
+  const art = [
+    '.....WWWWWW.....', '....WWWWWWWW....', '....WGGGGGGW....', '....WGGGGGGW....',
+    '....WGGGGGGW....', '....WWWWWWWW....', '......WW........', '...WWWWWWWW.....',
+    '...WCCCCCCW.....', '...WCCFFAAW.....', '...WCCCCCCW.....', '...WCCCCCCW.....',
+    '...WCCCCCCW.....', '....CCCCCC......', '....WW..WW......', '....WW..WW......',
+    '....BB..BB......', '....BB..BB......'
+  ];
+  const pal = {W:'#f8fafc',G:'#f59e0b',C:'#e2e8f0',F:'#38bdf8',A:'#e11d48',B:'#94a3b8'};
+  drawPixelArtGrid(c, art, pal, 2, ox + 8, 6);
 }
 
 function paintPirate(c, ox) {
-  tpx(c, ox + 14, 10, 20, 4, '#0f172a');
-  tpx(c, ox + 18, 6, 12, 6, '#1e293b');
-  tpx(c, ox + 20, 16, 4, 3, '#000000');
-  tpx(c, ox + 14, 22, 20, 16, '#991b1b');
-  tpx(c, ox + 10, 26, 4, 12, '#cbd5e1');
-  tpx(c, ox + 18, 38, 5, 8, '#0f172a');
-  tpx(c, ox + 25, 38, 5, 8, '#0f172a');
+  const art = [
+    '....TTTTTTTT....', '...TTTTTTTTTT...', '...TTSSSSSSTT...', '...TSPEPPSTT....',
+    '...TSSSSSSST....', '....SSBBBBSS....', '......SS........', '...SSSSSSSS.....',
+    '...SCCCCCCCS....', '...SCCGGCCCS....', '...SCCGGCCCS....', '...SCCCCCCCS....',
+    '...KCCCCCCCS....', '....CCCCCC......', '....SS..SS......', '....SS..SS......',
+    '....TT..TT......', '....TT..TT......'
+  ];
+  const pal = {T:'#0f172a',S:'#d29a66',P:'#000000',E:'#1a1a1a',B:'#7a5230',C:'#991b1b',G:'#facc15',K:'#cbd5e1'};
+  drawPixelArtGrid(c, art, pal, 2, ox + 8, 6);
 }
 
 function paintDragon(c, ox) {
