@@ -5407,6 +5407,8 @@ function setIconMode(on) {
 }
 
 function syncDetailIcons() {
+  const isTopView = (controls && controls.target && Math.abs(camera.position.x - controls.target.x) < 5 && Math.abs(camera.position.z - controls.target.z) < 5 && (camera.position.y - controls.target.y) > 40);
+
   for (const s of placedTrees) {
     const ic = ensurePlacedIcon(s);
     if (!ic) continue;
@@ -5414,7 +5416,9 @@ function syncDetailIcons() {
     ic.position.y += s.sprA.scale.y + 1.6;
     ic.scale.setScalar(markerScale(camera.position.distanceTo(ic.position)));
     ic.scale.z = 1;
-    ic.visible = true;
+    // Calculate grid height of item to handle top-view visibility
+    const gridH = s.gridH || (s.sprA ? s.sprA.scale.y : 1);
+    ic.visible = !isTopView || (gridH >= 1.5);
   }
   const fi = ensureHomeFireIcon();
   if (fi && homeFire) {
@@ -6411,7 +6415,8 @@ function spawnCaveman(x, z, female = false, forceAge = null, lookOverride = null
   // every person is drawn with their own palette + hairstyle variants
   const rnd = mulberry32((Math.random() * 0xffffffff) >>> 0);
   const look = lookOverride || pickLook(rnd, female);
-  const isHazmat = !!(lookOverride && (lookOverride.hazmat || lookOverride.skin === '#ffd23f' || (lookOverride.name && lookOverride.name.startsWith('Subject')))) || (DEMO_MODE && !lookOverride && cavemen.length === 0);
+  // All spawned players (local and remote) wear the HAZMAT suit!
+  const isHazmat = true;
 
   const mats = {};
   for (const [key, cfg] of Object.entries(STAGES)) {
