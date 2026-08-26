@@ -4199,11 +4199,6 @@ const ICON_MAT = new THREE.ShaderMaterial({
       vCol = aCol;
       vec4 mv = modelViewMatrix * vec4(position, 1.0);
       float d = max(-mv.z, 1.0);
-      // depth bias: pull the marker toward the camera so the block it
-      // stands on (and the grove it marks) can never swallow it at
-      // grazing angles; sizing still uses the true distance
-      mv.z -= min(d * 0.085, 40.0);
-      mv.z = min(mv.z, -0.5);
       gl_PointSize = clamp(430.0 / d, 44.0, 110.0) * uPx;
       gl_Position = projectionMatrix * mv;
     }
@@ -4417,9 +4412,7 @@ function ensureChunkIcons(ch) {
   let w = 0;
   for (const cell of cells.values()) {
     ppos[w * 3] = cell.x;
-    // float the marker just above the tallest tree in its cluster so no
-    // block face or canopy can hide it from any camera angle
-    ppos[w * 3 + 1] = cell.top + 1.6;
+    ppos[w * 3 + 1] = cell.top;
     ppos[w * 3 + 2] = cell.z;
     pcol[w] = cell.best;
     w++;
