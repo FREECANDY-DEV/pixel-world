@@ -3348,28 +3348,21 @@ const treeMat = new THREE.ShaderMaterial({
       float flutter = sin(uTime * (1.5 + vnoise(wp + 7.3)) + iPhase);
       // bend in WORLD space so orbiting the camera never spins the tree
       vec3 bendWorld = vec3(wdir.x, 0.0, wdir.y) * (flutter * lmag * position.y * iH * 0.14);
-      vec3 toCam = cameraPosition - iPos;
-      float distC = max(length(toCam), 0.001);
-      float vertK = clamp(toCam.y / distC, 0.0, 1.0);
-      float lenXZ = max(length(toCam.xz), 0.001);
-      vec2 dirXZ = toCam.xz / lenXZ;
-      // bottom of the art is ALWAYS anchored strictly to the top of the block it spawned on
-      vec3 basePos = iPos + vec3(0.0, 0.04 + aLift * 0.05, 0.0) + bendWorld;
-      vec3 rightA = vec3(dirXZ.y, 0.0, -dirXZ.x);
-      // top of art tilts back away from camera as camera moves to top view
-      float theta = smoothstep(0.1, 0.95, vertK) * 1.25;
-      float sinT = sin(theta);
-      float cosT = cos(theta);
-      vec3 upA = vec3(-dirXZ.x * sinT, cosT, -dirXZ.y * sinT);
-      vec3 wpq = basePos + rightA * (position.x * iH) + upA * (position.y * iH);
-      vec4 mv = viewMatrix * vec4(wpq, 1.0);
+      vec3 basePos = iPos + vec3(0.0, 0.05 + aLift * 0.08, 0.0) + bendWorld;
+      // Transform base anchor position (top of block) into view space
+      vec4 mvCenter = viewMatrix * vec4(basePos, 1.0);
+      // View-space spherical billboarding:
+      // position.x * iH moves horizontally along view X (camera right)
+      // position.y * iH moves vertically up along view Y (camera up)
+      vec3 mvPos = mvCenter.xyz + vec3(position.x * iH, position.y * iH, 0.0);
+      vec4 mv = vec4(mvPos, 1.0);
       float safeD = max(-mv.z, 0.001);
-      // view-space depth clearance so ground block faces never clip the quad
+      // View Z depth clearance so terrain block faces beneath never clip the quad
       float pull = min(safeD * 0.04, 4.0) + 0.35 + aLift * 0.30;
       mv.z -= pull;
       mv.z = min(mv.z, -0.35);
       vDist = max(-mv.z, 1.0);
-      vWorldY = wpq.y;
+      vWorldY = basePos.y + position.y * iH;
       gl_Position = projectionMatrix * mv;
     }
   `,
