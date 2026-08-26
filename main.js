@@ -8470,7 +8470,7 @@ const DEMO_COLORS = ['#ffd23f', '#7dd3fc', '#a7f3d0', '#f9a8d4', '#fdba74', '#c4
 const DEMO_POS_MS = 160;       // position publish throttle
 const DEMO_MOVE_EPS = 0.22;    // …only when the human actually moved this far
 const DEMO_HEARTBEAT_MS = 3000; // …or at least this often (keeps ghosts alive)
-const DEMO_TTL_MS = 45000;     // drop a ghost/presence after this much silence
+const DEMO_TTL_MS = 12000;     // drop a ghost/presence after 12s of silence
 
 const demoState = {
   id: '',
@@ -8762,6 +8762,17 @@ function demoConnect(idx) {
     setTimeout(() => demoConnect(idx + 1), 600);
   });
 }
+
+function demoLeave() {
+  if (demoState.mqtt && demoState.connected) {
+    try {
+      demoState.mqtt.publish(DEMO_TOPIC + '/presence/' + demoState.id, '', { retain: true, qos: 0 });
+      demoState.mqtt.end(true);
+    } catch (e) {}
+  }
+}
+window.addEventListener('pagehide', demoLeave);
+window.addEventListener('beforeunload', demoLeave);
 
 function demoPub(topic, obj) {
   const c = demoState.mqtt;
