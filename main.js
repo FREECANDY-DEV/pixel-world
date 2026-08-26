@@ -260,7 +260,7 @@ function buildBlockAtlas() {
   // helper: fill a tile at column col with a procedural pattern
   function tile(col, paintFn) {
     g.save();
-    g.translate(col * ATLAS_CELL, 0);
+    g.translate(col * BT_CELL, 0);
     paintFn(g);
     g.restore();
   }
