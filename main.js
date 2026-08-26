@@ -1934,18 +1934,19 @@ function updateHomeFlames(t) {
 const move = { up: false, down: false, left: false, right: false, raise: false, lower: false };
 
 window.addEventListener('keydown', (e) => {
-  if (e.code === 'KeyW') move.up = true;
-  else if (e.code === 'KeyS') move.down = true;
-  else if (e.code === 'KeyA') move.left = true;
-  else if (e.code === 'KeyD') move.right = true;
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.code === 'KeyW' || e.code === 'ArrowUp') move.up = true;
+  else if (e.code === 'KeyS' || e.code === 'ArrowDown') move.down = true;
+  else if (e.code === 'KeyA' || e.code === 'ArrowLeft') move.left = true;
+  else if (e.code === 'KeyD' || e.code === 'ArrowRight') move.right = true;
   else if (e.code === 'KeyR') move.lower = true;
   else if (e.code === 'KeyF') move.raise = true;
 });
 window.addEventListener('keyup', (e) => {
-  if (e.code === 'KeyW') move.up = false;
-  else if (e.code === 'KeyS') move.down = false;
-  else if (e.code === 'KeyA') move.left = false;
-  else if (e.code === 'KeyD') move.right = false;
+  if (e.code === 'KeyW' || e.code === 'ArrowUp') move.up = false;
+  else if (e.code === 'KeyS' || e.code === 'ArrowDown') move.down = false;
+  else if (e.code === 'KeyA' || e.code === 'ArrowLeft') move.left = false;
+  else if (e.code === 'KeyD' || e.code === 'ArrowRight') move.right = false;
   else if (e.code === 'KeyR') move.lower = false;
   else if (e.code === 'KeyF') move.raise = false;
 });
@@ -6631,6 +6632,12 @@ function updateCavemen(dt, t) {
       cm.velZ = THREE.MathUtils.damp(cm.velZ || 0, charJoy.z * js, 10, dt);
       pos.x += cm.velX * dt;
       pos.z += cm.velZ * dt;
+      if (cm === selectedCm) {
+        controls.target.x += cm.velX * dt;
+        controls.target.z += cm.velZ * dt;
+        camera.position.x += cm.velX * dt;
+        camera.position.z += cm.velZ * dt;
+      }
       // first commanded villager to brave the sea discovers Water
       if (!KNOW.water && waterDepthAt(pos.x, pos.z) > 0.14) {
         unlockKnowledge('water');
@@ -8545,17 +8552,9 @@ function initDemoMode() {
   timeSpeed = 1;
   // Disable auto-rotate
   controls.autoRotate = false;
-  // Disable box-select and action/move command
-  boxSelectOn = false;
+  // WASD / Arrow keys or joystick steer the human character
   actionMode = false;
   if (actionBtn) actionBtn.style.display = 'none';
-  // Block WASD/R/F keyboard shortcuts — only joystick should move the human
-  window.addEventListener('keydown', (e) => {
-    if (DEMO_MODE && ['w','a','s','d','r','f','W','A','S','D','R','F'].includes(e.key)) {
-      e.stopImmediatePropagation();
-      return false;
-    }
-  }, true);
 
   // --- Remove the sleeping founding couple — only live users spawn ---
   for (let i = cavemen.length - 1; i >= 0; i--) {
@@ -9076,31 +9075,83 @@ function demoGrunkSay(text) {
 }
 
 function grunkAnswer(q) {
-  const s = q.toLowerCase();
+  const s = q.toLowerCase().trim();
   const has = (...ws) => ws.some((w) => s.includes(w));
   const b = seasonInfo();
   const season = SEASONS[b.i];
-  if (has('hi', 'hello', 'hey', 'yo ', 'howdy')) return '\u{1F44B} Hello, ' + demoState.name + '! I am Grunk, keeper of the fire. Ask me about the seasons, the fish, the trees, or how the tribe lives.';
-  if (has('who are you', 'who r u', 'your name', 'grunk')) return 'I am Grunk the Elder. I have watched ' + Math.floor(gameMs / 86400000) + ' suns rise over this camp. Ask me anything about our world.';
-  if (has('help', 'what can you')) return 'I know of: \u{1F33F} seasons, \u{1F420} fish, \u{1F332} trees & plants, \u{1F525} fire, \u{1F30A} water, \u{1F634} sleep & energy, \u{1F3D6}\uFE0F the world, and how to move about.';
-  if (has('season', 'weather', 'winter', 'summer', 'spring', 'autumn', 'fall', 'snow', 'blossom')) {
-    const next = SEASONS[b.next];
-    const w = b.w > 0.001 ? ' (turning to ' + next.name + ')' : '';
-    return '\u{1F33F} It is ' + season.name + ' ' + season.icon + ' now' + w + '. Our year has 365 days: spring blossoms, summer green, autumn gold, winter snow \u2014 the trees paint themselves as it turns.';
+
+  // 1. Repo & Architecture
+  if (has('repo', 'github', 'freecandy', 'source', 'open source', 'license')) {
+    return '📦 Pixel World is open-source at FREECANDY-DEV/pixel-world (MIT License)! Built with 0 image files and 0 build steps. Everything is generated procedurally by JavaScript at runtime.';
   }
-  if (has('fish', 'sea', 'ocean', 'water animal', 'swim')) return '\u{1F420} The sea holds ' + FISH_KINDS.length + ' kinds: ' + FISH_KINDS.map((f) => f.label).join(', ') + '. They cruise deep under the waves in passing shoals \u2014 dive down and you will see them.';
-  if (has('tree', 'plant', 'species', 'flora', 'forest', 'oak', 'pine', 'cactus', 'palm', 'bamboo')) return '\u{1F332} ' + KIND_ORDER.length + ' plant & rock species grow here, from oak and pine to cactus, bamboo and blossom bush. Every one is painted by code, and they change with the seasons.';
-  if (has('fire', 'campfire', 'flint', 'spark')) return '\u{1F525} Fire! Strike the campfire to wake the tribe and unlock the Fire knowledge in the \u{1F4D6} book. Knowledge changes how we live \u2014 until Water is known, nobody wades into the wet.';
-  if (has('water', 'river', 'lake', 'swim across', 'wade')) return '\u{1F30A} Water runs deep. Command one of us to wade into the sea and you unlock the Water knowledge. Before that, we fear the wet.';
-  if (has('sleep', 'energy', 'tired', 'zzz', 'rest', 'night', 'bed')) return '\u{1F634} Everyone carries a daily battery. It drains while awake; at zero we collapse and sleep it off, and the ZZZs rise. Tired ones head for bed when dusk falls.';
-  if (has('world', 'seed', 'map', 'planet', 'terrain', 'biome', 'desert', 'jungle', 'snow')) return '\u{1F3D6}\uFE0F One seed grows this whole world \u2014 deserts, jungles, forests, snow, caves and a living sea. This world\u2019s seed is ' + SEED + '. Zoom out far enough and you\u2019ll see the planet itself.';
-  if (has('move', 'walk', 'control', 'steer', 'how do i', 'wasd', 'joystick')) return '\u{1F6B6} To walk your human: WASD (or the joystick on a phone) steers them. Drag to orbit, wheel to zoom. The \u{1F3D6}\uFE0F top-view button looks straight down.';
-  if (has('know', 'book', 'unlock', 'discover')) return '\u{1F4D6} The knowledge book tracks what we\u2019ve discovered: Fire and Water are real; Toolmaking, Farming, Writing and The Wheel wait to be dreamed up.';
-  if (has('name', 'who am i')) return 'You are ' + demoState.name + '! Tap the pencil \u{270F}\uFE0F next to your name to choose a new one \u2014 the whole tribe will see it.';
-  if (has('bye', 'goodbye', 'see you')) return '\u{1F44B} Safe travels, ' + demoState.name + '. The fire stays lit.';
-  if (has('love', 'marry', 'kiss', 'girlfriend', 'boyfriend')) return '\u{1F493} Ah, the heart\u2019s fire! Pick someone up with the Move command and carry them to the fire \u2014 we shall see what the sparks do.';
-  if (has('thank', 'ty', 'thanks')) return '\u{1F44D} The tribe thanks you, ' + demoState.name + '.';
-  return 'I am but an old caveman, ' + demoState.name + ' \u2014 I know the seasons, fish, trees, fire, water, sleep and the world. Say \u201Chelp\u201D and I will list them.';
+  if (has('tech', 'stack', 'how is it built', 'how does it work', 'framework', 'lib', 'dependency')) {
+    return '⚡ Tech Stack: Vanilla ES modules + Three.js + Web Workers for off-main-thread voxel chunking + Canvas2D procedural painting + WebSockets MQTT for multiplayer.';
+  }
+  if (has('shader', 'material', 'render', 'graphics', 'gpu', 'fps', 'performance', 'ao', 'fog')) {
+    return '🎨 Graphics Engine: Uses custom Three.js MeshStandardMaterial shaders with procedural ambient occlusion, edge softening, height-fog depth cueing, and 4-season sprite cross-fading.';
+  }
+  if (has('voxel', 'terrain', 'noise', 'fbm', 'procedural', 'generation', 'chunk', 'worker', 'seed')) {
+    return '⛰️ Voxel Engine: 3D Value Noise + FBM generate infinite procedural terrain. Off-thread Web Workers emit air-adjacent faces for high FPS. World Seed: ' + SEED + '.';
+  }
+
+  // 2. Controls & Movement
+  if (has('move', 'walk', 'control', 'steer', 'wasd', 'arrow', 'key', 'joystick', 'how to move')) {
+    return '🚶 Walk Controls: Use WASD or Arrow Keys to steer your human anywhere on the map! On mobile, drag the touch joystick. Drag screen to orbit, scroll to zoom.';
+  }
+
+  // 3. World, Biomes & Environment
+  if (has('biome', 'desert', 'jungle', 'forest', 'snow', 'mountain', 'cave', 'planet', 'map', 'world')) {
+    return '🌍 Biomes & Caves: Seed ' + SEED + ' features deserts, jungles, lush forests, snowy peaks, winding cave systems, and a living sea. Zoom far out to see the whole planet!';
+  }
+  if (has('season', 'weather', 'winter', 'summer', 'spring', 'autumn', 'fall', 'temp', 'degree')) {
+    const next = SEASONS[b.next];
+    const w = b.w > 0.001 ? ' (transitioning to ' + next.name + ')' : '';
+    return '🍂 Season System: Currently ' + season.name + ' ' + season.icon + ' (' + Math.round(tempNow) + '°C)' + w + '. 365-day solar year with dynamic tree foliage color shifts and seasonal weather.';
+  }
+
+  // 4. Ecosystem: Plants & Fish
+  if (has('tree', 'plant', 'species', 'flora', 'oak', 'cactus', 'palm', 'bamboo', 'agave', 'fern')) {
+    return '🌿 Flora: ' + KIND_ORDER.length + ' procedural plant & rock species (Oak, Acacia, Cactus, Bamboo, Agave, Palm, etc.) painted by code, updating dynamically across all 4 seasons.';
+  }
+  if (has('fish', 'sea', 'ocean', 'marine', 'sardine', 'tuna', 'clownfish', 'coral', 'seaweed')) {
+    return '🐠 Marine Life: 6 fish species (' + FISH_KINDS.map((f) => f.label).join(', ') + ') navigate shoals under the waves, alongside procedural coral, seaweed, and shells.';
+  }
+
+  // 5. Tribe & Character Simulation
+  if (has('human', 'caveman', 'tribe', 'sleep', 'battery', 'energy', 'zzz', 'rest', 'night')) {
+    return '😴 Tribe AI: Villagers have unique skin, hair, and clothing genetics. They carry a daily energy battery, gathering by the fire when awake and sleeping off tiredness at dusk.';
+  }
+  if (has('know', 'book', 'fire', 'water', 'unlock', 'discover', 'farming', 'wheel', 'writing')) {
+    return '📖 Knowledge Book: Interacting with campfires or wading into water unlocks Fire & Water knowledge, paving the way for Farming, Toolmaking, Writing, and The Wheel!';
+  }
+
+  // 6. Multiplayer & Demo Mode
+  if (has('multiplayer', 'online', 'chat', 'mqtt', 'player', 'people', 'grunk', 'demo')) {
+    return '🔥 Demo Mode: Real-time multiplayer over WebSocket MQTT! There are currently ' + (demoState.presence.size + 1) + ' tribe members active in camp.';
+  }
+
+  // 7. Identity & Greetings
+  if (has('hi', 'hello', 'hey', 'yo ', 'howdy', 'greetings')) {
+    return '👋 Hello ' + demoState.name + '! I am Grunk, AI guide for FREECANDY-DEV/pixel-world. Ask me about our code, procedural terrain, biomes, species, or controls!';
+  }
+  if (has('who are you', 'who r u', 'your name', 'what are you')) {
+    return '🗿 I am Grunk the Elder, the AI assistant for FREECANDY-DEV/pixel-world. I know everything about this repository and procedural world!';
+  }
+  if (has('help', 'what can you', 'question')) {
+    return '💡 Ask me about: 📦 Repo & Tech Stack, 🎨 Shaders & Three.js, ⛰️ Voxel Noise Engine, 🚶 WASD Controls, 🌍 Biomes & Caves, 🍂 Seasons, 🌿 Plants, 🐠 Fish, or 📖 Knowledge!';
+  }
+  if (has('name', 'who am i')) {
+    return '👤 You are ' + demoState.name + '! Tap the pencil ✏️ next to your name to change it — your name will sync live to the tribe.';
+  }
+  if (has('thank', 'ty', 'thanks', 'cool', 'awesome', 'great')) {
+    return '👍 The tribe appreciates you, ' + demoState.name + '! Keep exploring the world.';
+  }
+  if (has('bye', 'goodbye', 'see you')) {
+    return '👋 Safe travels, ' + demoState.name + '! May your fire burn bright.';
+  }
+
+  // 8. On-Topic Fallback
+  return '🗿 I am Grunk, keeper of FREECANDY-DEV/pixel-world! I answer questions about this repo, procedural voxel terrain, Three.js shaders, biomes, flora, fauna, and WASD controls. Try asking "how does the code work?" or "how do I walk?"!';
 }
 
 function demoMaybeReply(m) {
