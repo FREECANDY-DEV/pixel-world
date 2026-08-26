@@ -8509,8 +8509,8 @@ function initDemoMode() {
   if (!document.getElementById('demo-build-badge')) {
     const badge = document.createElement('div');
     badge.id = 'demo-build-badge';
-    badge.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:999;font-size:11px;font-weight:700;letter-spacing:0.1em;color:#ffd23f;background:rgba(6,10,16,0.85);padding:4px 12px;border-radius:12px;border:1px solid rgba(255,210,63,0.35);pointer-events:none;text-transform:uppercase;font-family:-apple-system,BlinkMacSystemFont,sans-serif;';
-    badge.textContent = 'Build v48.0.0';
+    badge.style.cssText = 'position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:999;font-size:9px;font-weight:500;color:rgba(255,210,63,0.55);background:none;border:none;pointer-events:none;font-family:-apple-system,BlinkMacSystemFont,sans-serif;';
+    badge.textContent = 'v53';
     document.body.appendChild(badge);
   }
   // Hide ALL creator tools — demo players only use joystick + chat + camera orbit
@@ -9150,6 +9150,7 @@ function updateDemo(dt, t) {
   if (!DEMO_MODE) return;
   const s = demoState;
   const now = performance.now();
+  const hide = iconMode || spaceMode;
   // Lock selection & camera target to player's own character
   if (s.me && s.me.spr) {
     selectedCm = s.me;
