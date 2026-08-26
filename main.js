@@ -5453,6 +5453,29 @@ function seasonTintName(k) {
   return 'autumn colours';
 }
 
+function paintThumbFromAtlas(tg, col, kind) {
+  tg.imageSmoothingEnabled = false;
+  const b = TREE_CELL_BOUNDS[col] || [0, ATLAS_CELL - 1, 0, ATLAS_CELL - 1];
+  const w = b[1] - b[0] + 1;
+  const h = b[3] - b[2] + 1;
+  if (w <= 0 || h <= 0) {
+    tg.drawImage(treeAtlasCanvas, col * ATLAS_CELL, ATLAS_CELL, ATLAS_CELL, ATLAS_CELL, 0, 0, ATLAS_CELL, ATLAS_CELL);
+    return;
+  }
+  const maxDim = Math.max(w, h);
+  const scale = Math.min(2.5, (ATLAS_CELL - 8) / maxDim);
+  const dw = Math.round(w * scale);
+  const dh = Math.round(h * scale);
+  const dx = Math.round((ATLAS_CELL - dw) / 2);
+  const dy = Math.round((ATLAS_CELL - dh) / 2);
+
+  tg.drawImage(
+    treeAtlasCanvas,
+    col * ATLAS_CELL + b[0], ATLAS_CELL + b[2], w, h,
+    dx, dy, dw, dh
+  );
+}
+
 function renderAssetPanel() {
   const root = document.getElementById('nature-root');
   if (!root) return;
@@ -5513,10 +5536,8 @@ function renderAssetPanel() {
       const thumb = document.createElement('canvas');
       thumb.className = 'tree-thumb';
       thumb.width = thumb.height = ATLAS_CELL;
-      thumb.getContext('2d').putImageData(
-        treeAtlasCanvas.getContext('2d').getImageData(col * ATLAS_CELL, ATLAS_CELL, ATLAS_CELL, ATLAS_CELL),
-        0, 0
-      );
+      const tg = thumb.getContext('2d');
+      paintThumbFromAtlas(tg, col, kind);
 
       const name = document.createElement('span');
       name.className = 'asset-name';
