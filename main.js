@@ -2635,6 +2635,49 @@ function placeCampfire(x, z) {
   campfires.push(f);
 }
 
+function spawnAppleTree(x, z) {
+  const c = document.createElement('canvas');
+  c.width = 48; c.height = 56;
+  const g = c.getContext('2d');
+  g.imageSmoothingEnabled = false;
+
+  // Trunk
+  g.fillStyle = '#6b4a2a';
+  g.fillRect(20, 30, 8, 26);
+  g.fillStyle = '#4a321a';
+  g.fillRect(24, 30, 4, 26);
+
+  // Canopy
+  g.fillStyle = '#225226';
+  g.beginPath(); g.arc(24, 20, 18, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#367c3a';
+  g.beginPath(); g.arc(22, 17, 15, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#4ea553';
+  g.beginPath(); g.arc(20, 13, 11, 0, Math.PI * 2); g.fill();
+
+  // Ripe Red Apples with White Shines
+  const apples = [[14, 17], [28, 14], [18, 25], [32, 21], [24, 10], [10, 21], [30, 27], [20, 14]];
+  for (const [ax, ay] of apples) {
+    g.fillStyle = '#e52b2b';
+    g.fillRect(ax, ay, 4, 4);
+    g.fillStyle = '#ffaaaa';
+    g.fillRect(ax, ay, 1, 1);
+  }
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.NearestFilter;
+  tex.colorSpace = THREE.SRGBColorSpace;
+
+  const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+  spr.center.set(0.5, 0);
+  spr.scale.set(4.5, 5.25, 1);
+  spr.position.set(x, charGroundY(x, z) + 0.05, z);
+  spr.renderOrder = 2;
+  scene.add(spr);
+  return spr;
+}
+
 function clearCampfires() {
   for (const f of campfires) scene.remove(f);
   campfires.length = 0;
@@ -8552,6 +8595,43 @@ function initDemoMode() {
 
   // --- Grunk, the elder by the fire (everyone sees the same Grunk) ---
   demoState.botGhost = demoMakeGhost('grunk', 'Grunk the Elder', '#ffd23f');
+
+  // --- Eden Haven (Heaven Sanctuary): Adam, Eve, Cain, Abel, Campfire & Apple Tree ---
+  (function initEdenHaven() {
+    const edenX = homePos.x + 28, edenZ = homePos.z - 22;
+    const edenY = charGroundY(edenX, edenZ);
+
+    // 1. Eden Campfire
+    placeCampfire(edenX, edenZ);
+
+    // 2. Heavenly Golden Glow Light
+    const edenGlow = makeGlowSprite();
+    edenGlow.position.set(edenX, edenY + 1.8, edenZ);
+    edenGlow.scale.set(6.5, 4.5, 1);
+    edenGlow.material.opacity = 0.65;
+    const edenLight = new THREE.PointLight(0xfffaed, 3.5, 40);
+    edenLight.position.set(edenX, edenY + 2.5, edenZ);
+    scene.add(edenLight);
+
+    // 3. Apple Tree (Custom Painted Oak with Ripe Red Apples)
+    spawnAppleTree(edenX + 3.2, edenZ - 2.2);
+
+    // 4. Adam & Eve & two children (Cain & Abel)
+    const edenFamily = [
+      { name: 'Adam', female: false, age: 32, look: { skin: '#e0aa7a', hair: '#3b2b1e', cloth: '#8a5a33', eyes: '#1a1a1a', style: 0, beard: 1 }, x: edenX - 2.2, z: edenZ + 1.5 },
+      { name: 'Eve', female: true, age: 28, look: { skin: '#f2c99b', hair: '#b8863b', dress: '#5e7a46', eyes: '#2e4a2e', style: 1, beard: -1 }, x: edenX + 2.0, z: edenZ + 1.8 },
+      { name: 'Cain', female: false, age: 10, look: { skin: '#e0aa7a', hair: '#3b2b1e', cloth: '#7a5230', eyes: '#1a1a1a', style: 0, beard: -1 }, x: edenX - 1.5, z: edenZ - 2.2 },
+      { name: 'Abel', female: false, age: 7, look: { skin: '#f2c99b', hair: '#b8863b', cloth: '#96613a', eyes: '#2e3a5e', style: 0, beard: -1 }, x: edenX + 1.8, z: edenZ - 2.0 },
+    ];
+
+    for (const f of edenFamily) {
+      spawnCaveman(f.x, f.z, f.female, f.age, f.look);
+      const person = cavemen[cavemen.length - 1];
+      person.stats.name = f.name;
+      person.homebound = true;
+      drawNameTag(person);
+    }
+  })();
 
   // --- UI wiring ---
   demoEl('demo-ui').classList.remove('hidden');
