@@ -1905,6 +1905,24 @@ function updateHomeFlames(t) {
       homeFire.position.y + HOME_FIRE_H * 0.45 +
       Math.abs(Math.sin(t * 9 + p)) * 0.15;
   }
+
+  for (const c of campfires) {
+    if (c.lit && c.flames) {
+      for (const f of c.flames) {
+        const p = f.userData.phase || 0;
+        f.scale.y = FLAME_H * (1 + Math.sin(t * 13 + p) * 0.18);
+        f.scale.x = FLAME_W * (1 + Math.sin(t * 11 + p * 1.7) * 0.1);
+        f.material.opacity = 0.85 + Math.sin(t * 17 + p) * 0.15;
+        f.position.y = c.position.y + CAMPFIRE_H * 0.45 + Math.abs(Math.sin(t * 9 + p)) * 0.12;
+      }
+      if (c.light) {
+        c.light.intensity = 1.8 + Math.sin(t * 14) * 0.3 + Math.cos(t * 22) * 0.2;
+      }
+      if (c.glow) {
+        c.glow.material.opacity = 0.4 + Math.sin(t * 10) * 0.1;
+      }
+    }
+  }
 }
 
 // ============================================================================
@@ -2674,11 +2692,36 @@ scene.add(ghostFire);
 const campfires = [];
 
 function placeCampfire(x, z, lit = true) {
-  const f = makeCampfireSprite(lit);
+  const f = makeCampfireSprite(false);
   f.position.set(x, groundYAt(x, z), z);
   f.lit = lit;
   scene.add(f);
   campfires.push(f);
+
+  if (lit) {
+    f.flames = [];
+    for (let i = 0; i < 2; i++) {
+      const fl = makeFlameSprite();
+      fl.userData.phase = i * 2.1;
+      fl.position.set(
+        x + (i === 0 ? -0.18 : 0.18),
+        f.position.y + CAMPFIRE_H * 0.45,
+        z
+      );
+      scene.add(fl);
+      f.flames.push(fl);
+    }
+    const light = new THREE.PointLight(0xff9a3c, 1.8, 18, 1.6);
+    light.position.set(x, f.position.y + 0.8, z);
+    scene.add(light);
+    f.light = light;
+
+    const glow = makeGlowSprite();
+    glow.position.set(x, f.position.y + 0.6, z);
+    glow.scale.set(4.5, 4.5, 1);
+    glow.material.opacity = 0.5;
+    f.glow = glow;
+  }
   return f;
 }
 
@@ -9099,13 +9142,13 @@ function makeHologramMat() {
       varying vec3 vWorldPos;
       void main() {
         vUv = uv;
-        vec3 basePos = modelMatrix[3].xyz;
-        vec4 mvPosition = viewMatrix * vec4(basePos, 1.0);
-        // Sprite view-space billboarding equation: anchors feet cleanly at basePos (ground level)
+        // Sprite view-space billboarding: modelViewMatrix * (0,0,0,1) transforms sprite position to view space
+        vec4 mvPosition = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
         vec2 scale = vec2(length(modelMatrix[0].xyz), length(modelMatrix[1].xyz));
+        // (position.y + 0.5) anchors feet (position.y = -0.5) at ground level (0.0 offset)
         vec2 alignedPosition = vec2(position.x, position.y + 0.5) * scale;
         mvPosition.xy += alignedPosition;
-        vWorldPos = basePos;
+        vWorldPos = (modelMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
         gl_Position = projectionMatrix * mvPosition;
       }
     `,
