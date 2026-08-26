@@ -3275,6 +3275,9 @@ treeAtlasTex.minFilter = THREE.NearestFilter;
 const treeMat = new THREE.ShaderMaterial({
   transparent: true,
   depthWrite: false,
+  polygonOffset: true,
+  polygonOffsetFactor: -4,
+  polygonOffsetUnits: -8,
   uniforms: {
     uTex: { value: treeAtlasTex },
     uFogColor: { value: new THREE.Color(0x8fb7d9) },
@@ -3345,20 +3348,23 @@ const treeMat = new THREE.ShaderMaterial({
       float flutter = sin(uTime * (1.5 + vnoise(wp + 7.3)) + iPhase);
       // bend in WORLD space so orbiting the camera never spins the tree
       vec3 bendWorld = vec3(wdir.x, 0.0, wdir.y) * (flutter * lmag * position.y * iH * 0.14);
-      // steep-camera response: viewed from above, a sprite must never become
-      // an edge-on sliver that sinks under its block. Below ~35° elevation it
       vec3 toCam = cameraPosition - iPos;
+      float distC = max(length(toCam), 0.001);
+      float vertK = clamp(toCam.y / distC, 0.0, 1.0);
       float lenXZ = length(toCam.xz);
       vec2 dirXZ = lenXZ > 0.001 ? toCam.xz / lenXZ : vec2(0.0, 1.0);
       vec3 basePos = iPos + bendWorld;
-      // elevate sprite base so it sits cleanly on top of the block surface
-      basePos.y += 0.08 + aLift * 0.12;
+      // raise base clean above voxel face, scaling with camera pitch & zoom
+      basePos.y += 0.15 + vertK * 0.40 + aLift * (0.20 + vertK * 0.30);
       vec3 rightA = vec3(dirXZ.y, 0.0, -dirXZ.x);
-      vec3 wpq = basePos + rightA * (position.x * iH) + vec3(0.0, position.y * iH, 0.0);
+      // spherical billboarding tilt factor for steep/zoomed camera angles
+      float tiltK = vertK * vertK * 0.75;
+      vec3 upA = vec3(-dirXZ.x * tiltK, 1.0 - tiltK * 0.35, -dirXZ.y * tiltK);
+      vec3 wpq = basePos + rightA * (position.x * iH) + upA * (position.y * iH);
       vec4 mv = viewMatrix * vec4(wpq, 1.0);
       float safeD = max(-mv.z, 0.001);
-      // view-space depth clearance: pull sprites forward toward the camera so voxel blocks never cut or swallow them
-      float pull = min(safeD * 0.06, 6.0) + (0.45 + aLift * 0.65);
+      // pull view Z strongly toward camera so terrain blocks behind/under can never clip or swallow the billboard
+      float pull = min(safeD * 0.08, 8.0) + 0.8 + vertK * 1.2 + aLift * (0.8 + vertK * 0.8);
       mv.z -= pull;
       mv.z = min(mv.z, -0.35);
       vDist = max(-mv.z, 1.0);
