@@ -3628,19 +3628,200 @@ function paintCyborg(c, ox) {
   tpx(c, ox + 25, 38, 5, 8, '#1a237e');
 }
 
+function paintNinja(c, ox) {
+  tpx(c, ox + 18, 14, 12, 10, '#111827');
+  tpx(c, ox + 18, 18, 12, 2, '#dc2626');
+  tpx(c, ox + 20, 16, 4, 2, '#fde047');
+  tpx(c, ox + 16, 24, 16, 14, '#1f2937');
+  tpx(c, ox + 10, 22, 4, 16, '#9ca3af');
+  tpx(c, ox + 18, 38, 5, 8, '#111827');
+  tpx(c, ox + 25, 38, 5, 8, '#111827');
+}
+
+function paintWizard(c, ox) {
+  tpx(c, ox + 16, 8, 16, 4, '#581c87');
+  tpx(c, ox + 20, 2, 8, 8, '#6b21a8');
+  tpx(c, ox + 18, 12, 12, 10, '#fde047');
+  tpx(c, ox + 14, 22, 20, 18, '#7e22ce');
+  tpx(c, ox + 32, 10, 3, 30, '#78350f');
+  tpx(c, ox + 31, 6, 5, 5, '#38bdf8');
+}
+
+function paintAstronaut(c, ox) {
+  tpx(c, ox + 16, 12, 16, 12, '#f8fafc');
+  tpx(c, ox + 18, 14, 12, 6, '#f59e0b');
+  tpx(c, ox + 14, 24, 20, 14, '#e2e8f0');
+  tpx(c, ox + 10, 22, 4, 12, '#cbd5e1');
+  tpx(c, ox + 18, 38, 5, 8, '#94a3b8');
+  tpx(c, ox + 25, 38, 5, 8, '#94a3b8');
+}
+
+function paintPirate(c, ox) {
+  tpx(c, ox + 14, 10, 20, 4, '#0f172a');
+  tpx(c, ox + 18, 6, 12, 6, '#1e293b');
+  tpx(c, ox + 20, 16, 4, 3, '#000000');
+  tpx(c, ox + 14, 22, 20, 16, '#991b1b');
+  tpx(c, ox + 10, 26, 4, 12, '#cbd5e1');
+  tpx(c, ox + 18, 38, 5, 8, '#0f172a');
+  tpx(c, ox + 25, 38, 5, 8, '#0f172a');
+}
+
+function paintDragon(c, ox) {
+  tpx(c, ox + 14, 20, 20, 16, '#b91c1c');
+  tpx(c, ox + 26, 12, 12, 10, '#dc2626');
+  tpx(c, ox + 34, 14, 2, 2, '#facc15');
+  tpx(c, ox + 36, 18, 4, 3, '#f97316');
+  tpx(c, ox + 6, 14, 12, 12, '#7f1d1d');
+  tpx(c, ox + 16, 36, 6, 10, '#991b1b');
+  tpx(c, ox + 26, 36, 6, 10, '#991b1b');
+  tpx(c, ox + 4, 30, 10, 4, '#dc2626');
+}
+
+function paintScorpion(c, ox) {
+  tpx(c, ox + 14, 26, 18, 10, '#78350f');
+  tpx(c, ox + 8, 22, 8, 6, '#92400e');
+  tpx(c, ox + 30, 22, 8, 6, '#92400e');
+  for (let i = 0; i < 5; i++) {
+    tpx(c, ox + 20 + i * 3, 20 - i * 2, 4, 4, '#b45309');
+  }
+  tpx(c, ox + 32, 10, 4, 4, '#dc2626');
+  for (let i = 0; i < 3; i++) {
+    tpx(c, ox + 12 + i * 4, 36, 2, 6, '#78350f');
+    tpx(c, ox + 24 + i * 4, 36, 2, 6, '#78350f');
+  }
+}
+
+function paintFox(c, ox) {
+  tpx(c, ox + 14, 26, 18, 10, '#ea580c');
+  tpx(c, ox + 10, 20, 10, 8, '#f97316');
+  tpx(c, ox + 8, 16, 3, 6, '#c2410c');
+  tpx(c, ox + 14, 16, 3, 6, '#c2410c');
+  tpx(c, ox + 12, 26, 6, 4, '#ffffff');
+  tpx(c, ox + 30, 24, 10, 6, '#ea580c');
+  tpx(c, ox + 38, 24, 4, 6, '#ffffff');
+  tpx(c, ox + 16, 36, 3, 8, '#9a3412');
+  tpx(c, ox + 26, 36, 3, 8, '#9a3412');
+}
+
+function paintOwl(c, ox) {
+  tpx(c, ox + 16, 18, 16, 20, '#78350f');
+  tpx(c, ox + 18, 22, 12, 14, '#fef3c7');
+  tpx(c, ox + 18, 20, 4, 4, '#f59e0b');
+  tpx(c, ox + 26, 20, 4, 4, '#f59e0b');
+  tpx(c, ox + 23, 22, 2, 3, '#d97706');
+}
+
+function paintCastle(c, ox) {
+  tpx(c, ox + 8, 22, 32, 22, '#64748b');
+  tpx(c, ox + 8, 16, 6, 6, '#475569');
+  tpx(c, ox + 18, 16, 6, 6, '#475569');
+  tpx(c, ox + 24, 16, 6, 6, '#475569');
+  tpx(c, ox + 34, 16, 6, 6, '#475569');
+  tpx(c, ox + 20, 32, 8, 12, '#334155');
+  tpx(c, ox + 23, 10, 2, 8, '#dc2626');
+  tpx(c, ox + 25, 10, 6, 4, '#dc2626');
+}
+
+function paintWindmill(c, ox) {
+  tpx(c, ox + 16, 20, 16, 24, '#94a3b8');
+  tpx(c, ox + 14, 16, 20, 4, '#475569');
+  tpx(c, ox + 22, 22, 4, 4, '#0f172a');
+  tpx(c, ox + 6, 23, 36, 2, '#d97706');
+  tpx(c, ox + 23, 6, 2, 36, '#d97706');
+}
+
+function paintSpaceship(c, ox) {
+  tpx(c, ox + 10, 22, 28, 10, '#38bdf8');
+  tpx(c, ox + 18, 16, 12, 8, '#0284c7');
+  tpx(c, ox + 22, 14, 4, 4, '#38bdf8');
+  tpx(c, ox + 6, 24, 6, 6, '#f97316');
+  tpx(c, ox + 36, 24, 6, 6, '#f97316');
+}
+
+function paintLaserCannon(c, ox) {
+  tpx(c, ox + 10, 24, 24, 6, '#334155');
+  tpx(c, ox + 32, 23, 6, 8, '#38bdf8');
+  tpx(c, ox + 16, 30, 4, 14, '#1e293b');
+  tpx(c, ox + 24, 30, 4, 14, '#1e293b');
+  tpx(c, ox + 20, 22, 4, 4, '#38bdf8');
+}
+
+function paintFlamethrower(c, ox) {
+  tpx(c, ox + 10, 20, 8, 20, '#ea580c');
+  tpx(c, ox + 18, 26, 18, 4, '#334155');
+  tpx(c, ox + 34, 24, 6, 8, '#f97316');
+  tpx(c, ox + 38, 22, 8, 12, '#ef4444');
+}
+
+function paintBattleaxe(c, ox) {
+  tpx(c, ox + 22, 6, 4, 38, '#78350f');
+  tpx(c, ox + 10, 12, 12, 12, '#94a3b8');
+  tpx(c, ox + 26, 12, 12, 12, '#94a3b8');
+  tpx(c, ox + 22, 4, 4, 4, '#eab308');
+}
+
+function paintTank(c, ox) {
+  tpx(c, ox + 8, 30, 32, 10, '#15803d');
+  tpx(c, ox + 6, 36, 36, 6, '#1e293b');
+  tpx(c, ox + 16, 22, 16, 10, '#166534');
+  tpx(c, ox + 28, 24, 14, 4, '#14532d');
+}
+
+function paintSubmarine(c, ox) {
+  tpx(c, ox + 8, 22, 32, 14, '#eab308');
+  tpx(c, ox + 20, 14, 6, 10, '#ca8a04');
+  tpx(c, ox + 24, 12, 6, 3, '#ca8a04');
+  tpx(c, ox + 4, 26, 4, 6, '#a16207');
+}
+
+function paintStingray(c, ox) {
+  tpx(c, ox + 8, 24, 32, 12, '#475569');
+  tpx(c, ox + 16, 20, 16, 18, '#64748b');
+  tpx(c, ox + 22, 36, 4, 10, '#334155');
+  for (const [sx, sy] of [[14, 24], [22, 22], [30, 24], [18, 28], [26, 28]]) {
+    tpx(c, ox + sx, sy, 2, 2, '#38bdf8');
+  }
+}
+
+function paintSquid(c, ox) {
+  tpx(c, ox + 16, 12, 16, 18, '#c026d3');
+  tpx(c, ox + 14, 16, 4, 4, '#ffffff');
+  tpx(c, ox + 30, 16, 4, 4, '#ffffff');
+  for (let i = 0; i < 5; i++) {
+    tpx(c, ox + 14 + i * 4, 30, 3, 14, '#a21caf');
+  }
+}
+
+function paintDiamondOre(c, ox) {
+  tpx(c, ox + 12, 28, 24, 16, '#616161');
+  tpx(c, ox + 16, 30, 6, 6, '#06b6d4');
+  tpx(c, ox + 26, 34, 6, 6, '#06b6d4');
+  tpx(c, ox + 22, 38, 4, 4, '#67e8f9');
+}
+
+function paintTreasureChest(c, ox) {
+  tpx(c, ox + 10, 24, 28, 18, '#78350f');
+  tpx(c, ox + 8, 22, 32, 6, '#b45309');
+  tpx(c, ox + 10, 24, 28, 2, '#475569');
+  tpx(c, ox + 10, 38, 28, 2, '#475569');
+  tpx(c, ox + 22, 28, 4, 6, '#eab308');
+}
+
 const SURVIVAL_PAINTERS = {
   mammoth: paintMammoth, sabertooth: paintSabertooth, boar: paintBoar, rabbit: paintRabbit, eagle: paintEagle, bee: paintBee,
   dino_t_rex: paintTRex, wolf: paintWolf, bear: paintBear, snake: paintSnake,
+  dragon: paintDragon, scorpion: paintScorpion, fox: paintFox, owl: paintOwl,
   thatchhut: paintThatchHut, logcabin: paintLogCabin, stonecottage: paintStoneCottage, concretebunker: paintConcreteBunker, cyberhab: paintCyberHab,
-  watchtower: paintWatchtower, pyramid: paintPyramid,
+  watchtower: paintWatchtower, pyramid: paintPyramid, castle: paintCastle, windmill: paintWindmill,
   flintspear: paintFlintSpear, ironsword: paintIronSword, tacticalrifle: paintTacticalRifle, plasmasaber: paintPlasmaSaber,
-  crossbow: paintCrossbow, grenade: paintGrenade,
+  crossbow: paintCrossbow, grenade: paintGrenade, laser_cannon: paintLaserCannon, flamethrower: paintFlamethrower, battleaxe: paintBattleaxe,
   chariot: paintChariot, survivaljeep: paintSurvivalJeep, hovercraft: paintHoverCraft,
-  mech: paintCombatMech, boat: paintCanoe,
+  mech: paintCombatMech, boat: paintCanoe, spaceship: paintSpaceship, tank: paintTank, submarine: paintSubmarine,
   greatwhite: paintGreatWhite, octopus: paintOctopus, seaturtle: paintSeaTurtle,
-  jellyfish: paintJellyfish, crab: paintCrab,
+  jellyfish: paintJellyfish, crab: paintCrab, stingray: paintStingray, squid: paintSquid,
   woodpile: paintWoodPile, poppy: paintPoppyFlower, sunflower: paintSunflower, beehive: paintBeehive, ironore: paintIronOre,
-  goldore: paintGoldOre, mushroom: paintMushroom, knight: paintKnight, cyborg: paintCyborg
+  goldore: paintGoldOre, diamondore: paintDiamondOre, mushroom: paintMushroom, knight: paintKnight, cyborg: paintCyborg,
+  ninja: paintNinja, wizard: paintWizard, astronaut: paintAstronaut, pirate: paintPirate, chest: paintTreasureChest
 };
 
 // --- programmatic seasonal variants --------------------------------------
