@@ -948,65 +948,52 @@
             const wind = Math.sin(t * 2.5 + idx) * 0.04;
             
             ctx.save();
-            ctx.translate(24, 42);
-            ctx.rotate(wind);
-            ctx.translate(-24, -42);
+            if (name === 'Tumble Bush') {
+              // Tumble Bush rolls along the ground
+              ctx.translate(24, 38);
+              ctx.rotate(t * 2.5);
+              ctx.translate(-24, -38);
+            } else {
+              // Gentle natural wind swaying
+              ctx.translate(24, 42);
+              ctx.rotate(wind);
+              ctx.translate(-24, -42);
+            }
             
-            // Render base tree/plant
+            // Render exact base plant/tree pixel art
             VEG_PAINTERS[name](ctx);
             
-            if (variant === 2) {
-              // Autumn 🍂: Color overlay using source-atop so it only colors the drawn tree pixels!
-              ctx.globalCompositeOperation = 'source-atop';
-              ctx.fillStyle = 'rgba(217, 119, 6, 0.45)'; // Amber autumn tint
-              ctx.fillRect(0, 0, 48, 48);
-              ctx.globalCompositeOperation = 'source-over';
-              
-              // Falling autumn leaves
-              ctx.fillStyle = '#ea580c';
-              for (let i = 0; i < 3; i++) {
-                const lx = (12 + (i * 11 + Math.floor(t * 15)) % 24);
-                const ly = (14 + (i * 9 + Math.floor(t * 20)) % 26);
-                ctx.fillRect(lx, ly, 2, 2);
+            // Apply species-specific seasonal accents ON top of the plant structure!
+            if (variant === 0) { // 🌸 Spring
+              if (name === 'Cactus') {
+                tpx(ctx, 22, 10, 4, 4, '#e040fb'); // Blooming magenta flower on top of cactus stem
+              } else if (name === 'Apple Tree') {
+                tpx(ctx, 16, 14, 3, 3, '#ff80ab'); // Pink blossom flower buds on canopy
+                tpx(ctx, 26, 18, 3, 3, '#ff80ab');
+              } else if (name === 'Berry Bush') {
+                tpx(ctx, 18, 30, 3, 3, '#ff4081'); // Ripe pink spring berries
+                tpx(ctx, 26, 32, 3, 3, '#ff4081');
+              } else if (name === 'Blossom Bush') {
+                tpx(ctx, 20, 28, 3, 3, '#f48fb1'); // Spring blossom bloom
               }
-            } else if (variant === 0) {
-              // Spring 🌸: Cherry blossoms on canopy & falling petals
-              ctx.fillStyle = '#f472b6';
-              const blossomSpots = [[18, 16], [26, 14], [22, 22], [30, 20], [16, 24], [28, 26]];
-              blossomSpots.forEach(([bx, by]) => {
-                ctx.fillRect(bx, by, 2, 2);
-              });
-              ctx.fillStyle = '#fb7185';
-              for (let i = 0; i < 3; i++) {
-                const px = (14 + (i * 13 + Math.floor(t * 12)) % 20);
-                const py = (16 + (i * 7 + Math.floor(t * 18)) % 24);
-                ctx.fillRect(px, py, 2, 2);
+            } else if (variant === 2) { // 🍂 Autumn
+              const isTree = name.includes('Tree') || name === 'Oak' || name === 'Pine' || name === 'Birch' || name === 'Maple' || name === 'Acacia';
+              if (isTree) {
+                // Single falling autumn leaf
+                const lx = 20 + Math.round(Math.sin(t * 3) * 6);
+                const ly = 24 + Math.round((t * 12) % 18);
+                tpx(ctx, lx, ly, 2, 2, '#ea580c');
               }
-            } else if (variant === 3) {
-              // Winter ❄️: Snow caps on canopy & falling snowflakes
-              ctx.globalCompositeOperation = 'source-atop';
-              ctx.fillStyle = 'rgba(226, 232, 240, 0.35)'; // Frost tint
-              ctx.fillRect(0, 0, 48, 48);
-              ctx.globalCompositeOperation = 'source-over';
-              
-              // Snow cap highlights
-              ctx.fillStyle = '#f8fafc';
-              ctx.fillRect(16, 12, 16, 3);
-              ctx.fillRect(14, 18, 20, 2);
-              
-              // Falling snowflakes
-              for (let i = 0; i < 4; i++) {
-                const sx = (10 + (i * 9 + Math.floor(t * 10)) % 28);
-                const sy = (8 + (i * 11 + Math.floor(t * 16)) % 32);
-                ctx.fillRect(sx, sy, 2, 2);
+            } else if (variant === 3) { // ❄️ Winter
+              const isEvergreen = name.includes('Pine') || name === 'Spruce';
+              if (isEvergreen) {
+                // Crisp white snow cap on top of pine tip
+                tpx(ctx, 23, 4, 3, 2, '#ffffff');
+                tpx(ctx, 20, 10, 9, 2, '#ffffff');
+              } else if (name.includes('Rock')) {
+                // Frost layer on rock crest
+                tpx(ctx, 18, 30, 8, 2, '#e0f7fa');
               }
-            } else if (variant === 1) {
-              // Summer ☀️: Sunbeam sheen sweep across canopy
-              const sweepX = (t * 20) % 60 - 10;
-              ctx.globalCompositeOperation = 'source-atop';
-              ctx.fillStyle = 'rgba(253, 224, 71, 0.25)';
-              ctx.fillRect(sweepX, 0, 10, 48);
-              ctx.globalCompositeOperation = 'source-over';
             }
             
             ctx.restore();
