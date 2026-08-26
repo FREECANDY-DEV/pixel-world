@@ -9933,12 +9933,13 @@ function animate() {
   rigFwd.normalize();
   rigRight.crossVectors(rigFwd, rigUp).normalize();
 
-  // with a villager selected, the joystick/WASD steers THEM instead of the
+  // with a villager selected or in demo mode, the joystick/WASD steers THEM instead of the
   // camera. Hysteresis (engage 0.07 / release 0.03) so analog jitter can't
   // flicker control on and off mid-walk
+  const activeChar = selectedCm || (DEMO_MODE ? demoState.me : null);
   const joyMag = Math.hypot(joy.x, joy.y);
   const joyOn = charJoy.active ? joyMag > 0.03 : joyMag > 0.07;
-  if (selectedCm && (joyOn || move.up || move.down || move.left || move.right)) {
+  if (activeChar && (joyOn || move.up || move.down || move.left || move.right)) {
     let jx = rigFwd.x * joy.y + rigRight.x * joy.x;
     let jz = rigFwd.z * joy.y + rigRight.z * joy.x;
     if (move.up) { jx += rigFwd.x; jz += rigFwd.z; }
@@ -9959,11 +9960,11 @@ function animate() {
   } else {
     if (charJoy.active) {
       charJoy.active = false;
-      if (selectedCm) {
+      if (activeChar) {
         // released the stick: they resume wandering randomly on their own
-        selectedCm.hold = false;
-        selectedCm.target = null;
-        selectedCm.wait = 0.2;
+        activeChar.hold = false;
+        activeChar.target = null;
+        activeChar.wait = 0.2;
       }
     }
   }
@@ -9973,32 +9974,30 @@ function animate() {
   charJoy.z = THREE.MathUtils.damp(charJoy.z, charJoy.active ? (charJoy.tz || 0) : 0, 9, dt);
 
   let mx = 0, mz = 0;
-  if (!charJoy.active) {
+  // CAMERA PAN VIA WASD / STICK: ONLY IF NO CHARACTER IS LOCKED OR SELECTED!
+  if (!activeChar && !charJoy.active) {
     if (move.up) { mx += rigFwd.x; mz += rigFwd.z; }
     if (move.down) { mx -= rigFwd.x; mz -= rigFwd.z; }
     if (move.left) { mx -= rigRight.x; mz -= rigRight.z; }
     if (move.right) { mx += rigRight.x; mz += rigRight.z; }
-    // camera stick: only pans camera when no character is selected
-    if (!selectedCm) {
-      mx += rigFwd.x * joy.y + rigRight.x * joy.x;
-      mz += rigFwd.z * joy.y + rigRight.z * joy.x;
+    mx += rigFwd.x * joy.y + rigRight.x * joy.x;
+    mz += rigFwd.z * joy.y + rigRight.z * joy.x;
+
+    const len = Math.hypot(mx, mz);
+    if (len > 0) {
+      const mag = Math.min(1, len);
+      mx = (mx / len) * speed * mag;
+      mz = (mz / len) * speed * mag;
     }
-  }
+    const dy = (move.lower ? -speed : 0) + (move.raise ? speed : 0);
 
-  const len = Math.hypot(mx, mz);
-  if (len > 0) {
-    const mag = Math.min(1, len);
-    mx = (mx / len) * speed * mag;
-    mz = (mz / len) * speed * mag;
+    controls.target.x += mx;
+    controls.target.z += mz;
+    controls.target.y += dy;
+    camera.position.x += mx;
+    camera.position.z += mz;
+    camera.position.y += dy;
   }
-  const dy = (move.lower ? -speed : 0) + (move.raise ? speed : 0);
-
-  controls.target.x += mx;
-  controls.target.z += mz;
-  controls.target.y += dy;
-  camera.position.x += mx;
-  camera.position.z += mz;
-  camera.position.y += dy;
 
   stepCamTween();
   controls.update();
