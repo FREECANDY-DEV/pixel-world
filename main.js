@@ -6911,11 +6911,12 @@ function drawCampLabel() {
   c.strokeStyle = 'rgba(10, 10, 14, 0.9)';
   c.strokeText(txt, 44, 38);
   c.fillText(txt, 44, 38);
-  // pixel person icon + live human count
+  // pixel person icon + live real-time online players count (excluding NPCs)
   c.fillStyle = '#ffe9a8';
   c.fillRect(146, 22, 10, 10);         // head
   c.fillRect(144, 34, 14, 16);         // body
-  const count = String(cavemen.length);
+  const onlinePlayers = DEMO_MODE ? (demoState.online || 1) : 1;
+  const count = String(onlinePlayers);
   c.strokeText(count, 164, 38);
   c.fillText(count, 164, 38);
   campLabelTex.needsUpdate = true;
@@ -10105,8 +10106,9 @@ function animate() {
     const dl = camera.position.distanceTo(campLabelSpr.position);
     const s = Math.max(2, dl * 0.05);
     campLabelSpr.scale.set(s * 3.55, s, 1);
-    if (cavemen.length !== campCountShown) {
-      campCountShown = cavemen.length;
+    const onlineCount = DEMO_MODE ? (demoState.online || 1) : 1;
+    if (onlineCount !== campCountShown) {
+      campCountShown = onlineCount;
       drawCampLabel();
     }
   }
