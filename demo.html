@@ -824,6 +824,8 @@
           grid.appendChild(h);
         }
 
+        const animCards = [];
+
         function createCard(name, renderFn, width = 48, height = 48) {
           const card = document.createElement('div');
           card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;';
@@ -832,76 +834,260 @@
           cv.style.cssText = 'image-rendering:pixelated;image-rendering:crisp-edges;width:48px;height:48px;';
           const ctx = cv.getContext('2d');
           ctx.imageSmoothingEnabled = false;
-          renderFn(ctx);
           card.appendChild(cv);
           const label = document.createElement('span');
           label.style.cssText = 'font-size:8px;font-weight:600;color:#dce4ee;text-align:center;line-height:1.15;opacity:0.88;';
           label.textContent = name;
           card.appendChild(label);
           grid.appendChild(card);
+
+          animCards.push({ cv, ctx, renderFn, width, height });
         }
 
         // 1. 👤 Tribe & Characters
-        addHeader('👤 Tribe & Characters');
+        addHeader('👤 Tribe & Characters (Animated)');
         GRID_CHARACTERS.forEach(ch => {
-          createCard(ch.name, (ctx) => {
+          createCard(ch.name, (ctx, t) => {
             const scale = 2;
+            const bob = Math.round(Math.sin(t * 5) * 1);
             const ox = Math.floor((48 - ch.art[0].length * scale) / 2);
-            const oy = Math.floor((48 - ch.art.length * scale) / 2);
+            const oy = Math.floor((48 - ch.art.length * scale) / 2) + bob;
             drawPixelArtGrid(ctx, ch.art, ch.pal, scale, ox, oy);
+            // Eye blink
+            if (Math.floor(t * 2) % 6 === 0) {
+              ctx.fillStyle = ch.pal.S || '#c78d5a';
+              ctx.fillRect(ox + 5 * scale, oy + 4 * scale, 6 * scale, scale);
+            }
           });
         });
-        ['Knight', 'Cyborg', 'Ninja', 'Wizard', 'Astronaut', 'Pirate'].forEach(name => {
-          createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
+        
+        createCard('Knight', (ctx, t) => {
+          const sway = Math.sin(t * 3) * 1;
+          ctx.save(); ctx.translate(sway, 0);
+          SURVIVAL_PAINTERS['knight'](ctx, 0);
+          // Sword gleam animation
+          const gleamY = 14 + (Math.floor(t * 20) % 20);
+          tpx(ctx, 12, gleamY, 4, 2, '#ffffff');
+          ctx.restore();
         });
 
-        // 2. 🌲 Vegetation & World Flora (25 species)
-        addHeader('🌲 Vegetation & Flora (25 World Species)');
-        Object.keys(VEG_PAINTERS).forEach(name => {
-          createCard(name, (ctx) => VEG_PAINTERS[name](ctx));
+        createCard('Cyborg', (ctx, t) => {
+          SURVIVAL_PAINTERS['cyborg'](ctx, 0);
+          // Red eye optic pulse & cyan arm glow
+          const glow = Math.sin(t * 8) > 0 ? '#ff1744' : '#ff5252';
+          tpx(ctx, 24, 18, 4, 2, glow);
+          if (Math.floor(t * 10) % 2 === 0) {
+            tpx(ctx, 6 + Math.floor(Math.random() * 6), 28, 2, 2, '#00e5ff');
+          }
         });
 
-        // 3. 🐟 Sea Life (6 fish species)
-        addHeader('🐟 Sea Life (6 Swimming Species)');
-        FISH_SPECIES.forEach(f => {
-          createCard(f.name, (ctx) => paintFish(ctx, 8, 8, f, false), 48, 48);
+        createCard('Ninja', (ctx, t) => {
+          const bob = Math.round(Math.sin(t * 6) * 1);
+          ctx.save(); ctx.translate(0, bob);
+          SURVIVAL_PAINTERS['ninja'](ctx, 0);
+          // Red headband streamer wave
+          const wave = Math.round(Math.sin(t * 10) * 2);
+          tpx(ctx, 30 + wave, 18, 4, 2, '#dc2626');
+          ctx.restore();
         });
 
-        // 4. 🦣 Wildlife & Beasts
-        addHeader('🦣 Wildlife & Beasts');
-        ['Mammoth', 'Sabertooth', 'Wild Boar', 'Rabbit', 'Eagle', 'Honeybee', 'T-Rex', 'Wolf', 'Bear', 'Snake', 'Dragon', 'Scorpion', 'Fox', 'Owl'].forEach(name => {
-          createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
+        createCard('Wizard', (ctx, t) => {
+          SURVIVAL_PAINTERS['wizard'](ctx, 0);
+          // Staff orb floating & pulsing spark
+          const pulseCol = ['#38bdf8', '#818cf8', '#c084fc'][Math.floor(t * 6) % 3];
+          tpx(ctx, 31, 5 + Math.round(Math.sin(t * 4) * 1), 5, 5, pulseCol);
         });
 
-        // 5. 🏚️ Housing & Base Building
-        addHeader('🏚️ Housing & Base Building (Era Tiers)');
-        ['Thatch Hut', 'Log Cabin', 'Stone Cottage', 'Bunker', 'Cyber Hab', 'Watchtower', 'Pyramid', 'Castle', 'Windmill'].forEach(name => {
-          createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
+        createCard('Astronaut', (ctx, t) => {
+          // Zero-g floating
+          const floatY = Math.sin(t * 2) * 3;
+          ctx.save(); ctx.translate(0, floatY);
+          SURVIVAL_PAINTERS['astronaut'](ctx, 0);
+          // Gold visor shine
+          tpx(ctx, 19 + Math.floor((t * 6) % 8), 15, 2, 4, '#ffffff');
+          ctx.restore();
         });
 
-        // 6. ⚔️ Weapons & Armaments
-        addHeader('⚔️ Weapons & Armaments (Evolutionary Tiers)');
-        ['Flint Spear', 'Iron Sword', 'Tactical Rifle', 'Plasma Saber', 'Crossbow', 'Grenade', 'Laser Cannon', 'Flamethrower', 'Battleaxe'].forEach(name => {
-          createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
+        createCard('Pirate', (ctx, t) => {
+          SURVIVAL_PAINTERS['pirate'](ctx, 0);
+          // Cutlass shine
+          if (Math.floor(t * 4) % 3 === 0) {
+            tpx(ctx, 10, 28, 2, 4, '#ffffff');
+          }
         });
 
-        // 7. 🚗 Vehicles & Transports
-        addHeader('🚗 Vehicles & Transports');
-        ['Chariot', 'Survival Jeep', 'Hovercraft', 'Combat Mech', 'Canoe', 'Spaceship', 'Tank', 'Submarine'].forEach(name => {
-          createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
+        // 2. 🌲 Vegetation & World Flora (25 species Animated)
+        addHeader('🌲 Vegetation & Flora (25 Species - Swaying & Seasons)');
+        Object.keys(VEG_PAINTERS).forEach((name, idx) => {
+          createCard(name, (ctx, t) => {
+            const wind = Math.sin(t * 3 + idx) * 1.5;
+            ctx.save();
+            ctx.translate(24, 44);
+            ctx.rotate((wind * Math.PI) / 180);
+            ctx.translate(-24, -44);
+            VEG_PAINTERS[name](ctx);
+            ctx.restore();
+          });
         });
 
-        // 8. 🦈 Apex Predators & Marine Life
-        addHeader('🦈 Marine Predators');
-        ['Great White', 'Octopus', 'Sea Turtle', 'Jellyfish', 'Crab', 'Stingray', 'Squid'].forEach(name => {
-          createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
+        // 3. 🐟 Sea Life (6 Swimming Species Animated)
+        addHeader('🐟 Sea Life (6 Swimming Species Animated)');
+        FISH_SPECIES.forEach((f, idx) => {
+          createCard(f.name, (ctx, t) => {
+            const frameB = Math.floor(t * 6 + idx) % 2 === 0;
+            const swimY = Math.sin(t * 4 + idx) * 2;
+            paintFish(ctx, 8, 8 + swimY, f, frameB);
+          });
         });
 
-        // 9. 🪵 Resources & Props
-        addHeader('🪵 Resources & World Props');
-        ['Wood Pile', 'Red Poppy', 'Sunflower', 'Beehive', 'Iron Ore', 'Gold Ore', 'Diamond Ore', 'Mushroom', 'Chest'].forEach(name => {
-          createCard(name, (ctx) => SURVIVAL_PAINTERS[name](ctx));
+        // 4. 🦣 Wildlife & Beasts Animated
+        addHeader('🦣 Wildlife & Beasts (Animated)');
+        ['Mammoth', 'Sabertooth', 'Wild Boar', 'Rabbit', 'Eagle', 'Honeybee', 'T-Rex', 'Wolf', 'Bear', 'Snake', 'Dragon', 'Scorpion', 'Fox', 'Owl'].forEach((name, idx) => {
+          createCard(name, (ctx, t) => {
+            const breath = Math.round(Math.sin(t * 4 + idx) * 1);
+            ctx.save();
+            if (name === 'Eagle' || name === 'Dragon') {
+              ctx.translate(0, Math.sin(t * 6) * 3);
+            } else if (name === 'Honeybee') {
+              ctx.translate(Math.sin(t * 12) * 2, Math.cos(t * 12) * 2);
+            } else {
+              ctx.translate(0, breath);
+            }
+            SURVIVAL_PAINTERS[name](ctx);
+            if (name === 'Dragon') {
+              // Fire breathing flame tip
+              if (Math.floor(t * 8) % 2 === 0) {
+                tpx(ctx, 40, 17, 6, 5, '#f97316');
+                tpx(ctx, 44, 18, 4, 3, '#facc15');
+              }
+            }
+            ctx.restore();
+          });
         });
+
+        // 5. 🏚️ Housing & Base Building (Animated)
+        addHeader('🏚️ Housing & Base Building (Animated)');
+        ['Thatch Hut', 'Log Cabin', 'Stone Cottage', 'Bunker', 'Cyber Hab', 'Watchtower', 'Pyramid', 'Castle', 'Windmill'].forEach((name, idx) => {
+          createCard(name, (ctx, t) => {
+            SURVIVAL_PAINTERS[name](ctx);
+            if (name === 'Windmill') {
+              // Rotating 4 sails
+              const ang = t * 3;
+              ctx.save(); ctx.translate(24, 24); ctx.rotate(ang);
+              ctx.fillStyle = '#d97706';
+              ctx.fillRect(-18, -1, 36, 2);
+              ctx.fillRect(-1, -18, 2, 36);
+              ctx.restore();
+            } else if (name === 'Thatch Hut' || name === 'Log Cabin') {
+              // Rising smoke puff
+              const smokeY = 10 - (Math.floor(t * 8) % 8);
+              tpx(ctx, 22 + Math.sin(t * 4) * 2, smokeY, 3, 3, 'rgba(200,200,200,0.6)');
+            } else if (name === 'Cyber Hab') {
+              // Glowing neon strip
+              const neon = Math.sin(t * 6) > 0 ? '#ff9f43' : '#fecca3';
+              tpx(ctx, 10, 28, 28, 2, neon);
+            }
+          });
+        });
+
+        // 6. ⚔️ Weapons & Armaments (Animated)
+        addHeader('⚔️ Weapons & Armaments (Animated)');
+        ['Flint Spear', 'Iron Sword', 'Tactical Rifle', 'Plasma Saber', 'Crossbow', 'Grenade', 'Laser Cannon', 'Flamethrower', 'Battleaxe'].forEach((name) => {
+          createCard(name, (ctx, t) => {
+            SURVIVAL_PAINTERS[name](ctx);
+            if (name === 'Plasma Saber') {
+              // Beam aura pulse
+              const pCol = Math.sin(t * 10) > 0 ? 'rgba(0, 240, 255, 0.95)' : 'rgba(180, 250, 255, 0.95)';
+              tpx(ctx, 21, 6, 6, 22, pCol);
+            } else if (name === 'Flamethrower') {
+              // Roaring flame cone
+              const fW = 8 + Math.floor(Math.random() * 4);
+              tpx(ctx, 38, 20 + Math.floor(Math.random() * 2), fW, 14, '#ef4444');
+              tpx(ctx, 40, 22, 6, 10, '#f97316');
+              tpx(ctx, 42, 24, 4, 6, '#facc15');
+            } else if (name === 'Laser Cannon') {
+              // Laser ring charge
+              if (Math.floor(t * 10) % 2 === 0) {
+                tpx(ctx, 38, 22, 8, 10, '#38bdf8');
+              }
+            }
+          });
+        });
+
+        // 7. 🚗 Vehicles & Transports (Animated)
+        addHeader('🚗 Vehicles & Transports (Animated)');
+        ['Chariot', 'Survival Jeep', 'Hovercraft', 'Combat Mech', 'Canoe', 'Spaceship', 'Tank', 'Submarine'].forEach((name) => {
+          createCard(name, (ctx, t) => {
+            ctx.save();
+            if (name === 'Hovercraft' || name === 'Spaceship' || name === 'Submarine') {
+              ctx.translate(0, Math.sin(t * 4) * 2);
+            }
+            SURVIVAL_PAINTERS[name](ctx);
+            if (name === 'Hovercraft') {
+              // Anti-grav glow skirt
+              const gCol = Math.sin(t * 8) > 0 ? 'rgba(0, 229, 255, 0.9)' : 'rgba(0, 180, 255, 0.6)';
+              tpx(ctx, 10, 34, 28, 4, gCol);
+            } else if (name === 'Spaceship') {
+              // Plasma thrusters flame
+              const flameL = 6 + Math.floor(Math.random() * 4);
+              tpx(ctx, 2, 24, flameL, 6, '#f97316');
+              tpx(ctx, 40, 24, flameL, 6, '#f97316');
+            }
+            ctx.restore();
+          });
+        });
+
+        // 8. 🦈 Apex Predators & Marine Life (Animated)
+        addHeader('🦈 Marine Predators & Ocean (Animated)');
+        ['Great White', 'Octopus', 'Sea Turtle', 'Jellyfish', 'Crab', 'Stingray', 'Squid'].forEach((name) => {
+          createCard(name, (ctx, t) => {
+            ctx.save();
+            ctx.translate(0, Math.sin(t * 3) * 2);
+            SURVIVAL_PAINTERS[name](ctx);
+            if (name === 'Crab') {
+              // Claws opening/closing
+              if (Math.floor(t * 4) % 2 === 0) {
+                tpx(ctx, 8, 20, 4, 4, '#ff3d00');
+                tpx(ctx, 36, 20, 4, 4, '#ff3d00');
+              }
+            }
+            ctx.restore();
+          });
+        });
+
+        // 9. 🪵 Resources & Props (Animated)
+        addHeader('🪵 Resources & World Props (Animated)');
+        ['Wood Pile', 'Red Poppy', 'Sunflower', 'Beehive', 'Iron Ore', 'Gold Ore', 'Diamond Ore', 'Mushroom', 'Chest'].forEach((name) => {
+          createCard(name, (ctx, t) => {
+            SURVIVAL_PAINTERS[name](ctx);
+            if (name === 'Gold Ore' || name === 'Diamond Ore') {
+              // Sparkle effect
+              const sparkX = 14 + (Math.floor(t * 12) % 20);
+              const sparkY = 28 + (Math.floor(t * 7) % 10);
+              const sCol = name === 'Gold Ore' ? '#ffffff' : '#e0f7fa';
+              tpx(ctx, sparkX, sparkY, 2, 2, sCol);
+            } else if (name === 'Chest') {
+              // Chest lid glow pulse
+              if (Math.floor(t * 5) % 4 === 0) {
+                tpx(ctx, 10, 22, 28, 2, '#fde047');
+              }
+            }
+          });
+        });
+
+        // Animation Loop Driver
+        let startT = performance.now();
+        function animLoop() {
+          if (overlay.style.display === 'none') return;
+          requestAnimationFrame(animLoop);
+          const t = (performance.now() - startT) * 0.001;
+          for (let i = 0; i < animCards.length; i++) {
+            const c = animCards[i];
+            c.ctx.clearRect(0, 0, c.width, c.height);
+            c.renderFn(c.ctx, t);
+          }
+        }
+        animLoop();
       });
     })();
   </script>
