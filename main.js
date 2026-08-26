@@ -3476,21 +3476,20 @@ const treeMat = new THREE.ShaderMaterial({
       // bend in WORLD space so orbiting the camera never spins the tree
       vec3 bendWorld = vec3(wdir.x, 0.0, wdir.y) * (flutter * lmag * position.y * iH * 0.14);
       vec3 basePos = iPos + vec3(0.0, 0.05 + aLift * 0.08, 0.0) + bendWorld;
-      // Transform base anchor position (top of block) into view space
-      vec4 mvCenter = viewMatrix * vec4(basePos, 1.0);
-      // View-space spherical billboarding:
-      // position.x * iH moves horizontally along view X (camera right)
-      // position.y * iH moves vertically up along view Y (camera up)
-      vec3 mvPos = mvCenter.xyz + vec3(position.x * iH, position.y * iH, 0.0);
-      vec4 mv = vec4(mvPos, 1.0);
-      float safeD = max(-mv.z, 0.001);
-      // View Z depth clearance so terrain block faces beneath never clip the quad
-      float pull = min(safeD * 0.04, 4.0) + 0.35 + aLift * 0.30;
-      mv.z -= pull;
-      mv.z = min(mv.z, -0.35);
-      vDist = max(-mv.z, 1.0);
-      vWorldY = basePos.y + position.y * iH;
-      gl_Position = projectionMatrix * mv;
+      // Transform base anchor position (top of block) into view space (Exact THREE.Sprite alignment)
+      vec4 mvPosition = viewMatrix * vec4(basePos, 1.0);
+
+      // Width and Height scaled according to pixel bounds in atlas
+      float artW = max(0.2, (aU.y - aU.x + 1.0) / 48.0) * iH;
+      float artH = max(0.2, (aV.y - aV.x + 1.0) / 48.0) * iH;
+
+      // Align quad: position.x [-0.5..0.5] centered, position.y [0..1] anchored at bottom
+      vec2 alignedPosition = vec2(position.x * artW, position.y * artH);
+      mvPosition.xy += alignedPosition;
+
+      vDist = max(-mvPosition.z, 1.0);
+      vWorldY = basePos.y + position.y * artH;
+      gl_Position = projectionMatrix * mvPosition;
     }
   `,
   fragmentShader: `
