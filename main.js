@@ -3347,62 +3347,20 @@ const treeMat = new THREE.ShaderMaterial({
       vec3 bendWorld = vec3(wdir.x, 0.0, wdir.y) * (flutter * lmag * position.y * iH * 0.14);
       // steep-camera response: viewed from above, a sprite must never become
       // an edge-on sliver that sinks under its block. Below ~35° elevation it
-      // stands upright as normal; as the camera climbs it tilts back, and at
-      // a fully vertical view it lays FLAT (facing the camera) so the art
-      // stays visible from top view instead of disappearing under the block.
       vec3 toCam = cameraPosition - iPos;
-      float distC = max(length(toCam), 0.001);
-      float vertK = clamp(toCam.y / distC, 0.0, 1.0);
-      float tiltA = smoothstep(0.35, 1.0, vertK) * 1.45; // ~83° at vertical
       float lenXZ = length(toCam.xz);
       vec2 dirXZ = lenXZ > 0.001 ? toCam.xz / lenXZ : vec2(0.0, 1.0);
-      // anchor every plant to the block edge FACING the camera: hugging the
-      // rim grounds it against the block face below (no mid-block floating),
-      // while looking straight down eases it back to the centre. Kept small:
-      // a big sideways slide walks the sprite into taller neighbour blocks
-      // and buries it at grazing angles.
-      float edgeAmt = (1.0 - vertK) * 0.16 * (1.0 - aLift * 0.4);
-      vec3 basePos = iPos + vec3(dirXZ.x, 0.0, dirXZ.y) * edgeAmt + bendWorld;
-      // clear the block top it stands on: the laid-flat sprite sits a touch
-      // higher so the voxel face below can never cover it from above
-      basePos.y += vertK * vertK * (0.35 + iH * 0.08);
-      // low sprites (bushes, rocks): tilt/rise toward the camera like the
-      // tall trees do, so steep angles never sink them into the block
-      basePos.y += aLift * vertK * vertK * (0.85 + iH * 0.20);
-      // low sprites also get a small permanent rise (a touch more when the
-      // view goes grazing) so their base always clears the block edge
-      // they stand on, instead of hiding behind it at eye level
-      float horizK = 1.0 - vertK;
-      basePos.y += aLift * (0.14 + 0.12 * horizK * horizK);
-      float cta = cos(tiltA), sta = sin(tiltA);
+      vec3 basePos = iPos + bendWorld;
+      // elevate sprite base so it sits cleanly on top of the block surface
+      basePos.y += 0.08 + aLift * 0.12;
       vec3 rightA = vec3(dirXZ.y, 0.0, -dirXZ.x);
-      vec3 upA = vec3(-dirXZ.x * sta, cta, -dirXZ.y * sta);
-      vec3 wpq = basePos + rightA * (position.x * iH) + upA * (position.y * iH);
+      vec3 wpq = basePos + rightA * (position.x * iH) + vec3(0.0, position.y * iH, 0.0);
       vec4 mv = viewMatrix * vec4(wpq, 1.0);
-      // pull toward the camera so slopes/rises can't slice the billboard,
-      // but strictly proportional to distance: a fixed minimum would shove
-      // close trees behind the near plane and clip them in half
       float safeD = max(-mv.z, 0.001);
-      float pull = min(safeD * 0.045, 5.0) * (0.55 + 0.45 * position.y);
-      // low sprites (rocks, bushes) get extra proportional clearance so
-      // nearby bumps can never swallow them while orbiting the camera
-      pull += aLift * min(safeD * 0.07, 7.0);
+      // view-space depth clearance: pull sprites forward toward the camera so voxel blocks never cut or swallow them
+      float pull = min(safeD * 0.06, 6.0) + (0.45 + aLift * 0.65);
       mv.z -= pull;
-      mv.z = min(mv.z, -0.8); // never cross the near plane
-      // depth advantage vs the ground they stand on: strong enough that
-      // lower ground in front never swallows them mid-body, but far-away
-      // hills still occlude naturally (bias fades with distance)
-      mv.z -= (0.55 + aLift * 0.85) * clamp(1.35 - safeD * 0.008, 0.35, 1.0);
-      // top-view depth clearance: when looking down from above, pull sprites forward in view depth so ground blocks can never hide them
-      float topViewBias = vertK * vertK * (0.8 + aLift * 0.5);
-      mv.z -= topViewBias;
-      // eye-level guarantee for low sprites (rocks, bushes): at grazing
-      // angles the next terrain row over can sit several units closer to
-      // the camera and swallow them entirely — subtract view depth that
-      // scales with how horizontal the view is (zero when looking down),
-      // with a floor so even point-blank ground can never cover them
-      mv.z -= aLift * horizK * horizK * max(min(safeD * 0.20, 22.0), 1.1);
-      mv.z = min(mv.z, -0.35); // stay in front of the near plane
+      mv.z = min(mv.z, -0.35);
       vDist = max(-mv.z, 1.0);
       vWorldY = wpq.y;
       gl_Position = projectionMatrix * mv;
