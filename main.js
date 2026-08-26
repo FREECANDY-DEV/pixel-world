@@ -10949,10 +10949,11 @@ function animate() {
 
   lightDir.copy(sunDir);
   if (sunDir.y < 0) lightDir.negate();
+  const sunLightDist = Math.max(160, camera.position.distanceTo(controls.target) * 0.8);
   sun.position.set(
-    controls.target.x + lightDir.x * 160,
-    controls.target.y + lightDir.y * 160,
-    controls.target.z + lightDir.z * 160
+    controls.target.x + lightDir.x * sunLightDist,
+    controls.target.y + lightDir.y * sunLightDist,
+    controls.target.z + lightDir.z * sunLightDist
   );
   sun.target.position.set(controls.target.x, controls.target.y, controls.target.z);
   sun.intensity = Math.max(2.2 * dayF, 0.35 * nightF) * lightGrade;
@@ -11013,17 +11014,21 @@ function animate() {
   windDirZ = Math.sin(windAng);
   water.material.color.copy(waterNight).lerp(waterDay, dayF);
 
+  const skyDist = Math.max(900, camera.position.distanceTo(controls.target) * 1.8);
   sunDisc.position.set(
-    controls.target.x + sunDir.x * 900,
-    controls.target.y + sunDir.y * 900,
-    controls.target.z + sunDir.z * 900
+    controls.target.x + sunDir.x * skyDist,
+    controls.target.y + sunDir.y * skyDist,
+    controls.target.z + sunDir.z * skyDist
   );
+  sunDisc.scale.set(Math.max(140, skyDist * 0.15), Math.max(140, skyDist * 0.15), 1);
   sunDisc.material.opacity = THREE.MathUtils.clamp((sunDir.y - 0.02) * 6, 0, 1);
+
   moonDisc.position.set(
-    controls.target.x - sunDir.x * 900,
-    controls.target.y - sunDir.y * 900,
-    controls.target.z - sunDir.z * 900
+    controls.target.x - sunDir.x * skyDist,
+    controls.target.y - sunDir.y * skyDist,
+    controls.target.z - sunDir.z * skyDist
   );
+  moonDisc.scale.set(Math.max(90, skyDist * 0.10), Math.max(90, skyDist * 0.10), 1);
   moonDisc.material.opacity = THREE.MathUtils.clamp((-sunDir.y - 0.02) * 6, 0, 1);
 
   const cloudBright = (0.3 + 0.7 * dayF) * (0.45 + 0.55 * envDim);
