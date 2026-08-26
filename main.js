@@ -863,7 +863,7 @@ controls.update();
 // from nose-to-ground up to deep space.
 let desiredDist = camera.position.distanceTo(controls.target);
 let lastPinchDist = 0;
-const ZOOM_MIN = 6, ZOOM_MAX = 12000;
+const ZOOM_MIN = 6, ZOOM_MAX = 25000;
 function clampZoom(d) { return THREE.MathUtils.clamp(d, ZOOM_MIN, ZOOM_MAX); }
 controls.enableZoom = false; // radial distance is fully managed below
 const pinchPts = new Map();
@@ -1632,11 +1632,11 @@ function syncChunks(force = false) {
   
   // Calculate dynamic render radius based on camera zoom distance
   const currentDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
-  const zoomMult = Math.min(2.5, Math.max(1.0, currentDist / 180));
-  const effectiveRadius = Math.min(64, Math.ceil(RENDER_RADIUS * zoomMult));
+  const zoomMult = Math.min(4.5, Math.max(1.0, currentDist / 150));
+  const effectiveRadius = Math.min(128, Math.ceil(RENDER_RADIUS * zoomMult));
 
   // Dynamically expand camera far plane so far map is never clipped
-  const targetFar = Math.max(3000, currentDist * 3.5);
+  const targetFar = Math.max(5000, currentDist * 4.0);
   if (typeof camera !== 'undefined' && camera && camera.far !== targetFar) {
     camera.far = targetFar;
     camera.updateProjectionMatrix();
@@ -5032,49 +5032,19 @@ function buildIconAtlas() {
 // zoomed-out tree/bush/rock icons: instead of one point per plant, cluster
 // them onto a coarse grid and emit a single marker per cell carrying the
 // dominant species — "here lives a grove of oaks", not a pixel for every tree
-function getDynamicClusterGrid() {
-  const d = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 150;
-  if (d <= 250) return 64;
-  if (d <= 500) return 128;
-  if (d <= 900) return 256;
-  return 512;
-}
-
 function ensureChunkIcons(ch) {
-  if (!ch.trees || !ch.trees.userData.iconData) return;
-  const gridStep = getDynamicClusterGrid();
-  if (ch.icons && ch._gridStep === gridStep) return;
-  if (ch.icons) releaseChunkIcons(ch);
-  ch._gridStep = gridStep;
-
+  if (ch.icons || !ch.trees || !ch.trees.userData.iconData) return;
   const ud = ch.trees.userData.iconData;
   const pos = ud.pos, col = ud.col;
   const hasH = !!ud.h;
-  const cells = new Map();
-  for (let i = 0; i < col.length; i++) {
-    const x = pos[i * 3], z = pos[i * 3 + 2];
-    const key = Math.round(x / gridStep) + ':' + Math.round(z / gridStep);
-    let cell = cells.get(key);
-    const treeTop = pos[i * 3 + 1] + (hasH ? ud.h[i] : 0);
-    if (!cell) {
-      cell = { x, y: pos[i * 3 + 1], z, top: treeTop, counts: new Map(), best: col[i] };
-      cells.set(key, cell);
-    } else if (treeTop > cell.top) {
-      cell.top = treeTop;
-    }
-    const k = col[i];
-    cell.counts.set(k, (cell.counts.get(k) || 0) + 1);
-    if (cell.counts.get(k) > cell.counts.get(cell.best)) cell.best = k;
-  }
-  const ppos = new Float32Array(cells.size * 3);
-  const pcol = new Float32Array(cells.size);
-  let w = 0;
-  for (const cell of cells.values()) {
-    ppos[w * 3] = cell.x;
-    ppos[w * 3 + 1] = cell.top;
-    ppos[w * 3 + 2] = cell.z;
-    pcol[w] = cell.best;
-    w++;
+  const count = col.length;
+  const ppos = new Float32Array(count * 3);
+  const pcol = new Float32Array(count);
+  for (let i = 0; i < count; i++) {
+    ppos[i * 3] = pos[i * 3];
+    ppos[i * 3 + 1] = pos[i * 3 + 1] + (hasH ? ud.h[i] : 0);
+    ppos[i * 3 + 2] = pos[i * 3 + 2];
+    pcol[i] = col[i];
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(ppos, 3));
@@ -5371,10 +5341,10 @@ function ensureCmIcon(cm) {
 // --- zoom-stage state machine ----------------------------------------------
 
 const ICON_ENTER = 170, ICON_EXIT = 148;
-const GLOBE_ENTER = 1500, GLOBE_EXIT = 1100;
+const GLOBE_ENTER = 3500, GLOBE_EXIT = 2500;
 // once the pull-out crosses into space it glides here on its own — the user
 // doesn't have to keep scrolling to get the full framed planet
-const SPACE_SETTLE_DIST = 2200;
+const SPACE_SETTLE_DIST = 4500;
 let iconMode = false;
 let spaceMode = false;
 let lodTween = null;
@@ -5437,44 +5407,15 @@ function setIconMode(on) {
 }
 
 function syncDetailIcons() {
-  const camD = camera.position.distanceTo(controls.target);
-
-  // 1. Placed trees clustering
-  if (camD > 300) {
-    const treeClusterDist = Math.max(40, camD * 0.15);
-    const treeClusters = new Map();
-    for (const s of placedTrees) {
-      const p = s.sprA.position;
-      const key = Math.round(p.x / treeClusterDist) + ':' + Math.round(p.z / treeClusterDist);
-      if (!treeClusters.has(key)) treeClusters.set(key, []);
-      treeClusters.get(key).push(s);
-    }
-    for (const group of treeClusters.values()) {
-      const main = group[0];
-      const mainIc = ensurePlacedIcon(main);
-      if (mainIc) {
-        mainIc.position.copy(main.sprA.position);
-        mainIc.position.y += main.sprA.scale.y + 1.6;
-        const sc = markerScale(camD) * (1 + 0.15 * Math.log2(group.length));
-        mainIc.scale.set(sc, sc, 1);
-        mainIc.visible = true;
-      }
-      for (let i = 1; i < group.length; i++) {
-        if (group[i].iconSpr) group[i].iconSpr.visible = false;
-      }
-    }
-  } else {
-    for (const s of placedTrees) {
-      const ic = ensurePlacedIcon(s);
-      if (!ic) continue;
-      ic.position.copy(s.sprA.position);
-      ic.position.y += s.sprA.scale.y + 1.6;
-      ic.scale.setScalar(markerScale(camera.position.distanceTo(ic.position)));
-      ic.scale.z = 1;
-      ic.visible = true;
-    }
+  for (const s of placedTrees) {
+    const ic = ensurePlacedIcon(s);
+    if (!ic) continue;
+    ic.position.copy(s.sprA.position);
+    ic.position.y += s.sprA.scale.y + 1.6;
+    ic.scale.setScalar(markerScale(camera.position.distanceTo(ic.position)));
+    ic.scale.z = 1;
+    ic.visible = true;
   }
-
   const fi = ensureHomeFireIcon();
   if (fi && homeFire) {
     fi.position.copy(homeFire.position);
@@ -5496,42 +5437,15 @@ function syncDetailIcons() {
     ic.scale.set(sc, sc, 1);
     ic.visible = true;
   }
-
-  // 2. Villagers (cavemen) clustering
-  if (camD > 250) {
-    const cmClusterDist = Math.max(30, camD * 0.12);
-    const cmClusters = new Map();
-    for (const cm of cavemen) {
-      const p = cm.spr.position;
-      const key = Math.round(p.x / cmClusterDist) + ':' + Math.round(p.z / cmClusterDist);
-      if (!cmClusters.has(key)) cmClusters.set(key, []);
-      cmClusters.get(key).push(cm);
-    }
-    for (const group of cmClusters.values()) {
-      const main = group[0];
-      const mainIc = ensureCmIcon(main);
-      if (mainIc) {
-        mainIc.position.copy(main.spr.position);
-        mainIc.position.y += 1.7;
-        const sc = markerScale(camD) * 0.55 * (1 + 0.2 * Math.log2(group.length));
-        mainIc.scale.set(sc, sc, 1);
-        mainIc.visible = true;
-      }
-      for (let i = 1; i < group.length; i++) {
-        if (group[i].iconSpr) group[i].iconSpr.visible = false;
-      }
-    }
-  } else {
-    for (const cm of cavemen) {
-      const ic = ensureCmIcon(cm);
-      if (!ic) continue;
-      ic.position.copy(cm.spr.position);
-      ic.position.y += 1.7; // float above the head: never hidden by their block
-      const sc = markerScale(camera.position.distanceTo(ic.position)) * 0.55;
-      ic.scale.set(sc, sc, 1);
-      ic.visible = true;
-      if (cm.react) cm.react.spr.visible = false;
-    }
+  for (const cm of cavemen) {
+    const ic = ensureCmIcon(cm);
+    if (!ic) continue;
+    ic.position.copy(cm.spr.position);
+    ic.position.y += 1.7; // float above the head: never hidden by their block
+    const sc = markerScale(camera.position.distanceTo(ic.position)) * 0.55;
+    ic.scale.set(sc, sc, 1);
+    ic.visible = true;
+    if (cm.react) cm.react.spr.visible = false;
   }
 }
 
