@@ -109,6 +109,7 @@
   </style>
 </head>
 <body>
+  <canvas id="starfield-bg" style="position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></canvas>
   <div id="loading-overlay"><div class="loader-ring"></div><div class="loader-text">Entering the world…</div></div>
 
   <div id="globe-wrap">
@@ -135,7 +136,7 @@
     </div>
     <div class="spawn-actions">
       <button class="btn-reroll" id="reroll">🎲</button>
-      <button class="btn-enter" id="spawn">🌍 Enter the world</button>
+      <button class="btn-enter" id="spawn">✨ 🌍 Enter the world ✨</button>
     </div>
   </div>
 
@@ -475,6 +476,90 @@
         setTimeout(() => { window.location.href = 'index.html?' + p.toString(); }, 400);
       }, 500);
     });
+
+    // ================================================================
+    // 5. Full-Viewport Twinkling Starfield & Meteors Background
+    // ================================================================
+    (function initStarfieldBG() {
+      const scv = document.getElementById('starfield-bg');
+      if (!scv) return;
+      const sctx = scv.getContext('2d');
+      let sw = 0, sh = 0, stars = [], meteors = [];
+
+      function resize() {
+        sw = scv.width = window.innerWidth;
+        sh = scv.height = window.innerHeight;
+        stars = [];
+        const count = Math.floor((sw * sh) / 2800);
+        for (let i = 0; i < count; i++) {
+          stars.push({
+            x: Math.random() * sw, y: Math.random() * sh,
+            r: Math.random() * 1.6 + 0.6,
+            alpha: Math.random() * 0.85 + 0.15,
+            speed: Math.random() * 0.04 + 0.015,
+            phase: Math.random() * Math.PI * 2,
+            color: Math.random() > 0.35 ? '#ffffff' : (Math.random() > 0.5 ? '#ffd23f' : '#38bdf8'),
+          });
+        }
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function draw() {
+        sctx.clearRect(0, 0, sw, sh);
+        const t = performance.now() * 0.001;
+
+        for (let i = 0; i < stars.length; i++) {
+          const s = stars[i];
+          const a = s.alpha * (0.55 + 0.45 * Math.sin(t * (s.speed * 60) + s.phase));
+          sctx.fillStyle = s.color;
+          sctx.globalAlpha = a;
+          sctx.beginPath();
+          sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          sctx.fill();
+
+          if (s.r > 1.2 && a > 0.6) {
+            sctx.globalAlpha = a * 0.35;
+            sctx.beginPath();
+            sctx.arc(s.x, s.y, s.r * 2.8, 0, Math.PI * 2);
+            sctx.fill();
+          }
+        }
+
+        if (Math.random() < 0.018 && meteors.length < 2) {
+          meteors.push({
+            x: Math.random() * sw, y: Math.random() * (sh * 0.45),
+            len: Math.random() * 90 + 40, speed: Math.random() * 9 + 4.5,
+            angle: Math.PI / 4 + (Math.random() - 0.5) * 0.2, alpha: 1,
+          });
+        }
+
+        for (let i = meteors.length - 1; i >= 0; i--) {
+          const m = meteors[i];
+          const endX = m.x - Math.cos(m.angle) * m.len;
+          const endY = m.y - Math.sin(m.angle) * m.len;
+          const grad = sctx.createLinearGradient(m.x, m.y, endX, endY);
+          grad.addColorStop(0, 'rgba(255, 255, 255, ' + m.alpha + ')');
+          grad.addColorStop(0.3, 'rgba(255, 210, 63, ' + (m.alpha * 0.7) + ')');
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          sctx.strokeStyle = grad;
+          sctx.lineWidth = 1.8;
+          sctx.globalAlpha = 1;
+          sctx.beginPath();
+          sctx.moveTo(m.x, m.y);
+          sctx.lineTo(endX, endY);
+          sctx.stroke();
+
+          m.x += Math.cos(m.angle) * m.speed;
+          m.y += Math.sin(m.angle) * m.speed;
+          m.alpha -= 0.016;
+          if (m.alpha <= 0 || m.x > sw || m.y > sh) meteors.splice(i, 1);
+        }
+
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
   </script>
 </body>
 </html>
