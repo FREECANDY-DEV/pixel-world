@@ -1,34 +1,44 @@
 <div align="center">
 
-<img src="docs/assets/campfire-flicker.gif" alt="The campfire, flickering" width="110">
+<img src="docs/assets/campfire-flicker.gif" alt="The campfire, flickering" width="120">
 
-# ⛰️ Pixel World
+# ⛰️ Pixel World: Stone Age Meets Code Magic! 🚀
 
-### An infinite caveman world that paints its own art.
+### *An infinite procedural caveman universe that paints 100% of its own pixel art in real-time — zero image files attached!*
 
-**Every sprite you see is drawn by code at runtime** — there is not a single
-image file inside the game. One seed grows an endless world of deserts, jungles,
-forests and snow; a little tribe sleeps by the fire until you strike it — then
-wakes, explores, discovers fire, and lives through a full day-night cycle.
-A game year is 365 days in four ~91-day seasons, ticking 60× faster than
-real time.
+**Every tree, fish, flame, star, and caveman you see is drawn on-the-fly by code.** 
+One seed sprouts an endless living world of scorching deserts, lush jungles, golden autumn forests, and freezing snowpeaks. A cute little tribe sleeps around the warm campfire until you strike the logs — then they leap up with a startled hop, explore the wilderness, discover fire, wade into the deep ocean, flee from scary strangers, and live through a full 365-day seasonal calendar!
 
-| 🌱 1 seed | 🌳 25 species | 🐟 6 fish | 📅 365-day year | 🧵 0 image files | ⚡ 60× time |
+| 🌱 1 Seed | 🌳 25 Plant & Rock Species | 🐟 6 Swim-Cycled Fish | ⚡ 60× Fast-Forward Time | 🧵 0 Image Files | 🤖 Cyan Holograms |
 |:---:|:---:|:---:|:---:|:---:|:---:|
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Vanilla JS](https://img.shields.io/badge/vanilla-JS-f7df1e?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![three.js](https://img.shields.io/badge/three.js-049EF4?logo=threedotjs&logoColor=white)](https://threejs.org)
-[![No build step](https://img.shields.io/badge/build%20step-none-success)](#quick-start)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Build Step: None](https://img.shields.io/badge/build%20step-none-success)](#-quick-start)
+[![GitHub Stars](https://img.shields.io/github/stars/FREECANDY-DEV/pixel-world?style=social)](https://github.com/FREECANDY-DEV/pixel-world)
 
 <img src="docs/assets/hero-sprites.png" alt="Birch, oak and pine trees, the campfire and a clownfish — all painted by code" width="620">
 
-*Left to right: birch, oak, pine, the campfire, and a clownfish — every pixel placed by `fillRect`.*
+*Left to right: birch, oak, pine, the flickering campfire, and a clownfish — every single pixel placed by `fillRect`!*
 
-[🎮 Play it](#quick-start) · [🔥 Live demo](#-live-demo) · [🕹️ Controls](#controls) · [✨ Features](#features) · [🧠 How it works](#how-it-works) · [🎨 The art](#the-art--all-painted-by-code) · [🧪 Testing](#testing) · [🤝 Contribute](CONTRIBUTING.md)
+[🎮 Play Live Demo](#-live-demo--play-it-with-friends) · [⚡ Quick Start](#-quick-start) · [🕹️ Controls](#-controls) · [🌟 What's New in v88](#-whats-new-in-v88) · [✨ Features](#-features) · [🧠 How It Works](#-how-it-works) · [🎨 The Art](#-the-art--all-painted-by-code) · [🧪 Testing](#-testing) · [🤝 Contribute](CONTRIBUTING.md)
 
 </div>
+
+---
+
+## 🌟 What's New in v88? (The Ultimate Update!)
+
+> 🎉 **The world just got bigger, prettier, smarter, and way more fun!**
+
+- 🤖 **Grunk the Hologram Elder**: Floating by the central campfire, Grunk now sports an animated **cyan scanline hologram effect** (`#00f0ff`) with view-space camera billboarding and ground anchoring! Ask him anything in multiplayer chat!
+- 🏃‍♂️ **Eden Haven Family Fleeing AI**: Adam, Eve, Cain, and Abel at Eden Haven get startled when you approach within 7 blocks — popping `!` reaction bubbles and fleeing across camp to keep their distance!
+- ☣️ **Subject-Zero Hazmat Suit**: Play as the mystery survivor in a yellow hazard suit with custom helmet visor, oxygen tank, and biohazard badge!
+- 🔥 **Ignited World Campfires**: Every campfire across the infinite map is lit with dual animated pixel flames, warm point lights, and flickering radial glow halos!
+- 🧗 **Smooth Physics Locomotion**: Vertical ground transitions use smooth interpolation so stepping up or dropping down terrain blocks feels buttery smooth!
+- ✨ **Cosmic Starfield & Shooting Meteors**: The landing page background is packed with 450+ twinkling star points, 4-point sparkle flares, and blazing shooting meteors!
+- 🔍 **Zoom-Fit Bush Thumbnails**: The Assets Panel auto-crops and zooms in **2.5x** on small bushes (*Berry*, *Frost*, *Shrub*, *Fern*, *Bramble*, *Bloom*) and rocks so every species is crisp and clearly visible!
 
 ---
 

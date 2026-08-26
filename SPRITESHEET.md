@@ -133,6 +133,8 @@ curled up, `zZ` energy bar:
   per-villager variants restyle hair/beard/clothes (`artVariant`) using `LOOK_POOL`.
 - Age stages scale height (child → adult → elder); three materials per villager:
   `[matR, matL, matSleep]`.
+- **Subject-Zero (Yellow Hazmat Suit Model)**: Custom hazard suit look (`#ffd23f` skin/suit), pixel helmet visor, biohazard chest emblem, oxygen tank pack, and hazard boots.
+- **Eden Haven Family (Adam, Eve, Cain, Abel)**: Unique caveman models living at Eden Camp (`homePos = (220, 180)`), equipped with fleeing AI that pops `!` reaction bubbles and flees at high speed (`3.4`) whenever a player approaches within 7.0 blocks.
 - **Sleep art**: eyes closed (`S` glyph with lash pixels below), baked −90° rotation into a
   lying pose canvas (`matSleep`) — head to the left, body along the ground.
 - **The founding couple spawns asleep** by the campfire and only wakes when you strike
@@ -142,10 +144,12 @@ curled up, `zZ` energy bar:
 
 ---
 
-## 5. Camp & effects
+## 5. Camp, Holograms & Lighting Effects
 
 ![Campfire flicker](docs/assets/campfire-flicker.gif)
 
+- **Cyan Pixel Hologram Shader (`makeHologramMat()`)**: Custom `ShaderMaterial` assigned to Grunk the Elder. Features cyan `#00f0ff` scanlines (`sin(vUv.y * 95.0 - uTime * 9.0)`), micro-flicker signal simulation, view-space camera billboarding (`modelViewMatrix * vec4(0,0,0,1)`), and ground pivot anchoring (`position.y + 0.5`).
+- **Lit World Campfires & Dual Pixel Flames**: Every campfire across the world is ignited with dual animated pixel flame sprites (`makeFlameSprite()`), warm point lights (`PointLight(0xff9a3c)`), and radial fire glow halos (`makeGlowSprite()`).
 - `CAMPFIRE` char-map art: stone ring + crossed logs teepee; `FLAME` overlays animated fire.
 - ZZZ stream: three rising "z" glyphs fading in loop above sleepers (`drawZzz`).
 - Reaction bubbles: ascii `!`, `!!`, `?!`, `‼`, `✦` (+`✨` for the Water discovery).
@@ -153,13 +157,20 @@ curled up, `zZ` energy bar:
 - **Camp label sprite** above the camp (`campLabelCanvas`, 256×72): a little
   pixel house with a stepped roof and door, outlined `CAMP` text, and a
   pixel-person icon carrying the live villager count.
-- **Space dressing**: a hand-pixelled moon skin (`makeMoonTexture`, 64×32) —
-  pale regolith with speckle and rimmed craters — plus a radial-glow sun sprite
-  that dresses the planet view.
+- **Space dressing & Starfield Canvas (`#starfield-bg`)**: A full-viewport background canvas rendering 450+ twinkling stars (`#ffffff`, `#ffd23f`, `#38bdf8`) with 4-point sparkle flares (`+`), soft ambient glow halos, and fast shooting meteors with linear alpha trails. Hand-pixelled moon skin (`makeMoonTexture`, 64×32) — pale regolith with speckle and rimmed craters — plus a radial-glow sun sprite that dresses the planet view.
 
 ---
 
-## 6. Anatomy view — `ANAT_ART` + `BODY_MAP`
+## 6. Asset Panel Zoom-Fit Thumbnails (`paintThumbFromAtlas`)
+
+In the Assets Panel (`#assets-panel`), small bushes (*Berry Bush*, *Frost Bush*, *Desert Shrub*, *Tumble Bush*, *Fern Thicket*, *Great Bush*, *Blossom Bush*, *Bramble Tangle*) and rocks (*Pebbles*, *Rocks*, *Boulders*) occupy only ~12-18px at the bottom of the 48x48 atlas cell. 
+
+- `paintThumbFromAtlas(tg, col, kind)` reads the exact pixel bounding box `[a0, a1, b0, b1]` from `TREE_CELL_BOUNDS[col]`.
+- Crops and scales up the plant graphics up to **2.5x zoom**, auto-centering `(dx, dy)` inside the 48x48 thumbnail canvas with crisp pixel art rendering (`imageSmoothingEnabled = false`). All vegetation species are crisp, large, and 100% clearly visible!
+
+---
+
+## 7. Anatomy view — `ANAT_ART` + `BODY_MAP`
 
 The 🫀 anatomy sheet's organ sprites, painted from char maps via `anatSprite`:
 
@@ -186,7 +197,7 @@ The 🫀 anatomy sheet's organ sprites, painted from char maps via `anatSprite`:
 
 ---
 
-## 7. UI glyphs (DOM, not canvas)
+## 8. UI Glyphs & Celestial Icon (DOM & Canvas)
 
 👁 toggle UI · 🌍 regenerate · 🔄 auto-spin · 🗺️ top view · 🏠 home · ⬚ box-select ·
 ❚❚ pause · 👤 villager panel · » assets panel · 🫀 anatomy · 📖 knowledge book ·
