@@ -93,6 +93,7 @@ let NEAR_RADIUS = IS_MOBILE ? 3 : 4;               // full-detail ring (caves + 
 const SEA_LEVEL = 24;
 const MAX_HEIGHT = 96;
 
+const DEMO_MODE = new URLSearchParams(location.search).has('demo');
 const DEMO_SEED = 7777777;
 let SEED = DEMO_MODE ? DEMO_SEED : Math.floor(Math.random() * 1e9);
 
@@ -8460,7 +8461,6 @@ function spawnLightning(pos) {
 // works solo (Grunk still chats locally).
 // ============================================================================
 
-const DEMO_MODE = new URLSearchParams(location.search).has('demo');
 const DEMO_BROKERS = [
   'wss://broker.hivemq.com:8884/mqtt',
   'wss://broker.emqx.io:8084/mqtt',
