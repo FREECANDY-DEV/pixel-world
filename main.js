@@ -6724,13 +6724,6 @@ function updateCavemen(dt, t) {
       cm.velZ = THREE.MathUtils.damp(cm.velZ || 0, charJoy.z * js, 10, dt);
       pos.x += cm.velX * dt;
       pos.z += cm.velZ * dt;
-      if (cm === selectedCm) {
-        controls.target.x += cm.velX * dt;
-        controls.target.z += cm.velZ * dt;
-        camera.position.x += cm.velX * dt;
-        camera.position.z += cm.velZ * dt;
-      }
-      // first commanded villager to brave the sea discovers Water
       if (!KNOW.water && waterDepthAt(pos.x, pos.z) > 0.14) {
         unlockKnowledge('water');
         spawnReaction(cm, '✨');
@@ -9143,23 +9136,6 @@ function makeHologramMat() {
   return grunkHoloMat;
 }
 
-function makeHoloRingSprite() {
-  const cv = document.createElement('canvas');
-  cv.width = 64; cv.height = 64;
-  const ctx = cv.getContext('2d');
-  const grad = ctx.createRadialGradient(32, 32, 2, 32, 32, 30);
-  grad.addColorStop(0, 'rgba(0,240,255,0.85)');
-  grad.addColorStop(0.4, 'rgba(0,240,255,0.35)');
-  grad.addColorStop(0.85, 'rgba(0,240,255,0.75)');
-  grad.addColorStop(1, 'rgba(0,240,255,0)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 64, 64);
-  const tex = new THREE.CanvasTexture(cv);
-  const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
-  spr.scale.set(2.6, 2.6, 1);
-  return spr;
-}
-
 // --- DEMO MODULE part 3: ghosts & bubbles ------------------------------------
 function demoMakeGhostMat(female, look) {
   if (!look) return female ? womanMatR : cavemanMatR;
@@ -9179,18 +9155,12 @@ function demoMakeGhost(id, name, color, female = false, look = null) {
   spr.visible = false;
   scene.add(spr);
 
-  let holoRing = null;
-  if (isGrunk) {
-    holoRing = makeHoloRingSprite();
-    scene.add(holoRing);
-  }
-
   const nameSpr = makeNameSprite();
   scene.add(nameSpr);
   const bubble = demoMakeBubble();
   scene.add(bubble);
   const g = {
-    id, name, color, female, look, spr, nameSpr, bubble, holoRing,
+    id, name, color, female, look, spr, nameSpr, bubble,
     cur: new THREE.Vector3(),
     target: new THREE.Vector3(),
     lastSeen: performance.now(),
@@ -9497,17 +9467,13 @@ function updateDemo(dt, t) {
 
   if (grunkHoloMat) grunkHoloMat.uniforms.uTime.value = t;
 
-  // Grunk: stands by the fire, glowing cyan hologram scanline effect
+  // Grunk: stands by the fire floating slightly above ground with glowing cyan hologram effect
   const gr = s.botGhost;
   if (gr) {
-    const fy = homeFire ? homeFire.position.y : groundYAt(homePos.x, homePos.z);
+    const fy = (homeFire ? homeFire.position.y : groundYAt(homePos.x, homePos.z)) + 0.35;
     const gx = homePos.x + 2.1, gz = homePos.z + 1.9;
     gr.spr.position.set(gx, fy + Math.sin(t * 1.6) * 0.06, gz);
     gr.spr.visible = !hide;
-    if (gr.holoRing) {
-      gr.holoRing.visible = !hide;
-      gr.holoRing.position.set(gx, fy + 0.05, gz);
-    }
     if (gr.nameSpr) {
       gr.nameSpr.visible = !hide;
       gr.nameSpr.position.set(gx, fy + gr.spr.scale.y + 0.32, gz);
