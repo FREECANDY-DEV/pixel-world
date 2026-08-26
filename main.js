@@ -2673,11 +2673,13 @@ scene.add(ghostFire);
 
 const campfires = [];
 
-function placeCampfire(x, z) {
-  const f = makeCampfireSprite(false);
+function placeCampfire(x, z, lit = true) {
+  const f = makeCampfireSprite(lit);
   f.position.set(x, groundYAt(x, z), z);
+  f.lit = lit;
   scene.add(f);
   campfires.push(f);
+  return f;
 }
 
 function spawnAppleTree(x, z) {
@@ -5754,12 +5756,19 @@ function spawnCaveman(x, z, female = false, forceAge = null, lookOverride = null
   // every person is drawn with their own palette + hairstyle variants
   const rnd = mulberry32((Math.random() * 0xffffffff) >>> 0);
   const look = lookOverride || pickLook(rnd, female);
+  const isHazmat = !!(lookOverride && (lookOverride.hazmat || lookOverride.skin === '#ffd23f' || (lookOverride.name && lookOverride.name.startsWith('Subject')))) || (DEMO_MODE && !lookOverride && cavemen.length === 0);
+
   const mats = {};
   for (const [key, cfg] of Object.entries(STAGES)) {
-    const vArt = artVariant(cfg.art, female, look.style, look.beard);
-    const vp = lookPal(cfg.pal || CAVEMAN_PALETTE, look);
+    let vArt = isHazmat ? HAZMAT_HUMAN : artVariant(cfg.art, female, look.style, look.beard);
+    let vp = isHazmat ? HAZMAT_PALETTE : lookPal(cfg.pal || CAVEMAN_PALETTE, look);
     const [mr, ml, ms] = makeCavemanMats(vArt, vp);
     mats[key] = { matR: mr, matL: ml, matSleep: ms, h: cfg.h, art: vArt, pal: vp };
+  }
+
+  if (isHazmat) {
+    const [hzR] = makeCavemanMats(HAZMAT_HUMAN, HAZMAT_PALETTE);
+    spr.material = hzR;
   }
   const cm = {
     spr,
@@ -6644,7 +6653,40 @@ function updateCavemen(dt, t) {
           cm.moving = false;
           continue;
         }
-        pickWanderTarget(cm);
+
+        // Eden Haven family members (Adam, Eve, Cain, Abel):
+        // If the player approaches close (< 6.0 units), they become afraid,
+        // trigger a fear reaction '!', and flee away while staying leashed to Eden Camp (4.5 units radius)!
+        if (cm.edenPos && demoState.me && demoState.me.spr && cm !== demoState.me) {
+          const px = demoState.me.spr.position.x;
+          const pz = demoState.me.spr.position.z;
+          const dPlayer = Math.hypot(cm.spr.position.x - px, cm.spr.position.z - pz);
+          if (dPlayer < 6.0) {
+            if (!cm.react || t > cm.react.t + 2.0) {
+              triggerReaction(cm, '!'); // Exclamation fear symbol
+            }
+            const fx = cm.spr.position.x - px;
+            const fz = cm.spr.position.z - pz;
+            const fl = Math.hypot(fx, fz) || 1.0;
+            let tx = cm.spr.position.x + (fx / fl) * 3.5;
+            let tz = cm.spr.position.z + (fz / fl) * 3.5;
+
+            // Keep strictly leashed within 4.5 units of Eden campfire
+            const hx = cm.edenPos.x, hz = cm.edenPos.z;
+            const ed = Math.hypot(tx - hx, tz - hz);
+            if (ed > 4.5) {
+              tx = hx + ((tx - hx) / ed) * 4.5;
+              tz = hz + ((tz - hz) / ed) * 4.5;
+            }
+            cm.target = { x: tx, z: tz };
+            cm.wait = 0;
+            cm.speed = 3.0; // Run fast when afraid!
+          } else {
+            pickWanderTarget(cm);
+          }
+        } else {
+          pickWanderTarget(cm);
+        }
         continue;
       }
     }
@@ -8733,8 +8775,8 @@ function initDemoMode() {
     // 0. Flatten ground clearing around Eden Campfire
     EDEN_FLAT = { x: edenX, z: edenZ, y: terrainHeight(edenX, edenZ, SEED) };
 
-    // 1. Eden Campfire
-    placeCampfire(edenX, edenZ);
+    // 1. Eden Campfire (Turned ON / Lit with pixel flames and glow)
+    placeCampfire(edenX, edenZ, true);
 
     // 2. Heavenly Golden Glow Light
     const edenGlow = makeGlowSprite();
