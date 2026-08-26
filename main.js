@@ -598,14 +598,27 @@ function buildBlockAtlas() {
 
 // Flat clearing around the home campfire (set by buildBeacon, sent to workers)
 let HOME_FLAT = null;
+let EDEN_FLAT = null;
 
 function homeFlatten(wx, wz, h) {
-  if (!HOME_FLAT) return h;
-  const dx = wx - HOME_FLAT.x, dz = wz - HOME_FLAT.z;
-  const d = Math.sqrt(dx * dx + dz * dz);
-  if (d >= 3.4) return h;
-  const t = sstep(Math.min(1, Math.max(0, (d - 1.4) / 2)));
-  return Math.round(lerp(HOME_FLAT.y, h, t));
+  let resH = h;
+  if (HOME_FLAT) {
+    const dx = wx - HOME_FLAT.x, dz = wz - HOME_FLAT.z;
+    const d = Math.sqrt(dx * dx + dz * dz);
+    if (d < 3.4) {
+      const t = sstep(Math.min(1, Math.max(0, (d - 1.4) / 2)));
+      resH = Math.round(lerp(HOME_FLAT.y, resH, t));
+    }
+  }
+  if (EDEN_FLAT) {
+    const dx = wx - EDEN_FLAT.x, dz = wz - EDEN_FLAT.z;
+    const d = Math.sqrt(dx * dx + dz * dz);
+    if (d < 4.5) {
+      const t = sstep(Math.min(1, Math.max(0, (d - 1.8) / 2.7)));
+      resH = Math.round(lerp(EDEN_FLAT.y, resH, t));
+    }
+  }
+  return resH;
 }
 
 // ============================================================================
@@ -2675,6 +2688,45 @@ function spawnAppleTree(x, z) {
   spr.position.set(x, charGroundY(x, z) + 0.05, z);
   spr.renderOrder = 2;
   scene.add(spr);
+  return spr;
+}
+
+function makeFloatingLabel(text, subtext, color) {
+  const c = document.createElement('canvas');
+  c.width = 280; c.height = 84;
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, 280, 84);
+
+  // Background Glass Pill
+  ctx.fillStyle = 'rgba(12, 18, 30, 0.82)';
+  ctx.strokeStyle = color || '#ffd23f';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(14, 8, 252, 68, 16);
+  ctx.fill();
+  ctx.stroke();
+
+  // Main Header Text
+  ctx.fillStyle = color || '#ffd23f';
+  ctx.font = '900 26px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+  ctx.shadowBlur = 8;
+  ctx.fillText(text, 140, 32);
+
+  if (subtext) {
+    ctx.fillStyle = '#e0eaef';
+    ctx.font = '600 12px sans-serif';
+    ctx.fillText(subtext, 140, 56);
+  }
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.magFilter = THREE.LinearFilter;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+  spr.scale.set(7.5, 2.25, 1);
+  spr.renderOrder = 999;
   return spr;
 }
 
@@ -5817,11 +5869,14 @@ function pickWanderTarget(cm) {
       continue;
     }
     if (cm.homebound) {
-      const dx = tx - homePos.x, dz = tz - homePos.z;
+      const hx = cm.edenPos ? cm.edenPos.x : homePos.x;
+      const hz = cm.edenPos ? cm.edenPos.z : homePos.z;
+      const leash = cm.edenPos ? 4.5 : CAMP_LEASH;
+      const dx = tx - hx, dz = tz - hz;
       const d = Math.hypot(dx, dz);
-      if (d > CAMP_LEASH) {
-        tx = homePos.x + (dx / d) * CAMP_LEASH;
-        tz = homePos.z + (dz / d) * CAMP_LEASH;
+      if (d > leash) {
+        tx = hx + (dx / d) * leash;
+        tz = hz + (dz / d) * leash;
       }
     }
     cm.target = { x: tx, z: tz };
@@ -8601,6 +8656,9 @@ function initDemoMode() {
     const edenX = homePos.x + 28, edenZ = homePos.z - 22;
     const edenY = charGroundY(edenX, edenZ);
 
+    // 0. Flatten ground clearing around Eden Campfire
+    EDEN_FLAT = { x: edenX, z: edenZ, y: terrainHeight(edenX, edenZ, SEED) };
+
     // 1. Eden Campfire
     placeCampfire(edenX, edenZ);
 
@@ -8616,7 +8674,12 @@ function initDemoMode() {
     // 3. Apple Tree (Custom Painted Oak with Ripe Red Apples)
     spawnAppleTree(edenX + 3.2, edenZ - 2.2);
 
-    // 4. Adam & Eve & two children (Cain & Abel)
+    // 4. Floating 3D "HEAVEN" Label Text Sprite above the camp
+    const heavenLabel = makeFloatingLabel('✨ HEAVEN ✨', 'Adam, Eve, Cain & Abel', '#ffd23f');
+    heavenLabel.position.set(edenX, edenY + 7.5, edenZ);
+    scene.add(heavenLabel);
+
+    // 5. Adam & Eve & two children (Cain & Abel)
     const edenFamily = [
       { name: 'Adam', female: false, age: 32, look: { skin: '#e0aa7a', hair: '#3b2b1e', cloth: '#8a5a33', eyes: '#1a1a1a', style: 0, beard: 1 }, x: edenX - 2.2, z: edenZ + 1.5 },
       { name: 'Eve', female: true, age: 28, look: { skin: '#f2c99b', hair: '#b8863b', dress: '#5e7a46', eyes: '#2e4a2e', style: 1, beard: -1 }, x: edenX + 2.0, z: edenZ + 1.8 },
@@ -8629,6 +8692,7 @@ function initDemoMode() {
       const person = cavemen[cavemen.length - 1];
       person.stats.name = f.name;
       person.homebound = true;
+      person.edenPos = { x: edenX, z: edenZ };
       drawNameTag(person);
     }
   })();
