@@ -93,7 +93,8 @@ let NEAR_RADIUS = IS_MOBILE ? 3 : 4;               // full-detail ring (caves + 
 const SEA_LEVEL = 24;
 const MAX_HEIGHT = 96;
 
-let SEED = Math.floor(Math.random() * 1e9);
+const DEMO_SEED = 7777777;
+let SEED = DEMO_MODE ? DEMO_SEED : Math.floor(Math.random() * 1e9);
 
 // Terrain elevation in blocks (y). Deterministic for every world column.
 function terrainHeight(x, z, seed) {
@@ -8525,7 +8526,7 @@ function initDemoMode() {
   ];
   hideIds.forEach((id) => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
 
-  // --- RESTRICT CONTROLS: only joystick + chat + camera orbit ---
+  SEED = DEMO_SEED;
   // Freeze time at normal speed
   timePaused = false;
   timeSpeed = 1;
