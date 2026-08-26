@@ -26,7 +26,7 @@
   <aside id="assets-panel">
     <header id="assets-header">
       <span id="assets-title">Assets</span>
-      <button id="assets-toggle" class="ctl" aria-label="Toggle assets panel" title="Assets">»</button>
+      <button id="assets-toggle" class="ctl" aria-label="Toggle assets panel" title="Assets">»</button><button id="assets-archive" class="ctl" aria-label="Show all assets" title="All Assets Archive">📦</button>
     </header>
     <div id="assets-body">
       <div class="asset-cat open" data-biome="people">
@@ -193,6 +193,47 @@
     </div>
   </div>
 
-  <script type="module" src="main.js?v=89"></script>
+      <script type="module" src="main.js?v=89"></script>
+      <script>
+        // Archive overlay handling
+        const archiveBtn = document.getElementById('assets-archive');
+        const assetsPanel = document.getElementById('assets-panel');
+        // Create overlay container
+        const overlay = document.createElement('div');
+        overlay.id = 'assets-archive-panel';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.background = 'rgba(0,0,0,0.8)';
+        overlay.style.display = 'none';
+        overlay.style.zIndex = '1000';
+        overlay.style.overflow = 'auto';
+        overlay.style.padding = '20px';
+        overlay.innerHTML = `<button id="archive-close" style="position:absolute;top:10px;right:10px;font-size:24px;cursor:pointer;">✖</button><h2 style="color:#fff;">All Assets &amp; Animations</h2><div id="archive-content" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;"></div>`;
+        document.body.appendChild(overlay);
+        const closeBtn = document.getElementById('archive-close');
+        closeBtn.addEventListener('click', () => { overlay.style.display = 'none'; });
+        archiveBtn.addEventListener('click', () => {
+          const contentDiv = document.getElementById('archive-content');
+          if (!contentDiv.hasChildNodes()) {
+            // Clone all asset canvases
+            document.querySelectorAll('.asset-card canvas').forEach(c => {
+              const clone = c.cloneNode(true);
+              const wrapper = document.createElement('div');
+              wrapper.style.width = '80px';
+              wrapper.style.height = '80px';
+              wrapper.style.background = '#222';
+              wrapper.style.display = 'flex';
+              wrapper.style.alignItems = 'center';
+              wrapper.style.justifyContent = 'center';
+              wrapper.appendChild(clone);
+              contentDiv.appendChild(wrapper);
+            });
+          }
+          overlay.style.display = 'flex';
+        });
+      </script>
 </body>
 </html>
