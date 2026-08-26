@@ -9096,6 +9096,70 @@ function demoClaimBot() {
   }, 2500);
 }
 
+let grunkHoloMat = null;
+function makeHologramMat() {
+  if (grunkHoloMat) return grunkHoloMat;
+  grunkHoloMat = new THREE.ShaderMaterial({
+    uniforms: {
+      uTex: { value: cavemanMatR.map },
+      uTime: { value: 0 },
+      uHoloColor: { value: new THREE.Color(0x00f0ff) },
+    },
+    transparent: true,
+    depthWrite: false,
+    vertexShader: `
+      varying vec2 vUv;
+      varying vec3 vWorldPos;
+      void main() {
+        vUv = uv;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+        gl_Position = projectionMatrix * mv;
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D uTex;
+      uniform float uTime;
+      uniform vec3 uHoloColor;
+      varying vec2 vUv;
+      varying vec3 vWorldPos;
+      void main() {
+        vec4 c = texture2D(uTex, vUv);
+        if (c.a < 0.1) discard;
+
+        // Holographic scanlines effect
+        float scanline = sin(vUv.y * 95.0 - uTime * 9.0) * 0.20 + 0.80;
+        float pulse = sin(uTime * 3.5) * 0.14 + 0.86;
+        float flicker = sin(uTime * 28.0 + vWorldPos.y * 12.0) * 0.06 + 0.94;
+
+        // Tint artwork towards glowing cyan hologram with original detail retained
+        vec3 holo = mix(c.rgb, uHoloColor * (c.r * 0.6 + c.g * 0.6 + c.b * 0.6 + 0.45), 0.82);
+        float alpha = c.a * 0.88 * pulse * scanline * flicker;
+
+        gl_FragColor = vec4(holo * 1.35, alpha);
+      }
+    `,
+  });
+  return grunkHoloMat;
+}
+
+function makeHoloRingSprite() {
+  const cv = document.createElement('canvas');
+  cv.width = 64; cv.height = 64;
+  const ctx = cv.getContext('2d');
+  const grad = ctx.createRadialGradient(32, 32, 2, 32, 32, 30);
+  grad.addColorStop(0, 'rgba(0,240,255,0.85)');
+  grad.addColorStop(0.4, 'rgba(0,240,255,0.35)');
+  grad.addColorStop(0.85, 'rgba(0,240,255,0.75)');
+  grad.addColorStop(1, 'rgba(0,240,255,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 64, 64);
+  const tex = new THREE.CanvasTexture(cv);
+  const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+  spr.scale.set(2.6, 2.6, 1);
+  return spr;
+}
+
 // --- DEMO MODULE part 3: ghosts & bubbles ------------------------------------
 function demoMakeGhostMat(female, look) {
   if (!look) return female ? womanMatR : cavemanMatR;
@@ -9107,18 +9171,26 @@ function demoMakeGhostMat(female, look) {
 }
 
 function demoMakeGhost(id, name, color, female = false, look = null) {
-  const mat = id === 'grunk' ? cavemanMatR : demoMakeGhostMat(female, look);
+  const isGrunk = id === 'grunk';
+  const mat = isGrunk ? makeHologramMat() : demoMakeGhostMat(female, look);
   const spr = new THREE.Sprite(mat);
   spr.center.set(0.5, 0);
   spr.scale.set(2.7, 3.0, 1);
   spr.visible = false;
   scene.add(spr);
+
+  let holoRing = null;
+  if (isGrunk) {
+    holoRing = makeHoloRingSprite();
+    scene.add(holoRing);
+  }
+
   const nameSpr = makeNameSprite();
   scene.add(nameSpr);
   const bubble = demoMakeBubble();
   scene.add(bubble);
   const g = {
-    id, name, color, female, look, spr, nameSpr, bubble,
+    id, name, color, female, look, spr, nameSpr, bubble, holoRing,
     cur: new THREE.Vector3(),
     target: new THREE.Vector3(),
     lastSeen: performance.now(),
@@ -9423,6 +9495,26 @@ function updateDemo(dt, t) {
     }
   }
 
+  if (grunkHoloMat) grunkHoloMat.uniforms.uTime.value = t;
+
+  // Grunk: stands by the fire, glowing cyan hologram scanline effect
+  const gr = s.botGhost;
+  if (gr) {
+    const fy = homeFire ? homeFire.position.y : groundYAt(homePos.x, homePos.z);
+    const gx = homePos.x + 2.1, gz = homePos.z + 1.9;
+    gr.spr.position.set(gx, fy + Math.sin(t * 1.6) * 0.06, gz);
+    gr.spr.visible = !hide;
+    if (gr.holoRing) {
+      gr.holoRing.visible = !hide;
+      gr.holoRing.position.set(gx, fy + 0.05, gz);
+    }
+    if (gr.nameSpr) {
+      gr.nameSpr.visible = !hide;
+      gr.nameSpr.position.set(gx, fy + gr.spr.scale.y + 0.32, gz);
+    }
+    demoStepBubble(gr, dt);
+  }
+
   // remote players: smooth toward their broadcast spot, tags & bubbles above
   for (const [id, g] of s.ghosts) {
     if (g === s.botGhost) continue;
@@ -9435,20 +9527,7 @@ function updateDemo(dt, t) {
       g.nameSpr.position.set(g.spr.position.x, g.spr.position.y + g.spr.scale.y + 0.32, g.spr.position.z);
     }
     demoStepBubble(g, dt);
-  }
-
   if (!homeLit) igniteHome();
-  // Grunk: stands by the fire, bobs gently, wears his name & bubbles
-  const gr = s.botGhost;
-  if (gr) {
-    const fy = homeFire ? homeFire.position.y : groundYAt(homePos.x, homePos.z);
-    gr.spr.position.set(homePos.x + 2.1, fy + Math.sin(t * 1.6) * 0.06, homePos.z + 1.9);
-    gr.spr.visible = !hide;
-    if (gr.nameSpr) {
-      gr.nameSpr.visible = !hide;
-      gr.nameSpr.position.set(gr.spr.position.x, gr.spr.position.y + gr.spr.scale.y + 0.32, gr.spr.position.z);
-    }
-    demoStepBubble(gr, dt);
   }
 
   // my own chat bubble rides above my human
