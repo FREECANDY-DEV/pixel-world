@@ -9105,9 +9105,14 @@ function makeHologramMat() {
       varying vec3 vWorldPos;
       void main() {
         vUv = uv;
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
-        gl_Position = projectionMatrix * mv;
+        vec3 basePos = modelMatrix[3].xyz;
+        vec4 mvPosition = viewMatrix * vec4(basePos, 1.0);
+        // Sprite view-space billboarding equation: anchors feet at basePos and always faces camera
+        vec2 scale = vec2(length(modelMatrix[0].xyz), length(modelMatrix[1].xyz));
+        vec2 alignedPosition = (position.xy - vec2(0.0, 0.5)) * scale;
+        mvPosition.xy += alignedPosition;
+        vWorldPos = basePos;
+        gl_Position = projectionMatrix * mvPosition;
       }
     `,
     fragmentShader: `
@@ -9470,9 +9475,9 @@ function updateDemo(dt, t) {
   // Grunk: stands by the fire floating slightly above ground with glowing cyan hologram effect
   const gr = s.botGhost;
   if (gr) {
-    const fy = (homeFire ? homeFire.position.y : groundYAt(homePos.x, homePos.z)) + 0.35;
+    const fy = charGroundY(homePos.x + 2.1, homePos.z + 1.9) + 0.18;
     const gx = homePos.x + 2.1, gz = homePos.z + 1.9;
-    gr.spr.position.set(gx, fy + Math.sin(t * 1.6) * 0.06, gz);
+    gr.spr.position.set(gx, fy + Math.sin(t * 1.6) * 0.08, gz);
     gr.spr.visible = !hide;
     if (gr.nameSpr) {
       gr.nameSpr.visible = !hide;
