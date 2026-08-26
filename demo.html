@@ -148,6 +148,18 @@
     <div class="pill">👥 Live players</div>
     <div class="pill">💬 Chat</div>
     <div class="pill">👆 Drag to look</div>
+    <button id="archive-btn" class="pill" style="cursor:pointer;border-color:rgba(255,210,63,0.45);background:rgba(255,210,63,0.12);color:#ffd23f;font-weight:600;">📦 Assets</button>
+  </div>
+
+  <!-- Archive Overlay -->
+  <div id="archive-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(4,7,13,0.96);overflow-y:auto;padding:24px;">
+    <div style="max-width:720px;margin:0 auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <h2 style="color:#ffd23f;font-size:18px;font-weight:800;letter-spacing:-0.02em;">📦 All Assets &amp; Animations</h2>
+        <button id="archive-close" style="background:none;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-size:18px;padding:4px 12px;cursor:pointer;">✕</button>
+      </div>
+      <div id="archive-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;"></div>
+    </div>
   </div>
 
   <div class="footer">MQTT-powered · Zero accounts</div>
@@ -566,6 +578,369 @@
         requestAnimationFrame(draw);
       }
       draw();
+    })();
+  </script>
+
+  <script>
+    // ================================================================
+    // 6. Archive Overlay — render all pixel-art assets from SPRITESHEET
+    // ================================================================
+    (function initArchive() {
+      const btn = document.getElementById('archive-btn');
+      const overlay = document.getElementById('archive-overlay');
+      const closeBtn = document.getElementById('archive-close');
+      const grid = document.getElementById('archive-grid');
+      if (!btn || !overlay || !grid) return;
+
+      closeBtn.addEventListener('click', () => { overlay.style.display = 'none'; });
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.style.display = 'none'; });
+
+      let built = false;
+      btn.addEventListener('click', () => {
+        overlay.style.display = 'block';
+        if (built) return;
+        built = true;
+
+        // All assets grouped by category
+        const categories = [
+          { title: '👤 Characters', assets: [
+            { name: 'Hazmat Human', art: [
+              '.....YYYYYY.....',
+              '....YYYYYYYY....',
+              '....YVVVVVVY....',
+              '....YVVGGVVY....',
+              '....YVVVVVVY....',
+              '....YYRRRYYY....',
+              '....YYYYYYYY....',
+              '.....YYYYYY.....',
+              '......YY........',
+              '....YYYYYYYY....',
+              '....YBBBBBYY....',
+              '...YYYYYYYYYY...',
+              '...YYBBAAYY.....',
+              '...YYYYYYYYYY...',
+              '....YYYYYY......',
+              '....KK..KK......',
+              '....KK..KK......',
+              '....KK..KK......',
+              '....KK..KK......',
+            ], pal: {Y:'#ffd23f',V:'#0f172a',G:'#38bdf8',R:'#475569',B:'#1e293b',A:'#e11d48',K:'#0f172a'}},
+            { name: 'Caveman', art: [
+              '................',
+              '.....BBBB.......',
+              '....BBBBBB......',
+              '....BSSSBB......',
+              '....BSEEBB......',
+              '....BSSSBB......',
+              '....BBBBBB......',
+              '.....BBBB.......',
+              '......SS........',
+              '....CCCCCC......',
+              '....CCCCCC......',
+              '...CCCCCCCC.....',
+              '...CCCCCCCC.....',
+              '....CCCCCC......',
+              '....SS..SS......',
+              '....SS..SS......',
+              '....SS..SS......',
+            ], pal: {B:'#5a3a1e',S:'#d4a373',E:'#1a1a1a',C:'#8b6b3d'}},
+          ]},
+          { title: '🦣 Wildlife & Creatures', assets: [
+            { name: 'Mammoth', art: [
+              '................',
+              '..BBBBB.........',
+              '.BBBBBBB........',
+              'BBBBBBBB..BB....',
+              'BBBBBBBBBBBB....',
+              '.BBBWWBBBBBB....',
+              '.BBBBBBBBBBBB...',
+              '..BBBBBBBBBBB...',
+              '..BBTTBBBBBBB...',
+              '...BTTTBBBBBB...',
+              '....TTTBBBBBB...',
+              '.....TTBBBBB....',
+              '......TBB.BB....',
+              '.......BB.BB....',
+            ], pal: {B:'#63422b',W:'#f4f0e4',T:'#8b7355'}},
+            { name: 'Sabertooth', art: [
+              '................',
+              '....GGG.........',
+              '...GGGGG........',
+              '...GGGGGG.......',
+              '...GGGGGGGGG....',
+              '...GGWGGGGGGG...',
+              '....GGGGGGGGGG..',
+              '....GGGGGGGGG...',
+              '.....GGGGGGGG...',
+              '.....GG..GG.T...',
+            ], pal: {G:'#c7863c',W:'#ffffff',T:'#c7863c'}},
+            { name: 'Wild Boar', art: [
+              '................',
+              '.....DDD........',
+              '....DDDDD.......',
+              '...DDDDDDDD.....',
+              '...DDDDDDDDD...',
+              '...DWDDDDDDDD..',
+              '....DDDDDDDDD..',
+              '....DDDDDDDD...',
+              '.....DD..DD.....',
+            ], pal: {D:'#42362b',W:'#f4f0e4'}},
+            { name: 'Rabbit', art: [
+              '................',
+              '....EE.EE.......',
+              '....EE.EE.......',
+              '....RRRRR.......',
+              '....RRRRR.......',
+              '...RRRRRR.......',
+              '...RRRRRR..W....',
+              '....RR.RR.......',
+            ], pal: {R:'#9c8874',E:'#d4c4b0',W:'#ffffff'}},
+            { name: 'Eagle', art: [
+              '................',
+              '......WW........',
+              '.....WWWW.......',
+              '....BWWWYB......',
+              '...BBBBBBB......',
+              '..BBBBBBBBB.....',
+              '.BBBBBBBBBBB....',
+              '................',
+            ], pal: {B:'#4a3625',W:'#ffffff',Y:'#ffcc00'}},
+            { name: 'Honeybee', art: [
+              '................',
+              '.......ww.......',
+              '......YBYB......',
+              '......YBBY......',
+              '.......YB.......',
+              '................',
+            ], pal: {Y:'#f5ba18',B:'#1a1813',w:'rgba(200,220,255,0.5)'}},
+          ]},
+          { title: '🏚️ Housing & Shelters', assets: [
+            { name: 'Thatch Hut', art: [
+              '......TTT.......',
+              '.....TTTTT......',
+              '....TTTTTTT.....',
+              '...TTTTTTTTT....',
+              '..TTTTTTTTTTT...',
+              '.TTTTTTTTTTTTT..',
+              '.TTTTTTTTTTTTT..',
+              '..TTLDDLTTTT....',
+              '..TTLDDDTTTT....',
+              '..TTTTTTTTTT....',
+            ], pal: {T:'#87693d',D:'#4e342e',L:'#5a3a1e'}},
+            { name: 'Log Cabin', art: [
+              '......CC........',
+              '.....CCCC.......',
+              '...LLLLLLLL.....',
+              '...LLLLLLLL.....',
+              '...LLYYLLLL.....',
+              '...LLLLLLLL.....',
+              '...LLDDLLLL.....',
+              '...LLDDLLLL.....',
+            ], pal: {L:'#664327',C:'#6b6660',Y:'#ffd23f',D:'#4e342e'}},
+            { name: 'Stone Cottage', art: [
+              '....RRRRRRRR....',
+              '...RRRRRRRRRR...',
+              '..SSSSSSSSSSSS..',
+              '..SSBBSSBBSSSS..',
+              '..SSSSSSSSSSSS..',
+              '..SSSSDDSSSSS...',
+              '..SSSSDDSSSSS...',
+            ], pal: {R:'#a33928',S:'#858994',B:'#82ccdd',D:'#4e342e'}},
+            { name: 'Bunker', art: [
+              '..CCCCCCCCCC....',
+              '..CCCCCCCCCC....',
+              '..CCVVCCCCCC....',
+              '..CCCCCCCCCC....',
+              '..CCDDCCCCCC....',
+              '..CCDDCCCCCC....',
+            ], pal: {C:'#57606f',D:'#2f3542',V:'#1e293b'}},
+            { name: 'Cyber Hab', art: [
+              '....GGGGGG......',
+              '...GGGGGGGG.....',
+              '..CCCCCCCCCC....',
+              '..CCBBCCCCCC....',
+              '..CCCCCCCCCC....',
+              '..CCDDCCNNCC....',
+            ], pal: {C:'#2f3542',G:'#00d2d3',B:'#0097e6',D:'#2f3542',N:'#ffa502'}},
+          ]},
+          { title: '⚔️ Weapons', assets: [
+            { name: 'Flint Spear', art: [
+              '........GG......',
+              '.......GGG......',
+              '.......BBB......',
+              '......WWWW......',
+              '......WWWW......',
+              '.......WW.......',
+              '.......WW.......',
+              '.......WW.......',
+              '.......WW.......',
+              '.......WW.......',
+            ], pal: {G:'#9e9e9e',B:'#4e342e',W:'#795548'}},
+            { name: 'Iron Sword', art: [
+              '.......SS.......',
+              '.......SS.......',
+              '.......SS.......',
+              '.......SS.......',
+              '.......SS.......',
+              '.......SS.......',
+              '......GGGG......',
+              '.......BB.......',
+              '.......BB.......',
+            ], pal: {S:'#cfd8dc',G:'#ffb300',B:'#795548'}},
+            { name: 'Tactical Rifle', art: [
+              '................',
+              '..DDDDDDDDDD....',
+              '..DTDDDDDSDD....',
+              '..DDDDDDDDD.....',
+              '......DDD.......',
+              '......MMM.......',
+            ], pal: {D:'#263238',T:'#009688',S:'#009688',M:'#37474f'}},
+            { name: 'Plasma Saber', art: [
+              '.......PP.......',
+              '.......PP.......',
+              '.......PP.......',
+              '.......PP.......',
+              '.......PP.......',
+              '......HHHH......',
+              '.......HH.......',
+            ], pal: {P:'#00f0ff',H:'#37474f'}},
+          ]},
+          { title: '🚗 Vehicles', assets: [
+            { name: 'Chariot', art: [
+              '................',
+              '....WWWWWW......',
+              '...WWWWWWWW.....',
+              '...WWWWWWWW.....',
+              '..TTTTTTTTTT....',
+              '.TT........TT...',
+            ], pal: {W:'#8d6e63',T:'#4e342e'}},
+            { name: 'Survival Jeep', art: [
+              '...GGGGGGGG.....',
+              '..GGGGGGGGGG....',
+              '..GGYGGGGGGGG...',
+              '..GGGGGGGGGG....',
+              '.TTT......TTT...',
+              '.TTT......TTT...',
+            ], pal: {G:'#2e7d32',T:'#212121',Y:'#ffd23f'}},
+            { name: 'Hovercraft', art: [
+              '....AAAAAA......',
+              '...AACCCCAA.....',
+              '..AAAAAAAAAA....',
+              '..AAAAAAAAAA....',
+              '...GGGGGGGG.....',
+            ], pal: {A:'#37474f',C:'#00bcd4',G:'#00f0ff'}},
+          ]},
+          { title: '🦈 Marine Life', assets: [
+            { name: 'Great White', art: [
+              '................',
+              '.......FF.......',
+              '......SSSS......',
+              '....SSSSSSSSS...',
+              '...SWWWWWWWSSST.',
+              '....SSSSSSSSS...',
+              '......SSSS......',
+            ], pal: {S:'#607d8b',W:'#eceff1',F:'#607d8b',T:'#607d8b'}},
+            { name: 'Octopus', art: [
+              '......RRRR......',
+              '.....RRRRRR.....',
+              '.....RREERRR....',
+              '....TTTTTTTT....',
+              '...T.TT.TT.T....',
+              '..T..TT.TT..T...',
+            ], pal: {R:'#d32f2f',E:'#ffffff',T:'#b71c1c'}},
+            { name: 'Sea Turtle', art: [
+              '......GGGG......',
+              '.....GGGGGG.....',
+              '...FFGGPPGGFF...',
+              '.....GGGGGG.....',
+              '......FFFF......',
+            ], pal: {G:'#2e7d32',P:'#4caf50',F:'#1b5e20'}},
+          ]},
+          { title: '🪵 Resources & Props', assets: [
+            { name: 'Wood Pile', art: [
+              '...LLLLLLLL.....',
+              '..LLLWLLWLLL....',
+              '..LLLLLLLLLL....',
+              '..LLLWLLWLLL....',
+              '...LLLLLLLL.....',
+            ], pal: {L:'#6d4c41',W:'#d7ccc8'}},
+            { name: 'Red Poppy', art: [
+              '.......RR.......',
+              '......RRRR......',
+              '......RDDR......',
+              '.......GG.......',
+              '.......GG.......',
+              '.......GG.......',
+              '.......GG.......',
+            ], pal: {R:'#e53935',D:'#b71c1c',G:'#2e7d32'}},
+            { name: 'Sunflower', art: [
+              '......YYY.......',
+              '.....YYYYY......',
+              '.....YYBBYY.....',
+              '......YYY.......',
+              '.......GG.......',
+              '.......GG.......',
+              '......GGG.......',
+              '.......GG.......',
+            ], pal: {Y:'#fbc02d',B:'#795548',G:'#2e7d32'}},
+            { name: 'Beehive', art: [
+              '......HHH.......',
+              '.....HHHHH......',
+              '....HHHHHHH.....',
+              '....HHDDHHHH....',
+              '....HHHHHHH.....',
+              '.....HHHHH......',
+            ], pal: {H:'#f57f17',D:'#4e342e'}},
+            { name: 'Iron Ore', art: [
+              '....SSSSSS......',
+              '...SSSRRSSSS....',
+              '..SSSSRRSSSSS...',
+              '..SSSSSSSSSSS...',
+              '...SSSRRSSSSS...',
+              '....SSSSSSSS....',
+            ], pal: {S:'#616161',R:'#b71c1c'}},
+          ]},
+        ];
+
+        // Render each category
+        categories.forEach(cat => {
+          const header = document.createElement('div');
+          header.style.cssText = 'grid-column:1/-1;color:#ffd23f;font-size:13px;font-weight:700;margin:12px 0 4px;letter-spacing:-0.01em;';
+          header.textContent = cat.title;
+          grid.appendChild(header);
+
+          cat.assets.forEach(asset => {
+            const card = document.createElement('div');
+            card.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;';
+
+            const cv = document.createElement('canvas');
+            const cols = asset.art[0].length, rows = asset.art.length;
+            const scale = Math.min(Math.floor(48 / cols), Math.floor(48 / rows), 4);
+            cv.width = cols * scale;
+            cv.height = rows * scale;
+            cv.style.cssText = 'image-rendering:pixelated;image-rendering:crisp-edges;width:48px;height:48px;';
+            const ctx = cv.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            for (let y = 0; y < rows; y++) {
+              for (let x = 0; x < cols; x++) {
+                const ch = asset.art[y][x];
+                const color = asset.pal[ch];
+                if (!color || ch === '.') continue;
+                ctx.fillStyle = color;
+                ctx.fillRect(x * scale, y * scale, scale, scale);
+              }
+            }
+            card.appendChild(cv);
+
+            const label = document.createElement('span');
+            label.style.cssText = 'font-size:8px;font-weight:600;color:#dce4ee;text-align:center;line-height:1.15;opacity:0.88;';
+            label.textContent = asset.name;
+            card.appendChild(label);
+
+            grid.appendChild(card);
+          });
+        });
+      });
     })();
   </script>
 </body>
