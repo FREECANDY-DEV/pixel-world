@@ -155,7 +155,7 @@
   <div id="archive-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(4,7,13,0.96);overflow-y:auto;padding:24px;">
     <div style="max-width:840px;margin:0 auto;">
       <div style="display:flex;align-items:center;justify-space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap;">
-        <h2 style="color:#ffd23f;font-size:18px;font-weight:800;letter-spacing:-0.02em;margin:0;">📦 All 1,000+ Assets (#0001 - #1020)</h2>
+        <h2 style="color:#ffd23f;font-size:18px;font-weight:800;letter-spacing:-0.02em;margin:0;">📦 Pixel Art Asset Archive</h2>
         <div style="flex:1;max-width:340px;">
           <input id="asset-search-input" type="text" placeholder="🔍 Search ID (#0042) or Name (Dragon)..." style="width:100%;padding:6px 12px;border:1px solid rgba(255,210,63,0.4);border-radius:8px;background:rgba(15,23,42,0.9);color:#fff;font-size:12px;outline:none;" />
         </div>
@@ -945,195 +945,15 @@
           });
         }
 
-        function paintProceduralAsset(ctx, num, catIdx, name, t) {
-          const s = (num * 2654435761) >>> 0; // Deterministic seed per asset ID
-          const rnd = (i) => (((s + i * 1013904223) >>> 0) / 4294967296);
-          const pickCol = (arr, i) => arr[Math.floor(rnd(i) * arr.length)];
-
-          const palPrimary = ['#ef4444', '#f97316', '#f59e0b', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#84cc16'];
-          const palSecondary = ['#1e293b', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1', '#e2e8f0', '#78350f', '#92400e', '#581c87'];
-          const c1 = pickCol(palPrimary, 1);
-          const c2 = pickCol(palSecondary, 2);
-          const c3 = pickCol(palPrimary, 3);
-          const c4 = pickCol(palSecondary, 4);
-
-          const bob = Math.round(Math.sin(t * 5 + num) * 1.5);
-          ctx.save();
-          ctx.translate(0, bob);
-
-          if (catIdx === 1) {
-            // 👤 Tribe & Hero Classes (#0001 - #0150)
-            const headShape = Math.floor(rnd(5) * 4);
-            const bodyWidth = 14 + Math.floor(rnd(6) * 6);
-            const weaponType = Math.floor(rnd(7) * 5);
-
-            tpx(ctx, 24 - bodyWidth / 2, 22, bodyWidth, 14, c2); // Torso
-            tpx(ctx, 18, 12, 12, 10, '#ffd23f'); // Head/Skin
-            tpx(ctx, 16, 36, 6, 8, '#0f172a'); // Left Leg
-            tpx(ctx, 26, 36, 6, 8, '#0f172a'); // Right Leg
-
-            if (headShape === 0) {
-              tpx(ctx, 16, 8, 16, 4, c1);
-              tpx(ctx, 14, 4, 3, 6, '#e2e8f0');
-              tpx(ctx, 29, 4, 3, 6, '#e2e8f0');
-            } else if (headShape === 1) {
-              tpx(ctx, 14, 10, 20, 3, c1);
-              tpx(ctx, 18, 2, 12, 8, c1);
-              tpx(ctx, 21, -2, 6, 4, '#facc15');
-            } else if (headShape === 2) {
-              tpx(ctx, 18, 14, 12, 4, '#00e5ff');
-              tpx(ctx, 28, 8, 2, 8, '#00e5ff');
-            } else {
-              tpx(ctx, 17, 7, 14, 5, '#facc15');
-              tpx(ctx, 19, 4, 2, 3, '#facc15');
-              tpx(ctx, 23, 4, 2, 3, '#facc15');
-              tpx(ctx, 27, 4, 2, 3, '#facc15');
-            }
-
-            if (weaponType === 0) {
-              tpx(ctx, 32, 10, 4, 26, '#94a3b8'); tpx(ctx, 30, 32, 8, 3, c1);
-            } else if (weaponType === 1) {
-              tpx(ctx, 32, 6, 3, 30, '#78350f'); tpx(ctx, 30, 2, 7, 7, c3);
-            } else if (weaponType === 2) {
-              tpx(ctx, 32, 2, 3, 34, '#795548'); tpx(ctx, 31, -3, 5, 7, '#cbd5e1');
-            } else if (weaponType === 3) {
-              tpx(ctx, 32, 12, 3, 20, '#d97706'); tpx(ctx, 34, 10, 1, 24, '#ffffff');
-            } else {
-              tpx(ctx, 30, 20, 14, 6, c1); tpx(ctx, 42, 18, 4, 10, '#00e5ff');
-            }
-          } else if (catIdx === 2) {
-            // 🌲 Vegetation & Flora (#0151 - #0300)
-            const trunkH = 14 + Math.floor(rnd(8) * 14);
-            const canopyType = Math.floor(rnd(9) * 4);
-            const tW = 4 + Math.floor(rnd(10) * 4);
-            
-            tpx(ctx, 24 - tW / 2, 44 - trunkH, tW, trunkH, c2);
-
-            if (canopyType === 0) {
-              for (let i = 0; i < 3; i++) {
-                const w = 24 - i * 6;
-                tpx(ctx, 24 - w / 2, 44 - trunkH - (i + 1) * 8, w, 9, c1);
-              }
-            } else if (canopyType === 1) {
-              tblob(ctx, 24, 44 - trunkH - 8, 14 + Math.floor(rnd(11) * 6), 10 + Math.floor(rnd(12) * 4), c1);
-            } else if (canopyType === 2) {
-              for (let a = 0; a < 5; a++) {
-                const dx = Math.round(Math.cos(a * 1.25) * 12);
-                const dy = Math.round(Math.sin(a * 1.25) * 8);
-                tpx(ctx, 24 + dx, 44 - trunkH + dy, 4, 4, c1);
-              }
-            } else {
-              tblob(ctx, 24, 44 - trunkH - 6, 10, 10, c3);
-              for (let i = 0; i < 4; i++) tpx(ctx, 20 + i * 3, 44 - trunkH - 14, 2, 4, '#ffffff');
-            }
-          } else if (catIdx === 3) {
-            // 🐟 Sea Life & Aquatic Organisms (#0301 - #0400)
-            const fishW = 20 + Math.floor(rnd(13) * 12);
-            const fishH = 10 + Math.floor(rnd(14) * 8);
-            const tailType = Math.floor(rnd(15) * 3);
-            
-            tpx(ctx, 24 - fishW / 2, 24 - fishH / 2, fishW, fishH, c1);
-            tpx(ctx, 24 - fishW / 2, 24, fishW, fishH / 2, c4);
-            tpx(ctx, 24 + fishW / 2 - 6, 20, 3, 3, '#0f172a');
-
-            if (tailType === 0) {
-              tpx(ctx, 24 - fishW / 2 - 8, 16, 8, 16, c3);
-            } else if (tailType === 1) {
-              tpx(ctx, 24 - fishW / 2 - 6, 14, 6, 6, c3);
-              tpx(ctx, 24 - fishW / 2 - 6, 28, 6, 6, c3);
-            } else {
-              tpx(ctx, 24 - fishW / 2 - 10, 20, 10, 8, c3);
-            }
-          } else if (catIdx === 4) {
-            // 🦣 Wildlife, Beasts & Megafauna (#0401 - #0550)
-            const bodyLength = 22 + Math.floor(rnd(16) * 10);
-            const bodyHeight = 12 + Math.floor(rnd(17) * 8);
-            const headPosition = Math.floor(rnd(18) * 3);
-
-            tpx(ctx, 14, 24 - bodyHeight / 2, bodyLength, bodyHeight, c1);
-            tpx(ctx, 10, 14, 10, 10, c3);
-            tpx(ctx, 16, 24 + bodyHeight / 2, 4, 10, c2);
-            tpx(ctx, 28, 24 + bodyHeight / 2, 4, 10, c2);
-            if (headPosition === 0) tpx(ctx, 4, 12, 8, 4, '#e2e8f0');
-            if (headPosition === 1) tpx(ctx, 12, 6, 3, 8, '#e2e8f0');
-          } else if (catIdx === 5) {
-            // 🏚️ Base Building & Housing (#0551 - #0700)
-            const bldgW = 22 + Math.floor(rnd(19) * 12);
-            const bldgH = 16 + Math.floor(rnd(20) * 12);
-            const roofStyle = Math.floor(rnd(21) * 4);
-
-            tpx(ctx, 24 - bldgW / 2, 44 - bldgH, bldgW, bldgH, c2);
-            tpx(ctx, 22, 44 - 10, 6, 10, '#3e2723');
-            tpx(ctx, 16, 44 - bldgH + 4, 4, 4, '#facc15');
-
-            if (roofStyle === 0) {
-              for (let i = 0; i < 10; i++) tpx(ctx, 24 - (bldgW / 2 + 2) + i, 44 - bldgH - i, (bldgW + 4) - i * 2, 1, c1);
-            } else if (roofStyle === 1) {
-              tpx(ctx, 24 - (bldgW / 2 + 2), 44 - bldgH - 6, bldgW + 4, 6, c1);
-            } else if (roofStyle === 2) {
-              tblob(ctx, 24, 44 - bldgH - 6, bldgW / 2 + 2, 8, c1);
-            } else {
-              tpx(ctx, 22, 44 - bldgH - 14, 4, 14, c1);
-              tpx(ctx, 24 - bldgW / 2 - 2, 44 - bldgH - 4, bldgW + 4, 4, c1);
-            }
-          } else if (catIdx === 6) {
-            // ⚔️ Weapons & Armaments (#0701 - #0800)
-            const wpnStyle = Math.floor(rnd(22) * 4);
-            if (wpnStyle === 0) {
-              tpx(ctx, 22, 6, 4, 34, c2); tpx(ctx, 14, 14, 20, 4, c1);
-            } else if (wpnStyle === 1) {
-              tpx(ctx, 22, 4, 4, 38, '#78350f'); tpx(ctx, 12, 8, 24, 10, c1);
-            } else if (wpnStyle === 2) {
-              tpx(ctx, 10, 22, 26, 6, c2); tpx(ctx, 34, 20, 6, 10, c1); tpx(ctx, 16, 28, 4, 8, c3);
-            } else {
-              tpx(ctx, 22, 8, 4, 32, c2); tpx(ctx, 18, 8, 12, 18, 'rgba(0,229,255,0.85)');
-            }
-          } else if (catIdx === 7) {
-            // 🚗 Vehicles & Transports (#0801 - #0900)
-            const vehW = 26 + Math.floor(rnd(23) * 10);
-            const vehH = 12 + Math.floor(rnd(24) * 6);
-            tpx(ctx, 24 - vehW / 2, 32 - vehH / 2, vehW, vehH, c1);
-            tpx(ctx, 18, 32 - vehH / 2 - 6, 12, 6, '#38bdf8');
-            tpx(ctx, 14, 32 + vehH / 2, 6, 6, '#0f172a');
-            tpx(ctx, 30, 32 + vehH / 2, 6, 6, '#0f172a');
-          } else if (catIdx === 8) {
-            // 🦈 Marine Predators & Ocean (#0901 - #0950)
-            const predW = 28 + Math.floor(rnd(25) * 8);
-            tpx(ctx, 24 - predW / 2, 20, predW, 12, c2);
-            tpx(ctx, 22, 10, 6, 10, c1);
-            tpx(ctx, 24 + predW / 2 - 8, 22, 3, 3, '#ef4444');
-            tpx(ctx, 24 + predW / 2 - 4, 26, 4, 4, '#ffffff');
-          } else if (catIdx === 9) {
-            // 🪵 World Resources & Props (#0951 - #1000)
-            const propType = Math.floor(rnd(26) * 3);
-            if (propType === 0) {
-              tpx(ctx, 14, 24, 20, 16, c1); tpx(ctx, 18, 20, 12, 4, c2); tpx(ctx, 22, 30, 4, 4, '#facc15');
-            } else if (propType === 1) {
-              tpx(ctx, 12, 26, 24, 16, '#616161'); tpx(ctx, 16, 28, 6, 6, c3); tpx(ctx, 26, 32, 6, 6, c3);
-            } else {
-              for (let y = 38; y >= 28; y -= 4) { tpx(ctx, 12, y, 24, 3, c1); }
-            }
-          } else {
-            // 👾 Era NPC Enemies (#1001 - #1020)
-            tpx(ctx, 16, 20, 16, 16, c2);
-            tpx(ctx, 18, 10, 12, 10, '#0f172a');
-            tpx(ctx, 20, 14, 8, 2, '#ef4444');
-            tpx(ctx, 10, 20, 5, 14, c1);
-          }
-
-          ctx.restore();
+        let assetCounter = 1;
+        function getNextId() {
+          return '#' + String(assetCounter++).padStart(4, '0');
         }
 
-        const VARIANT_NAMES = [
-          'Alpha', 'Prime', 'Mk-II', 'Elite', 'Ancient', 'Cyber', 'Starlight', 'Void',
-          'Solar', 'Lunar', 'Shadow', 'Crimson', 'Emerald', 'Azure', 'Golden', 'Obsidian',
-          'Rift', 'Quantum', 'Nebula', 'Overlord', 'Sentinel', 'Vanguard', 'Titan', 'Apex'
-        ];
-
-        // 1. 👤 Tribe & Hero Class Human Figures (#0001 - #0150)
-        addHeader('👤 Tribe & Hero Classes (#0001 - #0150)');
-        GRID_CHARACTERS.forEach((ch, idx) => {
-          const id = '#' + String(idx + 1).padStart(4, '0');
+        // 1. 👤 Tribe & Hero Class Human Figures
+        addHeader('👤 Tribe & Hero Classes');
+        GRID_CHARACTERS.forEach((ch) => {
+          const id = getNextId();
           createCard(ch.name, id, (ctx, t) => {
             const variant = Math.floor(t * 0.5) % 4;
             const scale = 2;
@@ -1146,169 +966,98 @@
             drawPixelArtGrid(ctx, ch.art, curPal, scale, ox, oy);
           });
         });
-        for (let i = GRID_CHARACTERS.length + 1; i <= 150; i++) {
-          const id = '#' + String(i).padStart(4, '0');
-          const baseCh = GRID_CHARACTERS[i % GRID_CHARACTERS.length];
-          const name = `${baseCh.name} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
-          createCard(name, id, (ctx, t) => {
-            paintProceduralAsset(ctx, i, 1, name, t);
-          });
-        }
 
-        // 2. 🌲 Vegetation & World Flora (#0151 - #0300)
-        addHeader('🌲 Vegetation & Flora (#0151 - #0300)');
-        const vegKeys = Object.keys(VEG_PAINTERS);
-        for (let i = 151; i <= 300; i++) {
-          const id = '#' + String(i).padStart(4, '0');
-          const baseName = vegKeys[(i - 151) % vegKeys.length];
-          const name = i <= 175 ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+        // 2. 🌲 Vegetation & World Flora
+        addHeader('🌲 Vegetation & Flora');
+        Object.keys(VEG_PAINTERS).forEach((name, idx) => {
+          const id = getNextId();
           createCard(name, id, (ctx, t) => {
-            if (i <= 175) {
-              const wind = Math.sin(t * 2.5 + i) * 0.04;
-              ctx.save();
-              ctx.translate(24, 42); ctx.rotate(wind); ctx.translate(-24, -42);
-              VEG_PAINTERS[baseName](ctx);
-              ctx.restore();
-            } else {
-              paintProceduralAsset(ctx, i, 2, name, t);
-            }
+            const wind = Math.sin(t * 2.5 + idx) * 0.04;
+            ctx.save();
+            ctx.translate(24, 42); ctx.rotate(wind); ctx.translate(-24, -42);
+            VEG_PAINTERS[name](ctx);
+            ctx.restore();
           });
-        }
+        });
 
-        // 3. 🐟 Sea Life & Aquatic Organisms (#0301 - #0400)
-        addHeader('🐟 Sea Life & Aquatic Organisms (#0301 - #0400)');
-        for (let i = 301; i <= 400; i++) {
-          const id = '#' + String(i).padStart(4, '0');
-          const baseFish = FISH_SPECIES[(i - 301) % FISH_SPECIES.length];
-          const name = i <= 306 ? baseFish.name : `${baseFish.name} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
-          createCard(name, id, (ctx, t) => {
-            if (i <= 306) {
-              const swimY = Math.sin(t * 4 + i) * 2;
-              paintFish(ctx, 8, 8 + swimY, baseFish, Math.floor(t * 6 + i) % 2 === 0);
-            } else {
-              paintProceduralAsset(ctx, i, 3, name, t);
-            }
+        // 3. 🐟 Sea Life & Aquatic Organisms
+        addHeader('🐟 Sea Life & Aquatic Organisms');
+        FISH_SPECIES.forEach((f, idx) => {
+          const id = getNextId();
+          createCard(f.name, id, (ctx, t) => {
+            const swimY = Math.sin(t * 4 + idx) * 2;
+            paintFish(ctx, 8, 8 + swimY, f, Math.floor(t * 6 + idx) % 2 === 0);
           });
-        }
+        });
 
-        // 4. 🦣 Wildlife, Beasts & Megafauna (#0401 - #0550)
-        addHeader('🦣 Wildlife, Beasts & Megafauna (#0401 - #0550)');
-        const beastKeys = ['Mammoth', 'Sabertooth', 'Wild Boar', 'Rabbit', 'Eagle', 'Honeybee', 'T-Rex', 'Wolf', 'Bear', 'Snake', 'Dragon', 'Scorpion', 'Fox', 'Owl'];
-        for (let i = 401; i <= 550; i++) {
-          const id = '#' + String(i).padStart(4, '0');
-          const baseName = beastKeys[(i - 401) % beastKeys.length];
-          const name = (i - 401) < beastKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+        // 4. 🦣 Wildlife, Beasts & Megafauna
+        addHeader('🦣 Wildlife, Beasts & Megafauna');
+        ['Mammoth', 'Sabertooth', 'Wild Boar', 'Rabbit', 'Eagle', 'Honeybee', 'T-Rex', 'Wolf', 'Bear', 'Snake', 'Dragon', 'Scorpion', 'Fox', 'Owl'].forEach((name, idx) => {
+          const id = getNextId();
           createCard(name, id, (ctx, t) => {
-            if ((i - 401) < beastKeys.length) {
-              const breath = Math.round(Math.sin(t * 4 + i) * 1);
-              ctx.save(); ctx.translate(0, breath);
-              SURVIVAL_PAINTERS[baseName](ctx, 0);
-              ctx.restore();
-            } else {
-              paintProceduralAsset(ctx, i, 4, name, t);
-            }
+            const breath = Math.round(Math.sin(t * 4 + idx) * 1);
+            ctx.save(); ctx.translate(0, breath);
+            SURVIVAL_PAINTERS[name](ctx, 0);
+            ctx.restore();
           });
-        }
+        });
 
-        // 5. 🏚️ Base Building & Housing (#0551 - #0700)
-        addHeader('🏚️ Base Building & Housing (#0551 - #0700)');
-        const bldgKeys = ['Thatch Hut', 'Log Cabin', 'Stone Cottage', 'Bunker', 'Cyber Hab', 'Watchtower', 'Pyramid', 'Castle', 'Windmill'];
-        for (let i = 551; i <= 700; i++) {
-          const id = '#' + String(i).padStart(4, '0');
-          const baseName = bldgKeys[(i - 551) % bldgKeys.length];
-          const name = (i - 551) < bldgKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+        // 5. 🏚️ Base Building & Housing
+        addHeader('🏚️ Base Building & Housing');
+        ['Thatch Hut', 'Log Cabin', 'Stone Cottage', 'Bunker', 'Cyber Hab', 'Watchtower', 'Pyramid', 'Castle', 'Windmill'].forEach((name) => {
+          const id = getNextId();
           createCard(name, id, (ctx, t) => {
-            if ((i - 551) < bldgKeys.length) {
-              SURVIVAL_PAINTERS[baseName](ctx, 0);
-            } else {
-              paintProceduralAsset(ctx, i, 5, name, t);
-            }
+            SURVIVAL_PAINTERS[name](ctx, 0);
           });
-        }
+        });
 
-        // 6. ⚔️ Weapons & Armaments (#0701 - #0800)
-        addHeader('⚔️ Weapons & Armaments (#0701 - #0800)');
-        const wpnKeys = ['Flint Spear', 'Iron Sword', 'Tactical Rifle', 'Plasma Saber', 'Crossbow', 'Grenade', 'Laser Cannon', 'Flamethrower', 'Battleaxe'];
-        for (let i = 701; i <= 800; i++) {
-          const id = '#' + String(i).padStart(4, '0');
-          const baseName = wpnKeys[(i - 701) % wpnKeys.length];
-          const name = (i - 701) < wpnKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+        // 6. ⚔️ Weapons & Armaments
+        addHeader('⚔️ Weapons & Armaments');
+        ['Flint Spear', 'Iron Sword', 'Tactical Rifle', 'Plasma Saber', 'Crossbow', 'Grenade', 'Laser Cannon', 'Flamethrower', 'Battleaxe'].forEach((name) => {
+          const id = getNextId();
           createCard(name, id, (ctx, t) => {
-            if ((i - 701) < wpnKeys.length) {
-              SURVIVAL_PAINTERS[baseName](ctx, 0);
-            } else {
-              paintProceduralAsset(ctx, i, 6, name, t);
-            }
+            SURVIVAL_PAINTERS[name](ctx, 0);
           });
-        }
+        });
 
-        // 7. 🚗 Vehicles & Transports (#0801 - #0900)
-        addHeader('🚗 Vehicles & Transports (#0801 - #0900)');
-        const vehKeys = ['Chariot', 'Survival Jeep', 'Hovercraft', 'Combat Mech', 'Canoe', 'Spaceship', 'Tank', 'Submarine'];
-        for (let i = 801; i <= 900; i++) {
-          const id = '#' + String(i).padStart(4, '0');
-          const baseName = vehKeys[(i - 801) % vehKeys.length];
-          const name = (i - 801) < vehKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+        // 7. 🚗 Vehicles & Transports
+        addHeader('🚗 Vehicles & Transports');
+        ['Chariot', 'Survival Jeep', 'Hovercraft', 'Combat Mech', 'Canoe', 'Spaceship', 'Tank', 'Submarine'].forEach((name) => {
+          const id = getNextId();
           createCard(name, id, (ctx, t) => {
-            if ((i - 801) < vehKeys.length) {
-              SURVIVAL_PAINTERS[baseName](ctx, 0);
-            } else {
-              paintProceduralAsset(ctx, i, 7, name, t);
-            }
+            SURVIVAL_PAINTERS[name](ctx, 0);
           });
-        }
+        });
 
-        // 8. 🦈 Marine Predators & Ocean (#0901 - #0950)
-        addHeader('🦈 Marine Predators & Ocean (#0901 - #0950)');
-        const predKeys = ['Great White', 'Octopus', 'Sea Turtle', 'Jellyfish', 'Crab', 'Stingray', 'Squid'];
-        for (let i = 901; i <= 950; i++) {
-          const id = '#' + String(i).padStart(4, '0');
-          const baseName = predKeys[(i - 901) % predKeys.length];
-          const name = (i - 901) < predKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+        // 8. 🦈 Marine Predators & Ocean
+        addHeader('🦈 Marine Predators & Ocean');
+        ['Great White', 'Octopus', 'Sea Turtle', 'Jellyfish', 'Crab', 'Stingray', 'Squid'].forEach((name) => {
+          const id = getNextId();
           createCard(name, id, (ctx, t) => {
-            if ((i - 901) < predKeys.length) {
-              const swimY = Math.sin(t * 3 + i) * 2;
-              ctx.save(); ctx.translate(0, swimY);
-              SURVIVAL_PAINTERS[baseName](ctx, 0);
-              ctx.restore();
-            } else {
-              paintProceduralAsset(ctx, i, 8, name, t);
-            }
+            const swimY = Math.sin(t * 3) * 2;
+            ctx.save(); ctx.translate(0, swimY);
+            SURVIVAL_PAINTERS[name](ctx, 0);
+            ctx.restore();
           });
-        }
+        });
 
-        // 9. 🪵 World Resources & Props (#0951 - #1000)
-        addHeader('🪵 World Resources & Props (#0951 - #1000)');
-        const propKeys = ['Wood Pile', 'Red Poppy', 'Sunflower', 'Beehive', 'Iron Ore', 'Gold Ore', 'Diamond Ore', 'Mushroom', 'Chest'];
-        for (let i = 951; i <= 1000; i++) {
-          const id = '#' + String(i).padStart(4, '0');
-          const baseName = propKeys[(i - 951) % propKeys.length];
-          const name = (i - 951) < propKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+        // 9. 🪵 World Resources & Props
+        addHeader('🪵 World Resources & Props');
+        ['Wood Pile', 'Red Poppy', 'Sunflower', 'Beehive', 'Iron Ore', 'Gold Ore', 'Diamond Ore', 'Mushroom', 'Chest'].forEach((name) => {
+          const id = getNextId();
           createCard(name, id, (ctx, t) => {
-            if ((i - 951) < propKeys.length) {
-              SURVIVAL_PAINTERS[baseName](ctx, 0);
-            } else {
-              paintProceduralAsset(ctx, i, 9, name, t);
-            }
+            SURVIVAL_PAINTERS[name](ctx, 0);
           });
-        }
+        });
 
-        // 10. 👾 Era NPC Enemies (#1001 - #1020)
-        addHeader('👾 Era NPC Enemies (#1001 - #1020)');
-        const enemyKeys = ['Rival Hunter', 'Barbarian Raider', 'Renegade Knight', 'Rogue Soldier', 'Cyber Drone'];
-        for (let i = 1001; i <= 1020; i++) {
-          const id = '#' + String(i).padStart(4, '0');
-          const baseName = enemyKeys[(i - 1001) % enemyKeys.length];
-          const name = (i - 1001) < enemyKeys.length ? baseName : `${baseName} ${VARIANT_NAMES[i % VARIANT_NAMES.length]}`;
+        // 10. 👾 Era NPC Enemies
+        addHeader('👾 Era NPC Enemies');
+        ['Rival Hunter', 'Barbarian Raider', 'Renegade Knight', 'Rogue Soldier', 'Cyber Drone'].forEach((name) => {
+          const id = getNextId();
           createCard(name, id, (ctx, t) => {
-            if ((i - 1001) < enemyKeys.length) {
-              SURVIVAL_PAINTERS[baseName](ctx, 0);
-              tpx(ctx, 20, 16, 8, 2, '#ef4444');
-            } else {
-              paintProceduralAsset(ctx, i, 10, name, t);
-            }
+            SURVIVAL_PAINTERS[name](ctx, 0);
           });
-        }
+        });
       });
     })();
   </script>
