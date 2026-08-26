@@ -6633,60 +6633,54 @@ function updateCavemen(dt, t) {
     }
 
     cm.moving = false;
+
+    // Eden Haven family members (Adam, Eve, Cain, Abel):
+    // If the player approaches close (< 7.0 units), they IMMEDIATELY become afraid,
+    // cancel any idle wait, spawn a fear reaction '!', and flee away leashed to Eden Camp!
+    if (cm.edenPos && demoState.me && demoState.me.spr && cm !== demoState.me) {
+      const px = demoState.me.spr.position.x;
+      const pz = demoState.me.spr.position.z;
+      const dx = cm.spr.position.x - px;
+      const dz = cm.spr.position.z - pz;
+      const dPlayer = Math.hypot(dx, dz);
+      if (dPlayer < 7.0) {
+        if (!cm.react || t > cm.react.t + 1.8) {
+          spawnReaction(cm, '!');
+        }
+        const fl = dPlayer || 1.0;
+        let tx = cm.spr.position.x + (dx / fl) * 4.5;
+        let tz = cm.spr.position.z + (dz / fl) * 4.5;
+
+        const hx = cm.edenPos.x, hz = cm.edenPos.z;
+        const ed = Math.hypot(tx - hx, tz - hz);
+        if (ed > 5.0) {
+          tx = hx + ((tx - hx) / ed) * 5.0;
+          tz = hz + ((tz - hz) / ed) * 5.0;
+        }
+        cm.target = { x: tx, z: tz };
+        cm.wait = 0;
+        cm.speed = 3.4;
+      }
+    }
+
     // steered villagers obey the stick unconditionally: never queued behind
     // idle waits or wander picks, so you can move them at any time
     if (!gathering && !steered) {
       if (cm.wait > 0) {
         cm.wait -= dt;
+        smoothGroundY(cm, dt, cm.spr.position.x, cm.spr.position.z);
         continue;
       }
       if (!cm.target) {
-        // a commanded human with no reachable path gives up and holds
-        // position rather than drifting back into idle wandering
         if (cm.actionMove || cm.followLead) {
           if (cm.actionMove) { cm.actionMove = null; hideMoveFlag(); }
           continue;
         }
-        // Move mode armed, or the options menu open on them: nobody strolls
-        // off randomly — the pick, the party and the target all hold still
         if (inFreezeHold(cm)) {
           cm.moving = false;
           continue;
         }
-
-        // Eden Haven family members (Adam, Eve, Cain, Abel):
-        // If the player approaches close (< 7.0 units), they become afraid,
-        // spawn a fear reaction '!', and flee away while staying leashed to Eden Camp (5.0 units radius)!
-        if (cm.edenPos && demoState.me && demoState.me.spr && cm !== demoState.me) {
-          const px = demoState.me.spr.position.x;
-          const pz = demoState.me.spr.position.z;
-          const dx = cm.spr.position.x - px;
-          const dz = cm.spr.position.z - pz;
-          const dPlayer = Math.hypot(dx, dz);
-          if (dPlayer < 7.0) {
-            if (!cm.react || t > cm.react.t + 2.0) {
-              spawnReaction(cm, '!'); // Exclamation fear symbol
-            }
-            const fl = dPlayer || 1.0;
-            let tx = cm.spr.position.x + (dx / fl) * 4.0;
-            let tz = cm.spr.position.z + (dz / fl) * 4.0;
-
-            // Keep strictly leashed within 5.0 units of Eden campfire
-            const hx = cm.edenPos.x, hz = cm.edenPos.z;
-            const ed = Math.hypot(tx - hx, tz - hz);
-            if (ed > 5.0) {
-              tx = hx + ((tx - hx) / ed) * 5.0;
-              tz = hz + ((tz - hz) / ed) * 5.0;
-            }
-            cm.target = { x: tx, z: tz };
-            cm.wait = 0;
-            cm.speed = 3.2; // Run fast when afraid!
-          } else {
-            pickWanderTarget(cm);
-          }
-        } else {
-          pickWanderTarget(cm);
-        }
+        pickWanderTarget(cm);
         continue;
       }
     }
@@ -9107,9 +9101,9 @@ function makeHologramMat() {
         vUv = uv;
         vec3 basePos = modelMatrix[3].xyz;
         vec4 mvPosition = viewMatrix * vec4(basePos, 1.0);
-        // Sprite view-space billboarding equation: anchors feet at basePos and always faces camera
+        // Sprite view-space billboarding equation: anchors feet cleanly at basePos (ground level)
         vec2 scale = vec2(length(modelMatrix[0].xyz), length(modelMatrix[1].xyz));
-        vec2 alignedPosition = (position.xy - vec2(0.0, 0.5)) * scale;
+        vec2 alignedPosition = vec2(position.x, position.y + 0.5) * scale;
         mvPosition.xy += alignedPosition;
         vWorldPos = basePos;
         gl_Position = projectionMatrix * mvPosition;
