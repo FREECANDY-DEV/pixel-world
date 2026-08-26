@@ -874,7 +874,11 @@
         for (let i = 0; i < animCards.length; i++) {
           const c = animCards[i];
           c.ctx.clearRect(0, 0, c.width, c.height);
-          c.renderFn(c.ctx, t);
+          try {
+            c.renderFn(c.ctx, t);
+          } catch(e) {
+            console.error('Card render error:', e);
+          }
         }
       }
 
@@ -952,7 +956,7 @@
             // Apply Seasonal Overlays according to variant
             if (variant === 0) {
               // Spring blossoms
-              c.fillStyle = '#f5b8cf';
+              ctx.fillStyle = '#f5b8cf';
               for (let i = 0; i < 5; i++) ctx.fillRect(16 + ((i * 7) % 18), 16 + ((i * 5) % 14), 2, 2);
             } else if (variant === 2) {
               // Autumn Tint Overlay
