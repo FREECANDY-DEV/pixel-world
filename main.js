@@ -5847,13 +5847,16 @@ function ensureSolarSystem() {
     solarSystemGroup.add(ringMesh);
   };
 
-  const makePlanet = (r, type, dist, speed, tilt = 0, roughness = 0.6) => {
+  const makePlanet = (r, type, dist, speed, tilt = 0, roughness = 0.5) => {
     addOrbitRing(dist);
+    const tex = getPlanetTexture(type);
     const pMat = new THREE.MeshStandardMaterial({
-      map: getPlanetTexture(type),
+      map: tex,
+      emissiveMap: tex,
+      emissive: 0xffffff,
+      emissiveIntensity: 0.45,
       roughness: roughness,
       metalness: 0.05,
-      emissive: 0x111111,
       fog: false,
     });
     const pMesh = new THREE.Mesh(new THREE.SphereGeometry(r, 48, 32), pMat);
@@ -6335,8 +6338,8 @@ function updateWorldLod(dt) {
     // with the auto-settle glide framing it completely
     const gd = Math.max(camera.position.distanceTo(controls.target), 1);
     // stretch the far plane alongside the camera so deep-space zooms can
-    // never clip the planet (or its star domes) out of existence
-    const needFar = Math.max(3000, gd * 2.6);
+    // never clip outer planets (or their star domes) out of existence
+    const needFar = Math.max(16000, gd * 6.0);
     if (camera.far !== needFar) {
       camera.far = needFar;
       camera.updateProjectionMatrix();
