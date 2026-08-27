@@ -5660,7 +5660,98 @@ function ensureMoon() {
   scene.add(moonPivot);
 }
 
-// --- Professional Solar System with Central Sun, Orbital Path Rings & Real Proportional Planets ---
+// --- Procedural Planet Texture Generator ---
+const planetTexCache = new Map();
+function getPlanetTexture(type) {
+  if (planetTexCache.has(type)) return planetTexCache.get(type);
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 128;
+  const g = c.getContext('2d');
+
+  if (type === 'sun') {
+    const gr = g.createLinearGradient(0, 0, 0, 128);
+    gr.addColorStop(0, '#fff5cc');
+    gr.addColorStop(0.5, '#ffbb33');
+    gr.addColorStop(1, '#ff5500');
+    g.fillStyle = gr;
+    g.fillRect(0, 0, 256, 128);
+    g.fillStyle = 'rgba(220, 50, 0, 0.45)';
+    for (let i = 0; i < 40; i++) {
+      const rx = Math.random() * 256, ry = Math.random() * 128, rw = 3 + Math.random() * 10;
+      g.beginPath(); g.arc(rx, ry, rw, 0, Math.PI * 2); g.fill();
+    }
+  } else if (type === 'mercury') {
+    g.fillStyle = '#8e8e88';
+    g.fillRect(0, 0, 256, 128);
+    g.fillStyle = 'rgba(50, 50, 50, 0.35)';
+    for (let i = 0; i < 60; i++) {
+      const rx = Math.random() * 256, ry = Math.random() * 128, rw = 2 + Math.random() * 6;
+      g.beginPath(); g.arc(rx, ry, rw, 0, Math.PI * 2); g.fill();
+    }
+  } else if (type === 'venus') {
+    const gr = g.createLinearGradient(0, 0, 0, 128);
+    gr.addColorStop(0, '#f2d594');
+    gr.addColorStop(0.3, '#e5b869');
+    gr.addColorStop(0.7, '#d69e45');
+    gr.addColorStop(1, '#ecc682');
+    g.fillStyle = gr;
+    g.fillRect(0, 0, 256, 128);
+    g.fillStyle = 'rgba(255, 240, 200, 0.25)';
+    for (let i = 0; i < 15; i++) {
+      g.fillRect(0, Math.random() * 128, 256, 3 + Math.random() * 8);
+    }
+  } else if (type === 'mars') {
+    g.fillStyle = '#c84e1b';
+    g.fillRect(0, 0, 256, 128);
+    g.fillStyle = 'rgba(80, 25, 10, 0.4)';
+    for (let i = 0; i < 25; i++) {
+      g.beginPath(); g.arc(Math.random() * 256, 30 + Math.random() * 68, 6 + Math.random() * 18, 0, Math.PI * 2); g.fill();
+    }
+    g.fillStyle = '#f0f4f8';
+    g.fillRect(0, 0, 256, 10);
+    g.fillRect(0, 118, 256, 10);
+  } else if (type === 'jupiter') {
+    const bands = ['#d8a47f', '#b87850', '#edd5be', '#c2865c', '#8a4b2a', '#e8ccb5'];
+    for (let y = 0; y < 128; y += 8) {
+      g.fillStyle = bands[Math.floor(y / 8) % bands.length];
+      g.fillRect(0, y, 256, 8);
+    }
+    g.fillStyle = '#b5321b';
+    g.beginPath(); g.ellipse(160, 80, 22, 12, 0, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#d4563d';
+    g.beginPath(); g.ellipse(160, 80, 14, 7, 0, 0, Math.PI * 2); g.fill();
+  } else if (type === 'saturn') {
+    const bands = ['#e6d6aa', '#d2bd88', '#f5e8c4', '#cbb075', '#ded0a2'];
+    for (let y = 0; y < 128; y += 6) {
+      g.fillStyle = bands[Math.floor(y / 6) % bands.length];
+      g.fillRect(0, y, 256, 6);
+    }
+  } else if (type === 'uranus') {
+    const gr = g.createLinearGradient(0, 0, 0, 128);
+    gr.addColorStop(0, '#9beaf4');
+    gr.addColorStop(0.5, '#6cd5e4');
+    gr.addColorStop(1, '#4fc5d7');
+    g.fillStyle = gr;
+    g.fillRect(0, 0, 256, 128);
+  } else if (type === 'neptune') {
+    const gr = g.createLinearGradient(0, 0, 0, 128);
+    gr.addColorStop(0, '#3866d9');
+    gr.addColorStop(0.5, '#234bb5');
+    gr.addColorStop(1, '#173691');
+    g.fillStyle = gr;
+    g.fillRect(0, 0, 256, 128);
+    g.fillStyle = 'rgba(10, 25, 75, 0.6)';
+    g.beginPath(); g.ellipse(100, 75, 18, 10, 0.2, 0, Math.PI * 2); g.fill();
+  }
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  planetTexCache.set(type, tex);
+  return tex;
+}
+
+// --- Professional Solar System with Central Sun, Solar-Centered Orbit Rings & Planet Textures ---
 let solarSystemGroup = null;
 
 function ensureSolarSystem() {
@@ -5668,8 +5759,8 @@ function ensureSolarSystem() {
   solarSystemGroup = new THREE.Group();
 
   // 0. Central 3D Glowing Solar Sun
-  const sunGeom = new THREE.SphereGeometry(PLANET_R * 2.6, 32, 24);
-  const sunMat = new THREE.MeshBasicMaterial({ color: 0xfffae0, fog: false });
+  const sunGeom = new THREE.SphereGeometry(PLANET_R * 2.8, 32, 24);
+  const sunMat = new THREE.MeshBasicMaterial({ map: getPlanetTexture('sun'), fog: false });
   const sunMesh = new THREE.Mesh(sunGeom, sunMat);
   solarSystemGroup.add(sunMesh);
 
@@ -5679,6 +5770,7 @@ function ensureSolarSystem() {
   coronaSpr.scale.setScalar(PLANET_R * 14.0);
   solarSystemGroup.add(coronaSpr);
 
+  // Solar-centered orbital path ring builder
   const addOrbitRing = (dist, col = 0xffe8a0) => {
     const ringGeom = new THREE.RingGeometry(dist - 0.7, dist + 0.7, 128);
     const ringMat = new THREE.MeshBasicMaterial({
@@ -5693,12 +5785,12 @@ function ensureSolarSystem() {
     solarSystemGroup.add(ringMesh);
   };
 
-  const makePlanet = (r, col, dist, speed, tilt = 0, roughness = 0.8) => {
+  const makePlanet = (r, type, dist, speed, tilt = 0, roughness = 0.7) => {
     addOrbitRing(dist);
     const pMat = new THREE.MeshStandardMaterial({
-      color: col,
+      map: getPlanetTexture(type),
       roughness: roughness,
-      metalness: 0.1,
+      metalness: 0.05,
       fog: false,
     });
     const pMesh = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 18), pMat);
@@ -5712,34 +5804,34 @@ function ensureSolarSystem() {
   };
 
   // Real Proportional Planet Scale Ratios relative to Earth (PLANET_R = 60u):
-  // 1. Mercury (0.38 Earth radius)
-  makePlanet(PLANET_R * 0.38, 0x9c9c96, PLANET_R * 4.5, 0.35, 0.03);
+  // 1. Mercury (0.38 Earth radius) + Orbit Ring
+  makePlanet(PLANET_R * 0.38, 'mercury', PLANET_R * 4.5, 0.35, 0.03);
 
-  // 2. Venus (0.95 Earth radius)
-  makePlanet(PLANET_R * 0.95, 0xe8c687, PLANET_R * 7.2, 0.24, 0.05);
+  // 2. Venus (0.95 Earth radius) + Orbit Ring
+  makePlanet(PLANET_R * 0.95, 'venus', PLANET_R * 7.2, 0.24, 0.05);
 
-  // 3. Earth Orbit Path Ring (Earth + Moon are in globe.group)
+  // 3. Earth Orbit Path Ring (Earth + Moon orbit at PLANET_R * 10.5)
   addOrbitRing(PLANET_R * 10.5, 0x88ccff);
 
-  // 4. Mars (0.53 Earth radius)
-  makePlanet(PLANET_R * 0.53, 0xd24d15, PLANET_R * 14.8, -0.18, -0.15);
+  // 4. Mars (0.53 Earth radius) + Orbit Ring
+  makePlanet(PLANET_R * 0.53, 'mars', PLANET_R * 14.8, -0.18, -0.15);
 
-  // 5. Jupiter (11.2x Earth radius -> 4.8x scaled for view)
-  makePlanet(PLANET_R * 4.8, 0xdca878, PLANET_R * 22.0, 0.08, 0.05);
+  // 5. Jupiter (11.2x Earth radius -> 4.8x scaled) + Orbit Ring
+  makePlanet(PLANET_R * 4.8, 'jupiter', PLANET_R * 22.0, 0.08, 0.05);
 
-  // 6. Saturn (9.5x Earth radius -> 4.1x scaled for view)
-  const sat = makePlanet(PLANET_R * 4.1, 0xe8d598, PLANET_R * 31.0, -0.05, 0.45);
+  // 6. Saturn (9.5x Earth radius -> 4.1x scaled) + Orbit Ring & 3D Rings
+  const sat = makePlanet(PLANET_R * 4.1, 'saturn', PLANET_R * 31.0, -0.05, 0.45);
   const ringGeom = new THREE.RingGeometry(PLANET_R * 5.2, PLANET_R * 8.5, 32);
   const ringMat = new THREE.MeshBasicMaterial({ color: 0xd4be88, side: THREE.DoubleSide, transparent: true, opacity: 0.78, fog: false });
   const ringMesh = new THREE.Mesh(ringGeom, ringMat);
   ringMesh.rotation.x = Math.PI / 2.2;
   sat.userData.pMesh.add(ringMesh);
 
-  // 7. Uranus (4.0x Earth radius -> 2.2x scaled)
-  makePlanet(PLANET_R * 2.2, 0x7de0f2, PLANET_R * 40.0, 0.03, 0.85);
+  // 7. Uranus (4.0x Earth radius -> 2.2x scaled) + Orbit Ring
+  makePlanet(PLANET_R * 2.2, 'uranus', PLANET_R * 40.0, 0.03, 0.85);
 
-  // 8. Neptune (3.9x Earth radius -> 2.1x scaled)
-  makePlanet(PLANET_R * 2.1, 0x3258c4, PLANET_R * 48.0, -0.02, 0.30);
+  // 8. Neptune (3.9x Earth radius -> 2.1x scaled) + Orbit Ring
+  makePlanet(PLANET_R * 2.1, 'neptune', PLANET_R * 48.0, -0.02, 0.30);
 
   solarSystemGroup.visible = false;
   scene.add(solarSystemGroup);
@@ -5751,12 +5843,16 @@ function updateSolarSystem(dt, gs) {
   solarSystemGroup.visible = spaceMode;
   if (!spaceMode) return;
 
-  solarSystemGroup.position.copy(globe.group.position);
+  // Solar system central origin is positioned in deep space
+  solarSystemGroup.position.set(homePos.x - 200, 0, homePos.z - 300);
   solarSystemGroup.scale.setScalar(gs);
 
   for (const child of solarSystemGroup.children) {
     if (child.userData && child.userData.speed) {
       child.rotation.y += dt * child.userData.speed;
+      if (child.userData.pMesh) {
+        child.userData.pMesh.rotation.y += dt * 0.4;
+      }
     }
   }
 }
