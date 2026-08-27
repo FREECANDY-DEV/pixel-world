@@ -5809,6 +5809,10 @@ function ensureSolarSystem() {
   const sunMesh = new THREE.Mesh(sunGeom, sunMat);
   solarSystemGroup.add(sunMesh);
 
+  // Dedicated Solar Point Light at Sun Core illuminating all 8 planets
+  const solarLight = new THREE.PointLight(0xfff5cc, 4.5, 0, 0);
+  solarSystemGroup.add(solarLight);
+
   // Translucent Solar Atmosphere Aura
   const sunAuraGeom = new THREE.SphereGeometry(PLANET_R * 4.6, 32, 24);
   const sunAuraMat = new THREE.MeshBasicMaterial({
@@ -5836,15 +5840,16 @@ function ensureSolarSystem() {
     solarSystemGroup.add(ringMesh);
   };
 
-  const makePlanet = (r, type, dist, speed, tilt = 0, roughness = 0.7) => {
+  const makePlanet = (r, type, dist, speed, tilt = 0, roughness = 0.6) => {
     addOrbitRing(dist);
     const pMat = new THREE.MeshStandardMaterial({
       map: getPlanetTexture(type),
       roughness: roughness,
       metalness: 0.05,
+      emissive: 0x111111,
       fog: false,
     });
-    const pMesh = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 18), pMat);
+    const pMesh = new THREE.Mesh(new THREE.SphereGeometry(r, 48, 32), pMat);
     const pPivot = new THREE.Group();
     pMesh.position.set(dist, 0, 0);
     pPivot.add(pMesh);
@@ -10363,6 +10368,15 @@ async function triggerGrunkCinematicSequence() {
   if (facingDir.lengthSq() < 1e-4) facingDir.set(0, 0, -1);
   facingDir.normalize();
 
+  // Temporarily hide foliage tree occluders during cutscene so assets never cover talking humans
+  for (const ch of chunks.values()) {
+    if (ch.trees) ch.trees.visible = false;
+  }
+  for (const t of placedTrees) {
+    t.sprA.visible = false;
+    t.sprB.visible = false;
+  }
+
   // STEP 1: Zoom camera directly onto Grunk's face from Player's opposite side
   const grunkFaceTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 2.45, grunkPos.z);
   const grunkCamPos = grunkFaceTgt.clone().addScaledVector(facingDir, -1.45);
@@ -10392,6 +10406,15 @@ async function triggerGrunkCinematicSequence() {
   setCutsceneUIVisibility(true);
   tweenCameraToExplicit(origTarget, origPos, 1.1);
   await new Promise(r => setTimeout(r, 1150));
+
+  // Restore foliage tree visibility after cutscene
+  for (const ch of chunks.values()) {
+    if (ch.trees) ch.trees.visible = !iconMode && !spaceMode;
+  }
+  for (const t of placedTrees) {
+    t.sprA.visible = !spaceMode;
+    t.sprB.visible = !spaceMode;
+  }
 
   controls.enabled = true;
   controls.update();
