@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Pixel World — Live Demo</title>
-  <link rel="icon" href="data:,?" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 19' shape-rendering='crispEdges'%3E%3Crect x='5' y='0' width='6' height='1' fill='%23ffd23f'/%3E%3Crect x='4' y='1' width='8' height='1' fill='%23ffd23f'/%3E%3Crect x='4' y='2' width='1' height='1' fill='%23ffd23f'/%3E%3Crect x='5' y='2' width='6' height='1' fill='%230f172a'/%3E%3Crect x='11' y='2' width='1' height='1' fill='%23ffd23f'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23ffd23f'/%3E%3Crect x='5' y='3' width='2' height='1' fill='%230f172a'/%3E%3Crect x='7' y='3' width='2' height='1' fill='%2338bdf8'/%3E%3Crect x='9' y='3' width='2' height='1' fill='%230f172a'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%23ffd23f'/%3E%3Crect x='4' y='4' width='1' height='1' fill='%23ffd23f'/%3E%3Crect x='5' y='4' width='6' height='1' fill='%230f172a'/%3E%3Crect x='11' y='4' width='1' height='1' fill='%23ffd23f'/%3E%3Crect x='4' y='5' width='2' height='1' fill='%23ffd23f'/%3E%3Crect x='6' y='5' width='3' height='1' fill='%23475569'/%3E%3Crect x='9' y='5' width='3' height='1' fill='%23ffd23f'/%3E%3Crect x='4' y='6' width='8' height='1' fill='%23ffd23f'/%3E%3Crect x='5' y='7' width='6' height='1' fill='%23ffd23f'/%3E%3Crect x='6' y='8' width='2' height='1' fill='%23ffd23f'/%3E%3Crect x='4' y='9' width='8' height='1' fill='%23ffd23f'/%3E%3Crect x='4' y='10' width='1' height='1' fill='%23ffd23f'/%3E%3Crect x='5' y='10' width='5' height='1' fill='%231e293b'/%3E%3Crect x='10' y='10' width='2' height='1' fill='%23ffd23f'/%3E%3Crect x='3' y='11' width='10' height='1' fill='%23ffd23f'/%3E%3Crect x='3' y='12' width='2' height='1' fill='%23ffd23f'/%3E%3Crect x='5' y='12' width='2' height='1' fill='%231e293b'/%3E%3Crect x='7' y='12' width='2' height='1' fill='%23e11d48'/%3E%3Crect x='9' y='12' width='4' height='1' fill='%23ffd23f'/%3E%3Crect x='3' y='13' width='10' height='1' fill='%23ffd23f'/%3E%3Crect x='4' y='14' width='6' height='1' fill='%23ffd23f'/%3E%3Crect x='4' y='15' width='2' height='4' fill='%231e293b'/%3E%3Crect x='8' y='15' width='2' height='4' fill='%231e293b'/%3E%3C/svg%3E" />
   <style>
     :root { --gold: #ffd23f; --bg: #060a10; --card: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08); --text: #dce4ee; --muted: #7a8fa6; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -126,8 +126,28 @@
   </div>
 
   <div class="title">
-    <div style="font-size: 9px; font-weight: 500; color: rgba(255, 210, 63, 0.55); margin-bottom: 2px;">v117</div>
-    <h1><span>Pixel World</span></h1>
+    <div style="font-size: 9px; font-weight: 500; color: rgba(255, 210, 63, 0.55); margin-bottom: 2px;">v118</div>
+    <h1 style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 19" width="32" height="38" style="vertical-align: middle; filter: drop-shadow(0 2px 10px rgba(255,210,63,0.5));" shape-rendering="crispEdges">
+        <rect x="5" y="0" width="6" height="1" fill="#ffd23f"/>
+        <rect x="4" y="1" width="8" height="1" fill="#ffd23f"/>
+        <rect x="4" y="2" width="1" height="1" fill="#ffd23f"/><rect x="5" y="2" width="6" height="1" fill="#0f172a"/><rect x="11" y="2" width="1" height="1" fill="#ffd23f"/>
+        <rect x="4" y="3" width="1" height="1" fill="#ffd23f"/><rect x="5" y="3" width="2" height="1" fill="#0f172a"/><rect x="7" y="3" width="2" height="1" fill="#38bdf8"/><rect x="9" y="3" width="2" height="1" fill="#0f172a"/><rect x="11" y="3" width="1" height="1" fill="#ffd23f"/>
+        <rect x="4" y="4" width="1" height="1" fill="#ffd23f"/><rect x="5" y="4" width="6" height="1" fill="#0f172a"/><rect x="11" y="4" width="1" height="1" fill="#ffd23f"/>
+        <rect x="4" y="5" width="2" height="1" fill="#ffd23f"/><rect x="6" y="5" width="3" height="1" fill="#475569"/><rect x="9" y="5" width="3" height="1" fill="#ffd23f"/>
+        <rect x="4" y="6" width="8" height="1" fill="#ffd23f"/>
+        <rect x="5" y="7" width="6" height="1" fill="#ffd23f"/>
+        <rect x="6" y="8" width="2" height="1" fill="#ffd23f"/>
+        <rect x="4" y="9" width="8" height="1" fill="#ffd23f"/>
+        <rect x="4" y="10" width="1" height="1" fill="#ffd23f"/><rect x="5" y="10" width="5" height="1" fill="#1e293b"/><rect x="10" y="10" width="2" height="1" fill="#ffd23f"/>
+        <rect x="3" y="11" width="10" height="1" fill="#ffd23f"/>
+        <rect x="3" y="12" width="2" height="1" fill="#ffd23f"/><rect x="5" y="12" width="2" height="1" fill="#1e293b"/><rect x="7" y="12" width="2" height="1" fill="#e11d48"/><rect x="9" y="12" width="4" height="1" fill="#ffd23f"/>
+        <rect x="3" y="13" width="10" height="1" fill="#ffd23f"/>
+        <rect x="4" y="14" width="6" height="1" fill="#ffd23f"/>
+        <rect x="4" y="15" width="2" height="4" fill="#1e293b"/><rect x="8" y="15" width="2" height="4" fill="#1e293b"/>
+      </svg>
+      <span>Pixel World</span>
+    </h1>
     <p>Multiplayer pixel campfire · No sign-up required</p>
   </div>
 
