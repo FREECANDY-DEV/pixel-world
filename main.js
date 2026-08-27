@@ -138,14 +138,6 @@ function terrainHeight(x, z, seed) {
     e += (roll - 0.5) * 0.12;
   }
 
-  // --- circular island boundary falloff: smoothly slope terrain into deep sea at 190u radius ---
-  const hX = (typeof HOME_FLAT !== 'undefined' && HOME_FLAT) ? HOME_FLAT.x : ((typeof homePos !== 'undefined' && homePos) ? homePos.x : 0);
-  const hZ = (typeof HOME_FLAT !== 'undefined' && HOME_FLAT) ? HOME_FLAT.z : ((typeof homePos !== 'undefined' && homePos) ? homePos.z : 0);
-  const distFromHome = Math.hypot(x - hX, z - hZ);
-  const rawK = (distFromHome - 145) / 45;
-  const circK = Math.max(0, Math.min(1, rawK));
-  e = lerp(e, -1.2, circK * circK * (3 - 2 * circK));
-
   return Math.max(1, Math.min(MAX_HEIGHT, Math.round(SEA_LEVEL + e * 22)));
 }
 
@@ -978,7 +970,7 @@ waterMat.onBeforeCompile = (sh) => {
     );
   waterMat.userData.shader = sh;
 };
-const water = new THREE.Mesh(new THREE.CircleGeometry(220, 128), waterMat);
+const water = new THREE.Mesh(new THREE.CircleGeometry(2500, 128), waterMat);
 water.rotation.x = -Math.PI / 2;
 water.position.set(0, SEA_LEVEL + 0.35, 0);
 scene.add(water);
@@ -1651,26 +1643,26 @@ function syncChunks(force = false) {
   if (spaceMode) return; // planet view: no terrain streaming
   const c = centerChunk();
   
-  // Dynamically expand camera far plane so far map is never clipped
+  // Calculate dynamic render radius based on camera zoom distance for infinite streaming
   const currentDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
+  const zoomMult = Math.min(3.5, Math.max(1.0, currentDist / 120));
+  const effectiveRadius = Math.min(64, Math.ceil(RENDER_RADIUS * zoomMult));
+
   const targetFar = Math.max(5000, currentDist * 4.0);
   if (typeof camera !== 'undefined' && camera && camera.far !== targetFar) {
     camera.far = targetFar;
     camera.updateProjectionMatrix();
   }
 
-  const effectiveRadius = RENDER_RADIUS;
-  if (!force && lastChunk && lastChunk.x === c.x && lastChunk.z === c.z) return;
-  lastChunk = { x: c.x, z: c.z };
+  if (!force && lastChunk && lastChunk.x === c.x && lastChunk.z === c.z && lastChunk.rad === effectiveRadius) return;
+  lastChunk = { x: c.x, z: c.z, rad: effectiveRadius };
 
   const needed = new Map();
-  const MAX_ISLAND_R2 = 190 * 190;
+  const rad2 = effectiveRadius * effectiveRadius;
   for (let dx = -effectiveRadius; dx <= effectiveRadius; dx++) {
     for (let dz = -effectiveRadius; dz <= effectiveRadius; dz++) {
+      if (dx * dx + dz * dz > rad2) continue; // Circular streaming horizon!
       const cx = c.x + dx, cz = c.z + dz;
-      const wx = (cx * CHUNK + CHUNK / 2) - homePos.x;
-      const wz = (cz * CHUNK + CHUNK / 2) - homePos.z;
-      if (wx * wx + wz * wz > MAX_ISLAND_R2) continue; // Pure 190u Circular Island Boundary!
       needed.set(cx + ',' + cz, requiredLod(cx, cz, c));
     }
   }
@@ -11435,8 +11427,9 @@ function animate() {
   }
   // Planetary Curvature: edges bend downward as camera zooms out from 90u to 400u+
   const curDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
-  const curveK = THREE.MathUtils.clamp((curDist - 85) / 280, 0, 1);
-  const curvatureVal = curveK * 0.00028;
+  // Pronounced, feeled 3D Earth Globe Curvature when zooming out!
+  const curveK = THREE.MathUtils.clamp((curDist - 75) / 220, 0, 1);
+  const curvatureVal = curveK * 0.00055;
 
   const camT = (typeof controls !== 'undefined' && controls && controls.target) ? controls.target : homePos;
   treeMat.uniforms.uCurvature.value = curvatureVal;
@@ -11448,8 +11441,8 @@ function animate() {
       chunkMat.userData.shader.uniforms.uCamTarget.value.set(camT.x, 0, camT.z);
     }
   }
-  water.position.x = homePos.x;
-  water.position.z = homePos.z;
+  water.position.x = camT.x;
+  water.position.z = camT.z;
   if (waterMat.userData.shader) {
     waterMat.userData.shader.uniforms.uCurvature.value = curvatureVal;
     if (waterMat.userData.shader.uniforms.uCamTarget) {
