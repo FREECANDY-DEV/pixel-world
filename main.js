@@ -10799,8 +10799,8 @@ function updateDemo(dt, t) {
   const s = demoState;
   const now = performance.now();
   const hide = iconMode || spaceMode;
-  // Lock selection & camera target to player's own character
-  if (s.me && s.me.spr) {
+  // Lock selection & camera target to player's own character (disabled during cutscenes)
+  if (s.me && s.me.spr && !cinematicActive) {
     selectedCm = s.me;
     followCm = s.me;
     controls.target.x = THREE.MathUtils.damp(controls.target.x, s.me.spr.position.x, 14, dt);
