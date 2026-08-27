@@ -2097,7 +2097,7 @@ renderer.domElement.addEventListener('touchcancel', endSwipe);
 
 const readout = document.getElementById('readout');
 
-document.getElementById('regenerate').addEventListener('click', () => {
+document.getElementById('regenerate')?.addEventListener('click', () => {
   SEED = Math.floor(Math.random() * 1e9);
   if (spaceMode) setSpaceMode(false);
   if (iconMode) setIconMode(false);
@@ -2117,13 +2117,13 @@ document.getElementById('regenerate').addEventListener('click', () => {
 });
 
 const autoBtn = document.getElementById('autorotate');
-autoBtn.addEventListener('click', () => {
+autoBtn?.addEventListener('click', () => {
   controls.autoRotate = !controls.autoRotate;
   autoBtn.textContent = controls.autoRotate ? '⏹' : '🔄';
   autoBtn.classList.toggle('active', controls.autoRotate);
 });
 
-document.getElementById('topview').addEventListener('click', () => {
+document.getElementById('topview')?.addEventListener('click', () => {
   // stay at the current zoom distance: snapping to a fixed height would drop
   // below the icon LOD threshold and make every map icon vanish (and swap the
   // map view for raw 3D terrain). Keeping the radial distance preserves the
@@ -2135,13 +2135,13 @@ document.getElementById('topview').addEventListener('click', () => {
   snapZoom();
 });
 
-document.getElementById('home').addEventListener('click', () => {
+document.getElementById('home')?.addEventListener('click', () => {
   followCm = null;
   goHome();
   syncChunks(true);
 });
 
-document.getElementById('toggle-ui').addEventListener('click', () => {
+document.getElementById('toggle-ui')?.addEventListener('click', () => {
   document.body.classList.toggle('hide-ui');
 });
 
@@ -5732,7 +5732,7 @@ function setCloudFade(v) {
 }
 function toggleGlobePop(on) {
   globePopOpen = !!(on && spaceMode);
-  document.getElementById('globe-pop').classList.toggle('open', globePopOpen);
+  document.getElementById('globe-pop')?.classList.toggle('open', globePopOpen);
 }
 function updateGlobePop() {
   if (!globePopOpen) return;
@@ -5750,18 +5750,18 @@ function updateGlobePop() {
     else if (yrs < AGE_STAGES.adult.maxAge) adults++;
     else elders++;
   }
-  document.getElementById('gp-pop').textContent =
-    cavemen.length +
-    (cavemen.length
-      ? ' \u00B7 ' + kids + '\u{1F476} ' + adults + '\u{1F9D1} ' + elders + '\u{1F9D3}'
-      : '');
-  document.getElementById('gp-births').textContent = String(campStats.births);
-  document.getElementById('gp-deaths').textContent = String(campStats.deaths);
-  document.getElementById('gp-season').textContent = s.icon + ' ' + s.name;
-  document.getElementById('gp-temp').textContent =
-    Math.round(tempNow) + '\u00B0C';
-  document.getElementById('gp-age').textContent =
-    'Year ' + cyr + ' · Day ' + cdoy;
+  const elPop = document.getElementById('gp-pop');
+  if (elPop) elPop.textContent = cavemen.length + (cavemen.length ? ' \u00B7 ' + kids + '\u{1F476} ' + adults + '\u{1F9D1} ' + elders + '\u{1F9D3}' : '');
+  const elB = document.getElementById('gp-births');
+  if (elB) elB.textContent = String(campStats.births);
+  const elD = document.getElementById('gp-deaths');
+  if (elD) elD.textContent = String(campStats.deaths);
+  const elS = document.getElementById('gp-season');
+  if (elS) elS.textContent = s.icon + ' ' + s.name;
+  const elT = document.getElementById('gp-temp');
+  if (elT) elT.textContent = Math.round(tempNow) + '\u00B0C';
+  const elA = document.getElementById('gp-age');
+  if (elA) elA.textContent = 'Year ' + cyr + ' · Day ' + cdoy;
 }
 
 function renderPlanetCanvas() {
@@ -7938,14 +7938,21 @@ function selectCaveman(cm) {
   // little badge: who is who at a glance
   charSexEl.textContent = cm.female ? '\u2640' : '\u2642';
   charSexEl.className = cm.female ? 'female' : 'male';
-  document.getElementById('char-name').textContent = cm.stats.name;
+  const elName = document.getElementById('char-name');
+  if (elName) elName.textContent = cm.stats.name;
   const vit = villagerVitals(cm);
-  document.getElementById('st-cond').textContent = vit.cond;
-  document.getElementById('st-hp').textContent = cm.stats.health + ' / 100';
-  document.getElementById('hp-fill').style.width = cm.stats.health + '%';
-  document.getElementById('st-weight').textContent = vit.weight;
-  document.getElementById('st-height').textContent = vit.height;
-  document.getElementById('st-iq').textContent = vit.iq;
+  const elCond = document.getElementById('st-cond');
+  if (elCond) elCond.textContent = vit.cond;
+  const elHp = document.getElementById('st-hp');
+  if (elHp) elHp.textContent = cm.stats.health + ' / 100';
+  const elFill = document.getElementById('hp-fill');
+  if (elFill) elFill.style.width = cm.stats.health + '%';
+  const elW = document.getElementById('st-weight');
+  if (elW) elW.textContent = vit.weight;
+  const elH = document.getElementById('st-height');
+  if (elH) elH.textContent = vit.height;
+  const elIQ = document.getElementById('st-iq');
+  if (elIQ) elIQ.textContent = vit.iq;
   lastAgeStr = '';
   anatOnSelect();
   renderRoster();
@@ -11619,11 +11626,16 @@ function animate() {
     const vit = villagerVitals(selectedCm);
     const vitalsStr = vit.weight + '|' + vit.height + '|' + vit.iq + '|' + vit.cond;
     if (ageStr !== lastAgeStr || vitalsStr !== lastVitalsStr) {
-      document.getElementById('st-age').textContent = ageStr;
-      document.getElementById('st-weight').textContent = vit.weight;
-      document.getElementById('st-height').textContent = vit.height;
-      document.getElementById('st-iq').textContent = vit.iq;
-      document.getElementById('st-cond').textContent = vit.cond;
+      const elAge = document.getElementById('st-age');
+      if (elAge) elAge.textContent = ageStr;
+      const elW = document.getElementById('st-weight');
+      if (elW) elW.textContent = vit.weight;
+      const elH = document.getElementById('st-height');
+      if (elH) elH.textContent = vit.height;
+      const elIQ = document.getElementById('st-iq');
+      if (elIQ) elIQ.textContent = vit.iq;
+      const elCond = document.getElementById('st-cond');
+      if (elCond) elCond.textContent = vit.cond;
       lastAgeStr = ageStr;
       lastVitalsStr = vitalsStr;
     }
