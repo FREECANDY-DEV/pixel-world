@@ -10370,26 +10370,34 @@ let playerIsTalking = false;
 
 function getGrunkFaceTgt() {
   const spr = (typeof demoState !== 'undefined' && demoState && demoState.botGhost) ? demoState.botGhost.spr : null;
-  const px = spr ? spr.position.x : (typeof homePos !== 'undefined' ? homePos.x + 2.1 : 0);
-  const pz = spr ? spr.position.z : (typeof homePos !== 'undefined' ? homePos.z + 1.9 : 0);
-  const py = (typeof charGroundY === 'function') ? charGroundY(px, pz) + 0.18 : 18.68;
-  return new THREE.Vector3(px, py + 2.35, pz);
+  if (spr) {
+    return new THREE.Vector3(spr.position.x, spr.position.y + 1.70, spr.position.z);
+  }
+  const gx = (typeof homePos !== 'undefined' ? homePos.x + 2.1 : 0);
+  const gz = (typeof homePos !== 'undefined' ? homePos.z + 1.9 : 0);
+  const gy = (typeof charGroundY === 'function') ? charGroundY(gx, gz) + 0.35 : 18.68;
+  return new THREE.Vector3(gx, gy + 1.70, gz);
 }
 
 function getGrunkCamPos() {
   const tgt = getGrunkFaceTgt();
-  return new THREE.Vector3(tgt.x, tgt.y + 0.25, tgt.z + 3.4);
+  return new THREE.Vector3(tgt.x, tgt.y, tgt.z + 3.4);
 }
 
 function getPlayerFaceTgt() {
   const spr = (typeof demoState !== 'undefined' && demoState && demoState.me && demoState.me.spr) ? demoState.me.spr : (cavemen[0] ? cavemen[0].spr : null);
-  const p = spr ? spr.position : (typeof homePos !== 'undefined' ? new THREE.Vector3(homePos.x, 18.5, homePos.z) : new THREE.Vector3());
-  return new THREE.Vector3(p.x, p.y + 2.20, p.z);
+  if (spr) {
+    return new THREE.Vector3(spr.position.x, spr.position.y + 1.45, spr.position.z);
+  }
+  const px = typeof homePos !== 'undefined' ? homePos.x : 0;
+  const pz = typeof homePos !== 'undefined' ? homePos.z : 0;
+  const py = typeof charGroundY === 'function' ? charGroundY(px, pz) : 18.5;
+  return new THREE.Vector3(px, py + 1.45, pz);
 }
 
 function getPlayerCamPos() {
   const tgt = getPlayerFaceTgt();
-  return new THREE.Vector3(tgt.x, tgt.y + 0.25, tgt.z - 3.4);
+  return new THREE.Vector3(tgt.x, tgt.y, tgt.z - 3.4);
 }
 
 function tweenCameraToExplicit(toT, toP, durSec = 1.1) {
