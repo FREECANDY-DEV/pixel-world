@@ -6754,7 +6754,12 @@ function lookPal(basePal, look) {
 // people never sink below knee-deep water: on the sea they wade at the
 // surface instead of dropping to the seabed
 function charGroundY(x, z) {
-  return Math.max(groundYAt(x, z), SEA_LEVEL - 0.45);
+  let g = groundYAt(x, z);
+  // sample 4-corner footprint around character to prevent lower body clipping near ledges
+  for (const [dx, dz] of [[-0.45, -0.45], [0.45, -0.45], [-0.45, 0.45], [0.45, 0.45]]) {
+    g = Math.max(g, groundYAt(x + dx, z + dz));
+  }
+  return Math.max(g + 0.05, SEA_LEVEL - 0.45);
 }
 
 function smoothGroundY(cm, dt, x, z) {
