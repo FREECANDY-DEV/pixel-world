@@ -11661,8 +11661,7 @@ function animate() {
   treeMat.uniforms.uWindAng.value = windAng;
   treeMat.uniforms.uWindPow.value = Math.max(0, envWind - 1) * 0.055;
   windDirX = Math.cos(windAng);
-  windDirZ = Math.sin(windAng);
-  water.material.color.copy(waterNight).lerp(waterDay, dayF).lerp(pitchBlack, zoomSpaceK * 0.95);
+  water.material.color.copy(waterNight).lerp(waterDay, dayF);
 
   const skyDist = Math.max(1200, camera.position.distanceTo(controls.target) * 2.2);
   sunDisc.position.set(
