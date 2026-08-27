@@ -10438,10 +10438,10 @@ async function triggerGrunkCinematicSequence() {
 
   const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x + 2.1, charGroundY(homePos.x + 2.1, homePos.z + 1.9) + 0.18, homePos.z + 1.9);
 
-  // Animate Player taking distance: smoothly step back 3.2 units from Grunk
+  // Animate Player taking distance: step player 3.2 units to the side of Grunk out of camera line-of-sight
   const startP = meSpr ? meSpr.position.clone() : new THREE.Vector3(homePos.x, charGroundY(homePos.x, homePos.z), homePos.z);
-  const standX = grunkPos.x;
-  const standZ = grunkPos.z + 3.2;
+  const standX = grunkPos.x - 3.2;
+  const standZ = grunkPos.z + 1.6;
   const standY = charGroundY(standX, standZ);
   const standP = new THREE.Vector3(standX, standY, standZ);
 
@@ -10460,8 +10460,8 @@ async function triggerGrunkCinematicSequence() {
     meSpr.position.copy(standP);
   }
 
-  // STEP 1: Zoom camera directly onto Grunk's face
-  if (meSpr) meSpr.visible = true;
+  // STEP 1: Zoom camera directly onto Grunk's face (Hide Player during Grunk's turn so Player NEVER blocks Grunk)
+  if (meSpr) meSpr.visible = false;
   if (grunkSpr) grunkSpr.visible = true;
 
   tweenCameraToExplicit(getGrunkFaceTgt(), getGrunkCamPos(), 1.1);
@@ -10473,7 +10473,9 @@ async function triggerGrunkCinematicSequence() {
   await showSubtitle('Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
   grunkIsTalking = false;
 
-  // STEP 3: Transition camera onto Player's face (Shot 2)
+  // STEP 3: Transition camera onto Player's face (Show Player, Hide Grunk during Player's turn so Grunk NEVER blocks Player)
+  if (meSpr) meSpr.visible = true;
+  if (grunkSpr) grunkSpr.visible = false;
   tweenCameraToExplicit(getPlayerFaceTgt(), getPlayerCamPos(), 1.1);
   await new Promise(r => setTimeout(r, 1150));
 
