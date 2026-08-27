@@ -113,23 +113,30 @@ function terrainHeight(x, z, seed) {
   const m = Math.max(0, (mtnMask - 0.46) / 0.54);
   e += Math.pow(m, 1.4) * ridge * 3.4 + m * peaks * 0.9; // mountain ranges
 
-  // --- lake basins: smooth, natural, shallow depressions (no sharp cliff holes) ---
-  const lakeMask = valueNoise2(x * 0.012, z * 0.012, seed + 2000);
-  const lakeDetail = valueNoise2(x * 0.035, z * 0.035, seed + 2001);
-  const lakeEdge = sstep(Math.max(0.0, Math.min(1.0, (lakeMask - 0.58) / 0.25))) *
-                   sstep(Math.max(0.0, Math.min(1.0, (lakeDetail - 0.44) / 0.3)));
-  if (lakeEdge > 0.01 && e > -0.1 && e < 1.2) {
-    e -= lakeEdge * 0.28;
+  // --- inland lake basins: smooth, natural depressions filled with water ---
+  const lakeMask = valueNoise2(x * 0.014, z * 0.014, seed + 2000);
+  const lakeDetail = valueNoise2(x * 0.038, z * 0.038, seed + 2001);
+  const lakeEdge = sstep(Math.max(0.0, Math.min(1.0, (lakeMask - 0.48) / 0.22))) *
+                   sstep(Math.max(0.0, Math.min(1.0, (lakeDetail - 0.40) / 0.28)));
+  if (lakeEdge > 0.01 && e > -0.1 && e < 1.4) {
+    e -= lakeEdge * 0.58; // dips terrain below sea level forming water lakes!
   }
 
-  // --- river valleys: long carved grooves following a noise curve ---
+  // --- cozy water ponds: small scenic water pools scattered across biomes ---
+  const pondMask = valueNoise2(x * 0.045, z * 0.045, seed + 2500);
+  if (pondMask > 0.64 && e > -0.05 && e < 0.7) {
+    const pondCarve = (pondMask - 0.64) * 1.6;
+    e -= pondCarve; // dips terrain into shimmering water ponds!
+  }
+
+  // --- river valleys & canals: long carved grooves carrying flowing water ---
   const riverNoise = valueNoise2(x * 0.004, z * 0.004, seed + 3000);
-  const riverPath = fbm2(x * 0.015, z * 0.015, seed + 3001, 3);
-  const riverWidth = 0.025 + riverNoise * 0.02;
+  const riverPath = fbm2(x * 0.012, z * 0.012, seed + 3001, 3);
+  const riverWidth = 0.032 + riverNoise * 0.02;
   const riverDist = Math.abs(riverPath - 0.5);
-  if (riverDist < riverWidth && e > 0.1 && e < 1.5) {
-    const riverCarve = (1 - riverDist / riverWidth) * 0.6;
-    e -= riverCarve;
+  if (riverDist < riverWidth && e > -0.05 && e < 1.5) {
+    const riverCarve = (1 - riverDist / riverWidth) * 0.58;
+    e -= riverCarve; // carves winding river channels!
   }
 
   // --- rolling hills: softer undulation in grassland ---
