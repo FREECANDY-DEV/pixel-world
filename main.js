@@ -6031,12 +6031,22 @@ function renderPlanetCanvas() {
       const wz = Math.round(homePos.z + Math.sin(th) * r);
       const h = terrainHeight(wx, wz, SEED);
       let cr, cg, cb;
-      if (h < SEA_LEVEL - 8) { cr = 14; cg = 36; cb = 66; }
-      else if (h <= SEA_LEVEL) { cr = 32; cg = 84; cb = 122; }
-      else if (h <= SEA_LEVEL + 1.6) { cr = 214; cg = 196; cb = 140; }
-      else if (h > 50) { cr = 236; cg = 241; cb = 246; }
-      else if (h > 44) { cr = 128; cg = 121; cb = 110; }
-      else {
+      if (h < SEA_LEVEL - 4) {
+        // Deep ocean sea: rich royal blue water
+        cr = 16; cg = 48; cb = 112;
+      } else if (h <= SEA_LEVEL) {
+        // Coastal shallows & lagoons: vibrant turquoise water
+        cr = 38; cg = 128; cb = 178;
+      } else if (h <= SEA_LEVEL + 1.8) {
+        // Sandy beach shorelines: golden sand
+        cr = 224; cg = 208; cb = 152;
+      } else if (h > 50) {
+        // Mountain snow peaks
+        cr = 236; cg = 241; cb = 246;
+      } else if (h > 44) {
+        // Rocky mountain slopes
+        cr = 128; cg = 121; cb = 110;
+      } else {
         const moist = fbm2(wx * 0.01, wz * 0.01, SEED + 333, 2);
         if (moist > 0.58) { cr = 38; cg = 104; cb = 56; }
         else if (moist < 0.34) { cr = 198; cg = 172; cb = 118; }
