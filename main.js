@@ -9863,6 +9863,61 @@ function makeHologramMat() {
 let cinematicActive = false;
 let grunkIsTalking = false;
 let cinematicSubtitlesEl = null;
+let cinematicBarsEl = null;
+
+function ensureCinematicBars() {
+  if (!cinematicBarsEl) {
+    const topBar = document.createElement('div');
+    topBar.id = 'cinematic-bar-top';
+    topBar.style.cssText = `
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      background: #000000;
+      z-index: 9998;
+      pointer-events: none;
+      transform: translateY(-100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    `;
+    const botBar = document.createElement('div');
+    botBar.id = 'cinematic-bar-bottom';
+    botBar.style.cssText = `
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 52px;
+      background: #000000;
+      z-index: 9998;
+      pointer-events: none;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    `;
+    document.body.appendChild(topBar);
+    document.body.appendChild(botBar);
+    cinematicBarsEl = { top: topBar, bot: botBar };
+  }
+  return cinematicBarsEl;
+}
+
+function setCinematicBars(active) {
+  const bars = ensureCinematicBars();
+  bars.top.style.transform = active ? 'translateY(0)' : 'translateY(-100%)';
+  bars.bot.style.transform = active ? 'translateY(0)' : 'translateY(100%)';
+}
+
+function setCutsceneUIVisibility(visible) {
+  const selectors = [
+    '#rail', '#joy', '#chat-btn', '#assets-panel', '#action-menu',
+    '#roster-bar', '#placing-bar', '#hud-header', '#inventory-bar'
+  ];
+  selectors.forEach(sel => {
+    const el = document.querySelector(sel);
+    if (el) {
+      el.style.transition = 'opacity 0.35s ease';
+      el.style.opacity = visible ? '1' : '0';
+      el.style.pointerEvents = visible ? 'auto' : 'none';
+    }
+  });
+}
 
 function getSubtitlesElement() {
   if (!cinematicSubtitlesEl) {
@@ -9870,7 +9925,7 @@ function getSubtitlesElement() {
     cinematicSubtitlesEl.id = 'cinematic-subtitles';
     cinematicSubtitlesEl.style.cssText = `
       position: fixed;
-      bottom: 36px;
+      bottom: 22px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 10000;
@@ -9933,6 +9988,10 @@ async function triggerGrunkCinematicSequence() {
   if (cinematicActive) return;
   cinematicActive = true;
 
+  // Activate Cinematic Letterbox & Hide all UI elements
+  setCinematicBars(true);
+  setCutsceneUIVisibility(false);
+
   const origTarget = controls.target.clone();
   const origPos = camera.position.clone();
 
@@ -9966,8 +10025,10 @@ async function triggerGrunkCinematicSequence() {
   // STEP 4: Player says "OK, I will!"
   await showSubtitle('OK, I will!', 2800);
 
-  // STEP 5: Smoothly return camera to original view & restore control
+  // STEP 5: Smoothly return camera to original view & restore control and UI
   hideSubtitles();
+  setCinematicBars(false);
+  setCutsceneUIVisibility(true);
   tweenCameraToExplicit(origTarget, origPos, 1.1);
   await new Promise(r => setTimeout(r, 1100));
 
