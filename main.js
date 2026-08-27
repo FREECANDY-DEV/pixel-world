@@ -3247,13 +3247,24 @@ function paintMaple(c, ox) {
 }
 
 function paintBerry(c, ox) {
-  tblob(c, ox + 24, 36, 13, 8, '#2c5c2a');
-  tblob(c, ox + 24, 33, 11, 7, '#3f7d3a');
-  tblob(c, ox + 21, 31, 7, 5, '#57a04e');
-  c.fillStyle = '#7ab86a';
-  for (let i = 0; i < 8; i++) c.fillRect(ox + 14 + ((i * 7) % 20), 28 + ((i * 5) % 9), 1, 1);
-  c.fillStyle = '#8a4a5a';
-  for (let i = 0; i < 5; i++) c.fillRect(ox + 16 + ((i * 9) % 16), 30 + ((i * 7) % 7), 2, 2);
+  // Wood stem base
+  tpx(c, ox + 23, 38, 2, 4, '#52361b');
+  // Full 3D rounded foliage layers (centered higher at cy=28 so bottom never clips flat)
+  tblob(c, ox + 24, 28, 14, 9, '#1e4822'); // base shadow lobe
+  tblob(c, ox + 19, 26, 11, 7, '#2c6b32'); // left lobe
+  tblob(c, ox + 29, 25, 10, 6, '#38843e'); // right lobe
+  tblob(c, ox + 24, 22, 9, 5, '#48a250');  // top crown highlight
+  c.fillStyle = '#78c680';
+  for (let i = 0; i < 10; i++) c.fillRect(ox + 13 + ((i * 7) % 22), 19 + ((i * 5) % 12), 2, 1);
+  // Vibrant ripe crimson berries with specular highlight
+  c.fillStyle = '#e82c3e';
+  for (const [bx, by] of [[16, 26], [22, 22], [28, 20], [33, 25], [19, 31], [26, 29], [31, 31]]) {
+    c.fillRect(ox + bx, by, 2, 2);
+  }
+  c.fillStyle = '#ffa4b0';
+  for (const [bx, by] of [[16, 26], [22, 22], [28, 20], [33, 25]]) {
+    c.fillRect(ox + bx, by, 1, 1);
+  }
 }
 
 function paintSpruce(c, ox) {
@@ -3271,12 +3282,14 @@ function paintSpruce(c, ox) {
 }
 
 function paintFrostbush(c, ox) {
-  tblob(c, ox + 24, 37, 12, 7, '#4a5a6a');
-  tblob(c, ox + 24, 34, 9, 6, '#5d7285');
-  tblob(c, ox + 22, 32, 6, 4, '#7a92a5');
-  c.fillStyle = '#dce8f2';
-  for (let i = 0; i < 10; i++) c.fillRect(ox + 14 + ((i * 7) % 20), 29 + ((i * 5) % 7), 1, 1);
-  tpx(c, ox + 23, 43, 3, 3, '#3a4a56');
+  tpx(c, ox + 23, 38, 2, 4, '#2e3a46');
+  tblob(c, ox + 24, 28, 14, 9, '#3a4a58');
+  tblob(c, ox + 20, 26, 11, 7, '#4c5e6f');
+  tblob(c, ox + 28, 24, 9, 6, '#5e7387');
+  tblob(c, ox + 24, 21, 7, 4, '#768fa6');
+  // Snow cap highlights on top foliage
+  c.fillStyle = '#eaf4fc';
+  for (let i = 0; i < 12; i++) c.fillRect(ox + 13 + ((i * 7) % 22), 17 + ((i * 5) % 11), 2, 1);
 }
 
 // --- rocks ------------------------------------------------------------------
@@ -3312,48 +3325,51 @@ function paintBoulder(c, ox) {
 }
 
 function paintGreatBush(c, ox) {
-  tpx(c, ox + 23, 41, 3, 4, '#5a3a22');
-  tblob(c, ox + 24, 33, 14, 8, '#245c2f');
-  tblob(c, ox + 20, 28, 11, 6, '#2f7a3a');
-  tblob(c, ox + 27, 26, 8, 5, '#3f9e4a');
-  c.fillStyle = '#63c06a';
-  for (let i = 0; i < 10; i++) {
-    c.fillRect(ox + 12 + ((i * 7) % 22), 22 + ((i * 5) % 12), 2, 1);
+  tpx(c, ox + 23, 38, 3, 4, '#4a321a');
+  tblob(c, ox + 24, 26, 16, 10, '#1c4d26');
+  tblob(c, ox + 18, 24, 12, 8, '#286934');
+  tblob(c, ox + 30, 23, 11, 7, '#358242');
+  tblob(c, ox + 24, 19, 10, 6, '#46a354');
+  c.fillStyle = '#6ed47c';
+  for (let i = 0; i < 12; i++) {
+    c.fillRect(ox + 11 + ((i * 7) % 26), 15 + ((i * 5) % 15), 2, 1);
   }
-  c.fillStyle = '#d24a5a';
-  for (const [bx, by] of [[17, 30], [26, 25], [31, 33], [21, 36]]) {
+  c.fillStyle = '#e24858';
+  for (const [bx, by] of [[15, 24], [22, 19], [30, 21], [35, 26], [20, 29], [28, 28]]) {
     c.fillRect(ox + bx, by, 2, 2);
   }
 }
 
 // blossom bush: soft green mound dotted with pink/white spring flowers
 function paintBloom(c, ox) {
-  tpx(c, ox + 23, 42, 3, 3, '#5a3a22');
-  tblob(c, ox + 24, 35, 12, 7, '#2e6e38');
-  tblob(c, ox + 20, 31, 9, 5, '#3d8a46');
-  tblob(c, ox + 28, 29, 7, 4, '#4da355');
-  c.fillStyle = '#f5b8cf';
-  for (const [fx, fy] of [[16, 33], [22, 28], [28, 25], [33, 31], [19, 38], [30, 36], [25, 33]]) {
+  tpx(c, ox + 23, 38, 2, 4, '#422c16');
+  tblob(c, ox + 24, 28, 14, 9, '#22592b');
+  tblob(c, ox + 19, 25, 11, 7, '#317a3d');
+  tblob(c, ox + 29, 24, 10, 6, '#40994f');
+  tblob(c, ox + 24, 21, 8, 5, '#52b863');
+  c.fillStyle = '#fca8c8';
+  for (const [fx, fy] of [[15, 26], [21, 20], [28, 19], [34, 24], [18, 31], [27, 29], [32, 28]]) {
     c.fillRect(ox + fx, fy, 2, 2);
   }
-  c.fillStyle = '#fff3f8';
-  for (const [fx, fy] of [[23, 30], [31, 27], [18, 35]]) {
+  c.fillStyle = '#ffffff';
+  for (const [fx, fy] of [[22, 22], [30, 20], [17, 28], [29, 30]]) {
     c.fillRect(ox + fx, fy, 1, 1);
   }
 }
 
 // bramble tangle: dark wiry thicket with thorn specks and deep greens
 function paintBramble(c, ox) {
-  tpx(c, ox + 22, 41, 4, 4, '#4a3418');
-  tblob(c, ox + 24, 33, 13, 8, '#1c4526');
-  tblob(c, ox + 19, 30, 9, 5, '#26592f');
-  tblob(c, ox + 29, 28, 8, 5, '#2f6b38');
-  c.fillStyle = '#153318';
+  tpx(c, ox + 22, 38, 3, 4, '#382612');
+  tblob(c, ox + 24, 27, 15, 10, '#153b1e');
+  tblob(c, ox + 18, 25, 11, 7, '#20542c');
+  tblob(c, ox + 30, 23, 10, 6, '#2d6d3b');
+  tblob(c, ox + 24, 20, 8, 5, '#3a874b');
+  c.fillStyle = '#102d17';
   for (let i = 0; i < 12; i++) {
-    c.fillRect(ox + 13 + ((i * 9) % 20), 26 + ((i * 7) % 14), 2, 1);
+    c.fillRect(ox + 12 + ((i * 9) % 22), 17 + ((i * 7) % 14), 2, 1);
   }
-  c.fillStyle = '#8fae52';
-  for (const [tx, ty] of [[17, 32], [24, 27], [31, 30], [21, 37], [29, 35]]) {
+  c.fillStyle = '#9bc255';
+  for (const [tx, ty] of [[16, 25], [23, 19], [31, 22], [20, 30], [29, 28]]) {
     c.fillRect(ox + tx, ty, 1, 1);
   }
 }
