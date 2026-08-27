@@ -10376,33 +10376,33 @@ let playerIsTalking = false;
 function getGrunkFaceTgt() {
   const spr = (typeof demoState !== 'undefined' && demoState && demoState.botGhost) ? demoState.botGhost.spr : null;
   if (spr) {
-    return new THREE.Vector3(spr.position.x, spr.position.y + 1.70, spr.position.z);
+    return new THREE.Vector3(spr.position.x, spr.position.y + 2.20, spr.position.z);
   }
   const gx = (typeof homePos !== 'undefined' ? homePos.x + 2.1 : 0);
   const gz = (typeof homePos !== 'undefined' ? homePos.z + 1.9 : 0);
   const gy = (typeof charGroundY === 'function') ? charGroundY(gx, gz) + 0.35 : 18.68;
-  return new THREE.Vector3(gx, gy + 1.70, gz);
+  return new THREE.Vector3(gx, gy + 2.20, gz);
 }
 
 function getGrunkCamPos() {
   const tgt = getGrunkFaceTgt();
-  return new THREE.Vector3(tgt.x, tgt.y, tgt.z + 3.4);
+  return new THREE.Vector3(tgt.x + 0.5, tgt.y + 0.35, tgt.z + 3.6);
 }
 
 function getPlayerFaceTgt() {
   const spr = (typeof demoState !== 'undefined' && demoState && demoState.me && demoState.me.spr) ? demoState.me.spr : (cavemen[0] ? cavemen[0].spr : null);
   if (spr) {
-    return new THREE.Vector3(spr.position.x, spr.position.y + 1.45, spr.position.z);
+    return new THREE.Vector3(spr.position.x, spr.position.y + 1.65, spr.position.z);
   }
   const px = typeof homePos !== 'undefined' ? homePos.x : 0;
   const pz = typeof homePos !== 'undefined' ? homePos.z : 0;
   const py = typeof charGroundY === 'function' ? charGroundY(px, pz) : 18.5;
-  return new THREE.Vector3(px, py + 1.45, pz);
+  return new THREE.Vector3(px, py + 1.65, pz);
 }
 
 function getPlayerCamPos() {
   const tgt = getPlayerFaceTgt();
-  return new THREE.Vector3(tgt.x, tgt.y, tgt.z - 3.4);
+  return new THREE.Vector3(tgt.x - 0.5, tgt.y + 0.35, tgt.z - 3.6);
 }
 
 function tweenCameraToExplicit(toT, toP, durSec = 1.1) {
