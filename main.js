@@ -5515,17 +5515,29 @@ const _gdQuat = new THREE.Quaternion();
 let prevDesired = null;
 
 // --- space dressing: a blazing distant sun + a moon circling the earth -----
+// --- space dressing: a massive blazing sun + solar system planets + deep space starfield -----
 const sunSprite = (() => {
   const c = document.createElement('canvas');
-  c.width = c.height = 128;
+  c.width = c.height = 256;
   const g = c.getContext('2d');
-  const gr = g.createRadialGradient(64, 64, 6, 64, 64, 64);
-  gr.addColorStop(0, 'rgba(255,255,244,1)');
-  gr.addColorStop(0.25, 'rgba(255,222,130,0.95)');
-  gr.addColorStop(0.5, 'rgba(255,165,64,0.32)');
-  gr.addColorStop(1, 'rgba(255,140,40,0)');
+  const gr = g.createRadialGradient(128, 128, 12, 128, 128, 128);
+  gr.addColorStop(0, 'rgba(255,255,250,1)');
+  gr.addColorStop(0.18, 'rgba(255,235,140,1)');
+  gr.addColorStop(0.42, 'rgba(255,160,40,0.85)');
+  gr.addColorStop(0.70, 'rgba(255,90,20,0.35)');
+  gr.addColorStop(1, 'rgba(255,40,0,0)');
   g.fillStyle = gr;
-  g.fillRect(0, 0, 128, 128);
+  g.fillRect(0, 0, 256, 256);
+  // Solar flare rays
+  g.fillStyle = 'rgba(255,220,130,0.22)';
+  for (let i = 0; i < 12; i++) {
+    const ang = (i / 12) * Math.PI * 2;
+    g.beginPath();
+    g.moveTo(128, 128);
+    g.arc(128, 128, 120, ang - 0.08, ang + 0.08);
+    g.closePath();
+    g.fill();
+  }
   const t = new THREE.CanvasTexture(c);
   const s = new THREE.Sprite(new THREE.SpriteMaterial({
     map: t,
@@ -5596,15 +5608,67 @@ function ensureMoon() {
   scene.add(moonPivot);
 }
 
-// full-sphere starfield for the planet view (the night domes only cover up)
+// --- Solar System Background Planets Orbiting in Space ---
+let solarSystemGroup = null;
+
+function ensureSolarSystem() {
+  if (solarSystemGroup) return;
+  solarSystemGroup = new THREE.Group();
+
+  const makePlanet = (r, col, dist, speed, tilt = 0) => {
+    const pMat = new THREE.MeshBasicMaterial({ color: col, fog: false });
+    const pMesh = new THREE.Mesh(new THREE.SphereGeometry(r, 16, 12), pMat);
+    const pPivot = new THREE.Group();
+    pMesh.position.set(dist, 0, 0);
+    pPivot.add(pMesh);
+    pPivot.rotation.z = tilt;
+    pPivot.userData = { speed, pMesh };
+    solarSystemGroup.add(pPivot);
+    return pPivot;
+  };
+
+  // Venus (golden), Mars (red), Jupiter (gas giant), Saturn (ringed)
+  makePlanet(PLANET_R * 0.18, 0xe8c87d, PLANET_R * 2.8, 0.22, 0.08); // Venus
+  makePlanet(PLANET_R * 0.15, 0xd14e32, PLANET_R * 4.2, -0.15, -0.12); // Mars
+  makePlanet(PLANET_R * 0.38, 0xd6a77a, PLANET_R * 6.5, 0.08, 0.05); // Jupiter
+
+  // Saturn ringed gas giant
+  const sat = makePlanet(PLANET_R * 0.32, 0xe3c988, PLANET_R * 9.2, -0.05, 0.25);
+  const ringGeom = new THREE.RingGeometry(PLANET_R * 0.42, PLANET_R * 0.68, 24);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xc8b078, side: THREE.DoubleSide, transparent: true, opacity: 0.7, fog: false });
+  const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+  ringMesh.rotation.x = Math.PI / 2.3;
+  sat.userData.pMesh.add(ringMesh);
+
+  solarSystemGroup.visible = false;
+  scene.add(solarSystemGroup);
+}
+
+function updateSolarSystem(dt, gs) {
+  ensureSolarSystem();
+  if (!solarSystemGroup) return;
+  solarSystemGroup.visible = spaceMode;
+  if (!spaceMode) return;
+
+  solarSystemGroup.position.copy(globe.group.position);
+  solarSystemGroup.scale.setScalar(gs);
+
+  for (const child of solarSystemGroup.children) {
+    if (child.userData && child.userData.speed) {
+      child.rotation.y += dt * child.userData.speed;
+    }
+  }
+}
+
+// full-sphere starfield for the solar planet view (1,800+ twinkling stars)
 const spaceDome = (() => {
-  const n = 560;
+  const n = 1800;
   const pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) {
     const u = Math.random() * 2 - 1;
     const a = Math.random() * Math.PI * 2;
     const rr = Math.sqrt(Math.max(0, 1 - u * u));
-    const d = 0.45 + Math.pow(Math.random(), 0.5) * 1.35;
+    const d = 0.35 + Math.pow(Math.random(), 0.5) * 1.8;
     pos[i * 3] = Math.cos(a) * rr * d;
     pos[i * 3 + 1] = u * d;
     pos[i * 3 + 2] = Math.sin(a) * rr * d;
@@ -5612,8 +5676,8 @@ const spaceDome = (() => {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   const p = new THREE.Points(g, new THREE.PointsMaterial({
-    size: 1.7,
-    color: 0xdfe8ff,
+    size: 2.1,
+    color: 0xffffff,
     transparent: true,
     opacity: 0,
     depthWrite: false,
@@ -6010,13 +6074,15 @@ function updateWorldLod(dt) {
     spaceDome.position.copy(camera.position);
     spaceDome.scale.setScalar(Math.min(2400, camera.far * 0.7));
     spaceDome.material.opacity = 1;
-    // sun: huge glowing celestial body motionless in deep space
+    // sun: MASSIVE glowing solar titan motionless in deep space
     sunSprite.visible = true;
     sunSprite.position
       .copy(globe.group.position)
-      .addScaledVector(SUN_SPACE_DIR, Math.min(2800, 750 * Math.max(1, gs)));
-    const ss = Math.max(550, 220 * gs);
+      .addScaledVector(SUN_SPACE_DIR, Math.min(3800, 1100 * Math.max(1, gs)));
+    const ss = Math.max(1600, 520 * gs); // MASSIVE Sun!
     sunSprite.scale.set(ss, ss, 1);
+    // solar system planets orbiting in space
+    updateSolarSystem(dt, gs);
     // moon: circles the earth once every ~18s, shrinking with the globe
     ensureMoon();
     moonPivot.visible = true;
