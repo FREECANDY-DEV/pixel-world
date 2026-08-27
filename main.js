@@ -10404,11 +10404,11 @@ async function triggerGrunkCinematicSequence() {
     t.sprB.visible = false;
   }
 
-  // STEP 1: Zoom camera directly onto Grunk's face (Head-on portrait view)
-  if (meSpr) meSpr.visible = true;
+  // STEP 1: Zoom camera directly onto Grunk's face (Hide Player so Player NEVER blocks Grunk's view)
+  if (meSpr) meSpr.visible = false;
   if (grunkSpr) grunkSpr.visible = true;
   for (const cm of cavemen) {
-    if (cm.spr && cm.spr !== grunkSpr && cm.spr !== meSpr) cm.spr.visible = false;
+    if (cm.spr && cm.spr !== grunkSpr) cm.spr.visible = false;
   }
 
   tweenCameraToExplicit(getGrunkFaceTgt(), getGrunkCamPos(), 1.1);
@@ -10420,7 +10420,10 @@ async function triggerGrunkCinematicSequence() {
   await showSubtitle('Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
   grunkIsTalking = false;
 
-  // STEP 3: Transition camera onto Player's face (Head-on portrait view from Grunk's side)
+  // STEP 3: Transition camera onto Player's face (Show Player, Hide Grunk so Grunk NEVER blocks Player's view)
+  if (meSpr) meSpr.visible = true;
+  if (grunkSpr) grunkSpr.visible = false;
+
   tweenCameraToExplicit(getPlayerFaceTgt(), getPlayerCamPos(), 1.1);
   await new Promise(r => setTimeout(r, 1150));
 
@@ -11839,8 +11842,8 @@ function animate() {
   updateCavemen(dt * worldRate, animT);
   reapElders();
   anatTick(dt);
-  // hard visibility rule: in detail mode no villager may stay hidden
-  if (!iconMode && !spaceMode) {
+  // hard visibility rule: in detail mode no villager may stay hidden (except during cutscenes)
+  if (!iconMode && !spaceMode && !cinematicActive) {
     for (const cm of cavemen) cm.spr.visible = true;
   }
   // live roster thumbs: real sprite faces + ages, refreshed twice a second
