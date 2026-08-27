@@ -2889,10 +2889,10 @@ KIND_ORDER.forEach((k, i) => { KIND_COL[k] = i / ATLAS_COLS; });
 // which species grow wild in each terrain — bushes weighted heavier and
 // rocks scattered through every biome
 const BIOME_TREES = {
-  desert: ['cactus', 'agave', 'acacia', 'shrub', 'tumble', 'pebble', 'rock', 'boulder'],
-  jungle: ['jungle', 'palm', 'bamboo', 'fern', 'fern', 'greatbush', 'bramble', 'bramble', 'pebble', 'rock'],
-  forest: ['oak', 'pine', 'birch', 'maple', 'berry', 'berry', 'bloom', 'bloom', 'greatbush', 'pebble', 'rock', 'boulder'],
-  snow: ['snowpine', 'spruce', 'dead', 'frostbush', 'frostbush', 'rock', 'boulder'],
+  desert: ['cactus', 'agave', 'acacia', 'shrub', 'tumble', 'shrub', 'tumble', 'pebble', 'rock', 'boulder'],
+  jungle: ['jungle', 'palm', 'bamboo', 'fern', 'bramble', 'greatbush', 'bloom', 'fern', 'bramble', 'pebble', 'rock'],
+  forest: ['oak', 'pine', 'birch', 'maple', 'berry', 'bloom', 'greatbush', 'bramble', 'bloom', 'greatbush', 'berry', 'pebble', 'rock', 'boulder'],
+  snow: ['snowpine', 'spruce', 'dead', 'frostbush', 'berry', 'frostbush', 'rock', 'boulder'],
 };
 const TREE_DENSITY = { desert: 0.017, jungle: 0.038, forest: 0.028, snow: 0.02 };
 
@@ -4124,7 +4124,7 @@ const treeMat = new THREE.ShaderMaterial({
       float flutter = sin(uTime * (1.5 + vnoise(wp + 7.3)) + iPhase);
       // bend in WORLD space so orbiting the camera never spins the tree
       vec3 bendWorld = vec3(wdir.x, 0.0, wdir.y) * (flutter * lmag * position.y * iH * 0.14);
-      vec3 basePos = iPos + vec3(0.0, 0.05 + aLift * 0.08, 0.0) + bendWorld;
+      vec3 basePos = iPos + vec3(0.0, 0.08 + aLift * 0.32, 0.0) + bendWorld;
       // Transform base anchor position (top of block) into view space (Exact THREE.Sprite alignment)
       vec4 mvPosition = viewMatrix * vec4(basePos, 1.0);
 
@@ -4298,7 +4298,7 @@ function buildChunkTrees(cx, cz, lod = 0) {
     const tr = items[i];
     const gy = groundYAt(tr.x, tr.z);
     iPos[i * 3] = tr.x;
-    iPos[i * 3 + 1] = gy + 0.09;
+    iPos[i * 3 + 1] = gy + 0.16;
     iPos[i * 3 + 2] = tr.z;
     iU[i] = KIND_COL[tr.kind];
     iCol[i] = KIND_ORDER.indexOf(tr.kind);
