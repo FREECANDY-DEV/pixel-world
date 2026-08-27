@@ -10382,17 +10382,17 @@ let playerIsTalking = false;
 function getGrunkFaceTgt() {
   const spr = (typeof demoState !== 'undefined' && demoState && demoState.botGhost) ? demoState.botGhost.spr : null;
   if (spr) {
-    return new THREE.Vector3(spr.position.x, spr.position.y + 2.20, spr.position.z);
+    return new THREE.Vector3(spr.position.x, spr.position.y + 2.05, spr.position.z);
   }
-  const gx = (typeof homePos !== 'undefined' ? homePos.x + 2.1 : 0);
-  const gz = (typeof homePos !== 'undefined' ? homePos.z + 1.9 : 0);
-  const gy = (typeof charGroundY === 'function') ? charGroundY(gx, gz) + 0.35 : 18.68;
-  return new THREE.Vector3(gx, gy + 2.20, gz);
+  const gx = (typeof homePos !== 'undefined' ? homePos.x + 1.8 : 0);
+  const gz = (typeof homePos !== 'undefined' ? homePos.z + 1.2 : 0);
+  const gy = (typeof charGroundY === 'function') ? charGroundY(gx, gz) + 0.15 : 18.68;
+  return new THREE.Vector3(gx, gy + 2.05, gz);
 }
 
 function getGrunkCamPos() {
   const tgt = getGrunkFaceTgt();
-  return new THREE.Vector3(tgt.x + 0.5, tgt.y + 0.35, tgt.z + 3.6);
+  return new THREE.Vector3(tgt.x, tgt.y, tgt.z + 3.4);
 }
 
 function getPlayerFaceTgt() {
@@ -10830,22 +10830,16 @@ function updateDemo(dt, t) {
 
   if (grunkHoloMat) grunkHoloMat.uniforms.uTime.value = t;
 
-  // Grunk: stands by the fire floating gracefully above local ground with glowing cyan hologram effect
+  // Grunk: stands by the fire floating gracefully next to the campfire with glowing cyan hologram effect
   const gr = s.botGhost;
   if (gr) {
-    const gx = homePos.x + 2.1, gz = homePos.z + 1.9;
-    let maxY = charGroundY(gx, gz);
-    for (let dx = -1.5; dx <= 1.5; dx += 1.5) {
-      for (let dz = -1.5; dz <= 1.5; dz += 1.5) {
-        maxY = Math.max(maxY, charGroundY(gx + dx, gz + dz));
-      }
-    }
-    const fy = maxY + 0.35;
+    const gx = homePos.x + 1.8, gz = homePos.z + 1.2;
+    const fy = charGroundY(gx, gz) + 0.15;
     gr.spr.position.set(gx, fy, gz);
     gr.spr.visible = !hide;
     if (gr.nameSpr) {
       gr.nameSpr.visible = !hide;
-      gr.nameSpr.position.set(gx, fy + gr.spr.scale.y + 0.32, gz);
+      gr.nameSpr.position.set(gx, fy + gr.spr.scale.y + 0.25, gz);
     }
     demoStepBubble(gr, dt);
   }
