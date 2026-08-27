@@ -9861,6 +9861,7 @@ function makeHologramMat() {
 
 // --- Cinematic Cutscene Sequence for Holographic Human (Grunk) ---
 let cinematicActive = false;
+let grunkIsTalking = false;
 let cinematicSubtitlesEl = null;
 
 function getSubtitlesElement() {
@@ -9869,26 +9870,26 @@ function getSubtitlesElement() {
     cinematicSubtitlesEl.id = 'cinematic-subtitles';
     cinematicSubtitlesEl.style.cssText = `
       position: fixed;
-      bottom: 48px;
+      bottom: 36px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 10000;
-      background: rgba(15, 23, 42, 0.92);
-      border: 1px solid rgba(255, 210, 63, 0.6);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.25);
-      border-radius: 12px;
-      padding: 12px 24px;
-      color: #ffd23f;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.01em;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0 16px;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
       text-align: center;
       max-width: 90vw;
       width: max-content;
       pointer-events: none;
       display: none;
       opacity: 0;
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 14px rgba(0, 0, 0, 0.8);
+      transition: opacity 0.25s ease, transform 0.25s ease;
       font-family: system-ui, -apple-system, sans-serif;
     `;
     document.body.appendChild(cinematicSubtitlesEl);
@@ -9917,7 +9918,7 @@ function hideSubtitles() {
   }
 }
 
-function tweenCameraToExplicit(toT, toP, durSec = 1.2) {
+function tweenCameraToExplicit(toT, toP, durSec = 1.1) {
   camTween = {
     t0: performance.now(),
     dur: durSec * 1000,
@@ -9942,42 +9943,44 @@ async function triggerGrunkCinematicSequence() {
   const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x, groundYAt(homePos.x, homePos.z), homePos.z);
   const playerPos = meSpr ? meSpr.position.clone() : new THREE.Vector3(homePos.x + 3, groundYAt(homePos.x + 3, homePos.z + 3), homePos.z + 3);
 
-  // STEP 1: Zoom camera to Grunk (Holographic Bot)
-  const grunkTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 1.2, grunkPos.z);
-  const grunkCamPos = new THREE.Vector3(grunkPos.x + 1.8, grunkPos.y + 1.6, grunkPos.z + 2.4);
+  // STEP 1: Zoom camera CLOSE to Grunk (Holographic Bot)
+  const grunkTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 1.4, grunkPos.z);
+  const grunkCamPos = new THREE.Vector3(grunkPos.x + 0.85, grunkPos.y + 1.5, grunkPos.z + 1.35);
 
-  tweenCameraToExplicit(grunkTgt, grunkCamPos, 1.2);
-  await new Promise(r => setTimeout(r, 1200));
+  tweenCameraToExplicit(grunkTgt, grunkCamPos, 1.1);
+  await new Promise(r => setTimeout(r, 1100));
 
-  // STEP 2: Grunk speaks subtitles & chat bubbles
+  // STEP 2: Grunk speaks subtitles & chat bubbles (Holographic Talking Animation Active)
+  grunkIsTalking = true;
   if (demoState.botGhost) {
     demoShowBubble(demoState.botGhost.bubble, demoState.botGhost, 'Grunk the Elder', demoState.botGhost.color, 'This project is actively under development!');
   }
-  await showSubtitle('<span style="color:#00f0ff;">🤖 Grunk the Elder:</span> Greetings Traveler! This project is actively under development!', 3600);
+  await showSubtitle('Greetings Traveler! This project is actively under development!', 3600);
 
   if (demoState.botGhost) {
     demoShowBubble(demoState.botGhost.bubble, demoState.botGhost, 'Grunk the Elder', demoState.botGhost.color, 'Starring on GitHub & donations help us grow!');
   }
-  await showSubtitle('<span style="color:#00f0ff;">🤖 Grunk the Elder:</span> Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
+  await showSubtitle('Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
+  grunkIsTalking = false;
 
-  // STEP 3: Transition camera to Player (Hazmat Suit)
-  const playerTgt = new THREE.Vector3(playerPos.x, playerPos.y + 1.2, playerPos.z);
-  const playerCamPos = new THREE.Vector3(playerPos.x - 1.8, playerPos.y + 1.5, playerPos.z + 2.2);
+  // STEP 3: Transition camera CLOSE to Player (Hazmat Suit)
+  const playerTgt = new THREE.Vector3(playerPos.x, playerPos.y + 1.4, playerPos.z);
+  const playerCamPos = new THREE.Vector3(playerPos.x - 0.85, playerPos.y + 1.5, playerPos.z + 1.35);
 
-  tweenCameraToExplicit(playerTgt, playerCamPos, 1.2);
-  await new Promise(r => setTimeout(r, 1200));
+  tweenCameraToExplicit(playerTgt, playerCamPos, 1.1);
+  await new Promise(r => setTimeout(r, 1100));
 
   // STEP 4: Player says "OK, I will!"
   const playerName = demoState.name || 'Player';
   if (demoState.meBubble && demoState.me) {
     demoShowBubble(demoState.meBubble, demoState.me, playerName, '#ffd23f', 'OK, I will!');
   }
-  await showSubtitle('<span style="color:#ffd23f;">☣️ ' + playerName + ':</span> OK, I will!', 2800);
+  await showSubtitle('OK, I will!', 2800);
 
   // STEP 5: Smoothly return camera to original view & restore control
   hideSubtitles();
-  tweenCameraToExplicit(origTarget, origPos, 1.2);
-  await new Promise(r => setTimeout(r, 1200));
+  tweenCameraToExplicit(origTarget, origPos, 1.1);
+  await new Promise(r => setTimeout(r, 1100));
 
   cinematicActive = false;
 }
@@ -11175,6 +11178,22 @@ function animate() {
   }
   if (iconMode && fishIconDirty) rebuildFishIconLayer();
   treeMat.uniforms.uTime.value = animT;
+  if (typeof grunkHoloMat !== 'undefined' && grunkHoloMat) {
+    grunkHoloMat.uniforms.uTime.value = animT * (grunkIsTalking ? 2.5 : 1.0);
+  }
+  if (demoState.botGhost && demoState.botGhost.spr) {
+    const gSpr = demoState.botGhost.spr;
+    const gBaseY = groundYAt(gSpr.position.x, gSpr.position.z);
+    if (grunkIsTalking) {
+      gSpr.position.y = gBaseY + Math.sin(animT * 9.0) * 0.14;
+      const speakPulse = Math.sin(animT * 16.0) * 0.12;
+      gSpr.scale.set(2.7 + speakPulse, 3.0 - speakPulse * 0.8, 1);
+    } else {
+      gSpr.position.y = THREE.MathUtils.damp(gSpr.position.y, gBaseY, 8, dt);
+      gSpr.scale.x = THREE.MathUtils.damp(gSpr.scale.x, 2.7, 8, dt);
+      gSpr.scale.y = THREE.MathUtils.damp(gSpr.scale.y, 3.0, 8, dt);
+    }
+  }
   // wind: power only above the calm baseline, direction wanders over time
   windAng += dt * 0.06 * Math.sin(t * 0.021 + 2.3);
   treeMat.uniforms.uWindAng.value = windAng;
