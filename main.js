@@ -6005,12 +6005,12 @@ function updateWorldLod(dt) {
     spaceDome.position.copy(camera.position);
     spaceDome.scale.setScalar(Math.min(2400, camera.far * 0.7));
     spaceDome.material.opacity = 1;
-    // sun: motionless in deep space behind the earth's shoulder
+    // sun: huge glowing celestial body motionless in deep space
     sunSprite.visible = true;
     sunSprite.position
       .copy(globe.group.position)
-      .addScaledVector(SUN_SPACE_DIR, Math.min(2300, 560 * gs));
-    const ss = THREE.MathUtils.clamp(52 * gs, 36, 170);
+      .addScaledVector(SUN_SPACE_DIR, Math.min(2800, 750 * Math.max(1, gs)));
+    const ss = Math.max(550, 220 * gs);
     sunSprite.scale.set(ss, ss, 1);
     // moon: circles the earth once every ~18s, shrinking with the globe
     ensureMoon();
@@ -11183,14 +11183,16 @@ function animate() {
   windDirZ = Math.sin(windAng);
   water.material.color.copy(waterNight).lerp(waterDay, dayF).lerp(pitchBlack, zoomSpaceK * 0.95);
 
-  const skyDist = Math.max(900, camera.position.distanceTo(controls.target) * 1.8);
+  const skyDist = Math.max(1200, camera.position.distanceTo(controls.target) * 2.2);
   sunDisc.position.set(
     controls.target.x + sunDir.x * skyDist,
     controls.target.y + sunDir.y * skyDist,
     controls.target.z + sunDir.z * skyDist
   );
-  sunDisc.scale.set(Math.max(140, skyDist * 0.15), Math.max(140, skyDist * 0.15), 1);
-  sunDisc.material.opacity = THREE.MathUtils.clamp((sunDir.y - 0.02) * 6, 0, 1);
+  // Huge sun scale when zoomed out so the sun dominates the cosmic background!
+  const sunScale = Math.max(380, skyDist * 0.38);
+  sunDisc.scale.set(sunScale, sunScale, 1);
+  sunDisc.material.opacity = Math.max(0.85, THREE.MathUtils.clamp((sunDir.y - 0.02) * 6, 0, 1));
 
   moonDisc.position.set(
     controls.target.x - sunDir.x * skyDist,
