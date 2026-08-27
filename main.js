@@ -952,10 +952,11 @@ scene.add(headLight);
 const waterMat = new THREE.MeshStandardMaterial({
   color: 0x2a6f9e,
   transparent: true,
-  opacity: 0.75,
+  opacity: 0.85,
   roughness: 0.25,
   metalness: 0.1,
   depthWrite: false, // no blend-order flicker against the shoreline
+  fog: false,        // prevent fog from fading ocean water into pitch black on zoom-out
 });
 // gentle swell so the waterline shimmers as motion, not aliasing stutter
 waterMat.onBeforeCompile = (sh) => {
