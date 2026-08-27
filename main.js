@@ -4860,14 +4860,22 @@ const ICON_MAT = new THREE.ShaderMaterial({
     uInvW: { value: 1 / (ICON_CELL * ICON_COLS) }, // 1 / atlas width in px
     uInvH: { value: 1 / ICON_CELL },               // 1 / atlas height in px
     uDay: { value: 1 },
+    uCurvature: { value: 0 },
+    uCamTarget: { value: new THREE.Vector3(0, 0, 0) },
   },
   vertexShader: `
     attribute float aCol;
     varying float vCol;
     uniform float uPx;
+    uniform float uCurvature;
+    uniform vec3 uCamTarget;
     void main() {
       vCol = aCol;
-      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      vec3 wPos = (modelMatrix * vec4(position, 1.0)).xyz;
+      vec2 distVec = vec2(wPos.x - uCamTarget.x, wPos.z - uCamTarget.z);
+      float distSq = dot(distVec, distVec);
+      wPos.y -= distSq * uCurvature;
+      vec4 mv = viewMatrix * vec4(wPos, 1.0);
       float d = max(-mv.z, 1.0);
       gl_PointSize = clamp(430.0 / d, 44.0, 110.0) * uPx;
       gl_Position = projectionMatrix * mv;
@@ -5288,18 +5296,23 @@ function fishIconMatRef() {
         uInvW: { value: 1 / (ICON_CELL * ICON_COLS) },
         uInvH: { value: 1 / ICON_CELL },
         uDay: { value: 1 },
+        uCurvature: { value: 0 },
+        uCamTarget: { value: new THREE.Vector3(0, 0, 0) },
       },
       vertexShader: `
         attribute float aCol;
         varying float vCol;
         uniform float uPx;
+        uniform float uCurvature;
+        uniform vec3 uCamTarget;
         void main() {
           vCol = aCol;
-          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          vec3 wPos = (modelMatrix * vec4(position, 1.0)).xyz;
+          vec2 distVec = vec2(wPos.x - uCamTarget.x, wPos.z - uCamTarget.z);
+          float distSq = dot(distVec, distVec);
+          wPos.y -= distSq * uCurvature;
+          vec4 mv = viewMatrix * vec4(wPos, 1.0);
           float d = max(-mv.z, 1.0);
-          // no depth bias: a sea chip belongs to the water it marks, so a
-          // block closer to the camera must occlude it, never float under it
-          // size scales with distance — near markers read bigger than far
           gl_PointSize = clamp(6800.0 / d, 14.0, 84.0) * uPx;
           gl_Position = projectionMatrix * mv;
         }
@@ -11595,6 +11608,14 @@ function animate() {
   const camT = (typeof controls !== 'undefined' && controls && controls.target) ? controls.target : homePos;
   treeMat.uniforms.uCurvature.value = curvatureVal;
   if (treeMat.uniforms.uCamTarget) treeMat.uniforms.uCamTarget.value.set(camT.x, 0, camT.z);
+
+  ICON_MAT.uniforms.uCurvature.value = curvatureVal;
+  if (ICON_MAT.uniforms.uCamTarget) ICON_MAT.uniforms.uCamTarget.value.set(camT.x, 0, camT.z);
+
+  if (_fishIconMat) {
+    _fishIconMat.uniforms.uCurvature.value = curvatureVal;
+    if (_fishIconMat.uniforms.uCamTarget) _fishIconMat.uniforms.uCamTarget.value.set(camT.x, 0, camT.z);
+  }
 
   if (chunkMat.userData.shader) {
     chunkMat.userData.shader.uniforms.uCurvature.value = curvatureVal;
