@@ -9950,16 +9950,9 @@ async function triggerGrunkCinematicSequence() {
   tweenCameraToExplicit(grunkTgt, grunkCamPos, 1.1);
   await new Promise(r => setTimeout(r, 1100));
 
-  // STEP 2: Grunk speaks subtitles & chat bubbles (Holographic Talking Animation Active)
+  // STEP 2: Grunk speaks subtitles (Holographic Talking Animation Active)
   grunkIsTalking = true;
-  if (demoState.botGhost) {
-    demoShowBubble(demoState.botGhost.bubble, demoState.botGhost, 'Grunk the Elder', demoState.botGhost.color, 'This project is actively under development!');
-  }
   await showSubtitle('Greetings Traveler! This project is actively under development!', 3600);
-
-  if (demoState.botGhost) {
-    demoShowBubble(demoState.botGhost.bubble, demoState.botGhost, 'Grunk the Elder', demoState.botGhost.color, 'Starring on GitHub & donations help us grow!');
-  }
   await showSubtitle('Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
   grunkIsTalking = false;
 
@@ -9971,10 +9964,6 @@ async function triggerGrunkCinematicSequence() {
   await new Promise(r => setTimeout(r, 1100));
 
   // STEP 4: Player says "OK, I will!"
-  const playerName = demoState.name || 'Player';
-  if (demoState.meBubble && demoState.me) {
-    demoShowBubble(demoState.meBubble, demoState.me, playerName, '#ffd23f', 'OK, I will!');
-  }
   await showSubtitle('OK, I will!', 2800);
 
   // STEP 5: Smoothly return camera to original view & restore control
