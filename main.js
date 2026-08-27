@@ -962,7 +962,7 @@ waterMat.onBeforeCompile = (sh) => {
   sh.uniforms.uTime = { value: 0 };
   sh.uniforms.uOffset = { value: new THREE.Vector3() };
   sh.uniforms.uCurvature = { value: 0 };
-  sh.uniforms.uHomePos = { value: new THREE.Vector3(homePos.x, 0, homePos.z) };
+  sh.uniforms.uHomePos = { value: new THREE.Vector3(0, 0, 0) };
   sh.vertexShader =
     'uniform float uTime;\nuniform vec3 uOffset;\nuniform float uCurvature;\nuniform vec3 uHomePos;\n' +
     sh.vertexShader.replace(
@@ -1450,7 +1450,7 @@ chunkMat.onBeforeCompile = (shader) => {
   shader.uniforms.uParched = { value: 0 };
   shader.uniforms.uAtlasW = { value: 1 / BT_COLS };
   shader.uniforms.uCurvature = { value: 0 };
-  shader.uniforms.uHomePos = { value: new THREE.Vector3(homePos.x, 0, homePos.z) };
+  shader.uniforms.uHomePos = { value: new THREE.Vector3(0, 0, 0) };
   chunkMat.userData.shader = shader;
   // --- vertex shader: pass AO + worldY + smooth normal to fragment ---
   shader.vertexShader = shader.vertexShader
@@ -4094,7 +4094,7 @@ const treeMat = new THREE.ShaderMaterial({
     uInvW: { value: 1 / (ATLAS_CELL * ATLAS_COLS) },
     uInvH: { value: 1 / (ATLAS_CELL * ATLAS_ROWS) },
     uCurvature: { value: 0 },
-    uHomePos: { value: new THREE.Vector3(homePos.x, 0, homePos.z) },
+    uHomePos: { value: new THREE.Vector3(0, 0, 0) },
   },
   vertexShader: `
     attribute vec3 iPos;
