@@ -11024,12 +11024,15 @@ function animate() {
   flashEl.style.opacity = (flashK * 0.75).toFixed(3);
 
   // camp marker floats over the fire, scaled by distance so it stays legible
-  {
+  if (campLabelSpr) {
     const fy = homeFire ? homeFire.position.y : groundYAt(homePos.x, homePos.z);
     campLabelSpr.position.set(homePos.x, fy + 10, homePos.z);
     const dl = camera.position.distanceTo(campLabelSpr.position);
-    const s = Math.max(2, dl * 0.05);
+    // Cap label scale so it never grows into a giant banner across space/planet view!
+    const s = Math.min(12, Math.max(2, dl * 0.035));
     campLabelSpr.scale.set(s * 3.55, s, 1);
+    // Hide label completely in spaceMode or when zoomed far out (>= 300u)
+    campLabelSpr.visible = !spaceMode && (dl < 300);
     const onlineCount = DEMO_MODE ? (demoState.online || 1) : 1;
     if (onlineCount !== campCountShown) {
       campCountShown = onlineCount;
@@ -11042,8 +11045,11 @@ function animate() {
     const ey = groundYAt(EDEN_FLAT.x, EDEN_FLAT.z);
     heavenLabelSpr.position.set(EDEN_FLAT.x, ey + 10, EDEN_FLAT.z);
     const dl = camera.position.distanceTo(heavenLabelSpr.position);
-    const s = Math.max(2, dl * 0.05);
+    // Cap label scale so it never grows into a giant banner across space/planet view!
+    const s = Math.min(12, Math.max(2, dl * 0.035));
     heavenLabelSpr.scale.set(s * 3.88, s, 1);
+    // Hide label completely in spaceMode or when zoomed far out (>= 300u)
+    heavenLabelSpr.visible = !spaceMode && (dl < 300);
     drawHeavenLabel();
   }
 
