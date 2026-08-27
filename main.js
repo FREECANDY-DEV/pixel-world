@@ -5726,17 +5726,6 @@ function getPlanetTexture(type) {
       g.fillStyle = 'rgba(30, 5, 0, 0.95)';
       g.beginPath(); g.arc(sx + (Math.random() - 0.5) * 2, sy + (Math.random() - 0.5) * 2, sr * 0.45, 0, Math.PI * 2); g.fill();
     }
-
-    // Solar Prominence / Flare Filaments
-    g.strokeStyle = 'rgba(255, 230, 100, 0.5)';
-    g.lineWidth = 3;
-    for (let i = 0; i < 12; i++) {
-      const fx = Math.random() * 512, fy = Math.random() * 256;
-      g.beginPath();
-      g.moveTo(fx, fy);
-      g.quadraticCurveTo(fx + 20, fy - 15, fx + 40, fy + 5);
-      g.stroke();
-    }
   } else if (type === 'mercury') {
     g.fillStyle = '#8e8e88';
     g.fillRect(0, 0, 256, 128);
@@ -5831,12 +5820,6 @@ function ensureSolarSystem() {
     fog: false,
   });
   solarSystemGroup.add(new THREE.Mesh(sunAuraGeom, sunAuraMat));
-
-  // Add solar corona flare sprite at Sun core
-  const coronaSpr = sunSprite.clone();
-  coronaSpr.visible = true;
-  coronaSpr.scale.setScalar(PLANET_R * 18.0);
-  solarSystemGroup.add(coronaSpr);
 
   // Solar-centered orbital path ring builder
   const addOrbitRing = (dist, col = 0xffe8a0) => {
