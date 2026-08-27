@@ -9180,6 +9180,16 @@ renderer.domElement.addEventListener('pointerup', (e) => {
   placeNdcFromEvent(e);
   raycaster.setFromCamera(placeNdc, camera);
 
+  // 0. Grunk (Holographic Human) tap detection: ray distance & sprite hit check
+  const grunkSpr = demoState.botGhost ? demoState.botGhost.spr : null;
+  const grunkPos = grunkSpr ? grunkSpr.position : new THREE.Vector3(homePos.x - 2.5, groundYAt(homePos.x - 2.5, homePos.z + 1.5), homePos.z + 1.5);
+  const dGrunk = raycaster.ray.distanceToPoint(new THREE.Vector3(grunkPos.x, grunkPos.y + 1.2, grunkPos.z));
+
+  if (dGrunk < 3.5) {
+    triggerGrunkCinematicSequence();
+    return;
+  }
+
   // villagers are picked FIRST: they stand right next to the fire, and the
   // generous campfire tap-radius below would otherwise swallow their clicks
   const pickObjs = [];
@@ -9187,14 +9197,13 @@ renderer.domElement.addEventListener('pointerup', (e) => {
     pickObjs.push(c.spr);
     if (c.iconSpr && c.iconSpr.visible) pickObjs.push(c.iconSpr);
   }
-  if (demoState.botGhost && demoState.botGhost.spr) {
-    pickObjs.push(demoState.botGhost.spr);
-  }
+  if (grunkSpr) pickObjs.push(grunkSpr);
+
   closeActionMenu(true); // any tap away closes the options popup
   const sprHits = raycaster.intersectObjects(pickObjs, false);
   if (sprHits.length) {
     const hitObj = sprHits[0].object;
-    if (demoState.botGhost && hitObj === demoState.botGhost.spr) {
+    if (grunkSpr && hitObj === grunkSpr) {
       triggerGrunkCinematicSequence();
       return;
     }
