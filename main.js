@@ -968,7 +968,7 @@ waterMat.onBeforeCompile = (sh) => {
     );
   waterMat.userData.shader = sh;
 };
-const water = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), waterMat);
+const water = new THREE.Mesh(new THREE.CircleGeometry(1600, 128), waterMat);
 water.rotation.x = -Math.PI / 2;
 water.position.y = SEA_LEVEL + 0.35;
 scene.add(water);
@@ -1648,8 +1648,10 @@ function syncChunks(force = false) {
   lastChunk = { x: c.x, z: c.z, rad: effectiveRadius };
 
   const needed = new Map();
+  const rad2 = effectiveRadius * effectiveRadius;
   for (let dx = -effectiveRadius; dx <= effectiveRadius; dx++) {
     for (let dz = -effectiveRadius; dz <= effectiveRadius; dz++) {
+      if (dx * dx + dz * dz > rad2) continue; // Circular map boundary radius check
       const cx = c.x + dx, cz = c.z + dz;
       needed.set(cx + ',' + cz, requiredLod(cx, cz, c));
     }
