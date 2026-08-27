@@ -950,15 +950,15 @@ scene.add(headLight);
 // ============================================================================
 
 const waterMat = new THREE.MeshStandardMaterial({
-  color: 0x2a6f9e,
+  color: 0x2472a4,
   transparent: true,
-  opacity: 0.85,
-  roughness: 0.25,
-  metalness: 0.1,
+  opacity: 0.76,
+  roughness: 0.16,
+  metalness: 0.18,
   depthWrite: false, // no blend-order flicker against the shoreline
   fog: false,        // prevent fog from fading ocean water into pitch black on zoom-out
 });
-// gentle swell so the waterline shimmers as motion, not aliasing stutter
+// Multi-harmonic smooth wave systems (individual waves for oceans, lakes, ponds & rivers)
 waterMat.onBeforeCompile = (sh) => {
   sh.uniforms.uTime = { value: 0 };
   sh.uniforms.uOffset = { value: new THREE.Vector3() };
@@ -973,12 +973,25 @@ waterMat.onBeforeCompile = (sh) => {
        vec2 distVec = vec2(wPos.x - uCamTarget.x, wPos.z - uCamTarget.z);
        float distSq = min(dot(distVec, distVec), 360000.0);
        transformed.z -= distSq * uCurvature;
-       transformed.z += sin((position.x + uOffset.x) * 0.045 + uTime * 1.6) * 0.09
-                      + cos((position.y + uOffset.z) * 0.037 - uTime * 1.1) * 0.07;`
+
+       // Multi-harmonic wave system:
+       float wx = wPos.x;
+       float wz = wPos.z;
+
+       // 1. Ocean / Sea Swell (gentle broad waves)
+       float wOcean = sin(wx * 0.035 + uTime * 1.3) * 0.12 + cos(wz * 0.035 - uTime * 1.1) * 0.10;
+       // 2. Lake & Pond Ripples (localized smooth ripples)
+       float wLake = sin((wx * 0.14 + wz * 0.12) + uTime * 2.2) * 0.06;
+       // 3. River Flow Current (directional flow waves)
+       float wRiver = cos((wx * 0.07 - wz * 0.18) + uTime * 2.7) * 0.08;
+
+       // Smooth layer wave height composition
+       transformed.z += wOcean + wLake + wRiver;`
     );
   waterMat.userData.shader = sh;
 };
-const water = new THREE.Mesh(new THREE.PlaneGeometry(1400, 1400, 64, 64), waterMat);
+// Thin fluid layer plane geometry with high subdivision for silky smooth waves
+const water = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600, 128, 128), waterMat);
 water.rotation.x = -Math.PI / 2;
 water.position.set(0, SEA_LEVEL + 0.35, 0);
 scene.add(water);
