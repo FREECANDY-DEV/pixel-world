@@ -961,15 +961,17 @@ const waterMat = new THREE.MeshStandardMaterial({
 waterMat.onBeforeCompile = (sh) => {
   sh.uniforms.uTime = { value: 0 };
   sh.uniforms.uOffset = { value: new THREE.Vector3() };
+  sh.uniforms.uCurvature = { value: 0 };
+  sh.uniforms.uHomePos = { value: new THREE.Vector3(homePos.x, 0, homePos.z) };
   sh.vertexShader =
-    'uniform float uTime;\nuniform vec3 uOffset;\n' +
+    'uniform float uTime;\nuniform vec3 uOffset;\nuniform float uCurvature;\nuniform vec3 uHomePos;\n' +
     sh.vertexShader.replace(
       '#include <begin_vertex>',
       `#include <begin_vertex>
-       // waves are anchored to WORLD coordinates (uOffset = the plane's own
-       // world position, added to the local grid): the plane follows the
-       // camera, so local-space waves used to jump every time it snapped —
-       // that made the sea surface and the shoreline stutter
+       vec4 wPos = modelMatrix * vec4(position, 1.0);
+       vec2 distVec = vec2(wPos.x - uHomePos.x, wPos.z - uHomePos.z);
+       float distSq = dot(distVec, distVec);
+       transformed.z -= distSq * uCurvature;
        transformed.z += sin((position.x + uOffset.x) * 0.045 + uTime * 1.6) * 0.09
                       + cos((position.y + uOffset.z) * 0.037 - uTime * 1.1) * 0.07;`
     );
@@ -1447,11 +1449,15 @@ chunkMat.onBeforeCompile = (shader) => {
   shader.uniforms.uSnow = { value: 0 };
   shader.uniforms.uParched = { value: 0 };
   shader.uniforms.uAtlasW = { value: 1 / BT_COLS };
+  shader.uniforms.uCurvature = { value: 0 };
+  shader.uniforms.uHomePos = { value: new THREE.Vector3(homePos.x, 0, homePos.z) };
   chunkMat.userData.shader = shader;
   // --- vertex shader: pass AO + worldY + smooth normal to fragment ---
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', [
       '#include <common>',
+      'uniform float uCurvature;',
+      'uniform vec3 uHomePos;',
       'attribute float ao;',
       'varying float vAO;',
       'varying float vWorldY;',
@@ -1460,7 +1466,11 @@ chunkMat.onBeforeCompile = (shader) => {
     ].join('\n'))
     .replace(
       '#include <begin_vertex>',
-      '#include <begin_vertex>',
+      `#include <begin_vertex>
+       vec4 wPos = modelMatrix * vec4(position, 1.0);
+       vec2 distVec = vec2(wPos.x - uHomePos.x, wPos.z - uHomePos.z);
+       float distSq = dot(distVec, distVec);
+       transformed.y -= distSq * uCurvature;`
     );
   // inject after begin_vertex to capture transformed + uv
   shader.vertexShader = shader.vertexShader.replace(
@@ -4083,6 +4093,8 @@ const treeMat = new THREE.ShaderMaterial({
     uDusk: { value: 0 },
     uInvW: { value: 1 / (ATLAS_CELL * ATLAS_COLS) },
     uInvH: { value: 1 / (ATLAS_CELL * ATLAS_ROWS) },
+    uCurvature: { value: 0 },
+    uHomePos: { value: new THREE.Vector3(homePos.x, 0, homePos.z) },
   },
   vertexShader: `
     attribute vec3 iPos;
@@ -4101,6 +4113,8 @@ const treeMat = new THREE.ShaderMaterial({
     uniform float uTime;
     uniform float uWindPow;
     uniform float uWindAng;
+    uniform float uCurvature;
+    uniform vec3 uHomePos;
     float hash21(vec2 p) {
       p = fract(p * vec2(123.34, 345.45));
       p += dot(p, p + 34.345);
@@ -4135,6 +4149,11 @@ const treeMat = new THREE.ShaderMaterial({
       // bend in WORLD space so orbiting the camera never spins the tree
       vec3 bendWorld = vec3(wdir.x, 0.0, wdir.y) * (flutter * lmag * position.y * iH * 0.14);
       vec3 basePos = iPos + vec3(0.0, 0.08 + aLift * 0.32, 0.0) + bendWorld;
+
+      // Planetary Curvature: bend instanced flora downward as distance from world center increases
+      vec2 distVec = vec2(basePos.x - uHomePos.x, basePos.z - uHomePos.z);
+      float distSq = dot(distVec, distVec);
+      basePos.y -= distSq * uCurvature;
       // Transform base anchor position (top of block) into view space (Exact THREE.Sprite alignment)
       vec4 mvPosition = viewMatrix * vec4(basePos, 1.0);
 
@@ -11322,6 +11341,27 @@ function animate() {
       gSpr.scale.y = THREE.MathUtils.damp(gSpr.scale.y, 3.0, 8, dt);
     }
   }
+  // Planetary Curvature: edges bend downward as camera zooms out from 90u to 400u+
+  const curDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
+  const curveK = THREE.MathUtils.clamp((curDist - 85) / 280, 0, 1);
+  const curvatureVal = curveK * 0.00028;
+
+  treeMat.uniforms.uCurvature.value = curvatureVal;
+  if (treeMat.uniforms.uHomePos) treeMat.uniforms.uHomePos.value.set(homePos.x, 0, homePos.z);
+
+  if (chunkMat.userData.shader) {
+    chunkMat.userData.shader.uniforms.uCurvature.value = curvatureVal;
+    if (chunkMat.userData.shader.uniforms.uHomePos) {
+      chunkMat.userData.shader.uniforms.uHomePos.value.set(homePos.x, 0, homePos.z);
+    }
+  }
+  if (waterMat.userData.shader) {
+    waterMat.userData.shader.uniforms.uCurvature.value = curvatureVal;
+    if (waterMat.userData.shader.uniforms.uHomePos) {
+      waterMat.userData.shader.uniforms.uHomePos.value.set(homePos.x, 0, homePos.z);
+    }
+  }
+
   // wind: power only above the calm baseline, direction wanders over time
   windAng += dt * 0.06 * Math.sin(t * 0.021 + 2.3);
   treeMat.uniforms.uWindAng.value = windAng;
