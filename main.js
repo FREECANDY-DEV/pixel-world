@@ -5045,9 +5045,9 @@ function ensureChunkIcons(ch) {
   const count = col.length;
   if (count === 0) return;
 
-  // Cluster nearby tree positions onto a 12x12 spatial grid cell so zoomed-out view shows merged grove markers
+  // Cluster nearby tree positions onto a 28x28 spatial grid cell so zoomed-out view shows merged grove markers
   const clusters = new Map();
-  const CELL_SIZE = 12.0;
+  const CELL_SIZE = 28.0;
 
   for (let i = 0; i < count; i++) {
     const px = pos[i * 3];
@@ -5445,8 +5445,9 @@ function syncDetailIcons() {
   const camDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
   const isTopView = (controls && controls.target && Math.abs(camera.position.x - controls.target.x) < 5 && Math.abs(camera.position.z - controls.target.z) < 5 && (camera.position.y - controls.target.y) > 40);
 
-  // Dynamic zoom stride: as you zoom out further, icons thin out significantly into fewer regional markers
-  const zoomStride = Math.max(1, Math.floor(camDist / 130));
+  // Aggressive exponential zoom stride: thins out visible icons drastically down to 3%-10% when zoomed out
+  const zoomFactor = Math.max(0, (camDist - 130) / 45);
+  const zoomStride = Math.max(1, Math.floor(1 + Math.pow(zoomFactor, 1.6) * 2.5));
 
   for (const ch of chunks.values()) {
     if (ch.icons && ch.icons.geometry) {
