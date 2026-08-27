@@ -10196,6 +10196,7 @@ function makeHologramMat() {
       uHoloColor: { value: new THREE.Color(0x00f0ff) },
     },
     transparent: true,
+    depthTest: false,
     depthWrite: false,
     vertexShader: `
       varying vec2 vUv;
@@ -10480,6 +10481,7 @@ function demoMakeGhost(id, name, color, female = false, look = null) {
   const spr = new THREE.Sprite(mat);
   spr.center.set(0.5, 0);
   spr.scale.set(2.7, 3.0, 1);
+  if (isGrunk) spr.renderOrder = 999;
   spr.visible = false;
   scene.add(spr);
 
@@ -10795,12 +10797,18 @@ function updateDemo(dt, t) {
 
   if (grunkHoloMat) grunkHoloMat.uniforms.uTime.value = t;
 
-  // Grunk: stands by the fire floating slightly above ground with glowing cyan hologram effect
+  // Grunk: stands by the fire floating gracefully above local ground with glowing cyan hologram effect
   const gr = s.botGhost;
   if (gr) {
-    const fy = charGroundY(homePos.x + 2.1, homePos.z + 1.9) + 0.18;
     const gx = homePos.x + 2.1, gz = homePos.z + 1.9;
-    gr.spr.position.set(gx, fy + Math.sin(t * 1.6) * 0.08, gz);
+    let maxY = charGroundY(gx, gz);
+    for (let dx = -1.5; dx <= 1.5; dx += 1.5) {
+      for (let dz = -1.5; dz <= 1.5; dz += 1.5) {
+        maxY = Math.max(maxY, charGroundY(gx + dx, gz + dz));
+      }
+    }
+    const fy = maxY + 0.35;
+    gr.spr.position.set(gx, fy, gz);
     gr.spr.visible = !hide;
     if (gr.nameSpr) {
       gr.nameSpr.visible = !hide;
