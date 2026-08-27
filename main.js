@@ -10217,8 +10217,11 @@ function makeHologramMat() {
       uHoloColor: { value: new THREE.Color(0x00f0ff) },
     },
     transparent: true,
-    depthTest: false,
+    depthTest: true,
     depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -4,
     vertexShader: `
       varying vec2 vUv;
       varying vec3 vWorldPos;
@@ -10512,7 +10515,6 @@ function demoMakeGhost(id, name, color, female = false, look = null) {
   const spr = new THREE.Sprite(mat);
   spr.center.set(0.5, 0);
   spr.scale.set(2.7, 3.0, 1);
-  if (isGrunk) spr.renderOrder = 999;
   spr.visible = false;
   scene.add(spr);
 
