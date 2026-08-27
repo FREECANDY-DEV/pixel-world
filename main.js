@@ -10650,8 +10650,18 @@ const rigFwd = new THREE.Vector3();
 const rigRight = new THREE.Vector3();
 const rigUp = new THREE.Vector3(0, 1, 0);
 
+let mapGenLoaderActive = true;
+
 function animate() {
   requestAnimationFrame(animate);
+  if (mapGenLoaderActive) {
+    mapGenLoaderActive = false;
+    const loader = document.getElementById('map-gen-overlay');
+    if (loader) {
+      loader.style.opacity = '0';
+      setTimeout(() => { loader.style.display = 'none'; }, 650);
+    }
+  }
   const dt = Math.min(clock.getDelta(), 0.1);
   const t = clock.getElapsedTime();
 

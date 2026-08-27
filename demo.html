@@ -87,7 +87,9 @@
 
     /* ── Loading overlay ───────────────────────────── */
     #loading-overlay {
-      position: fixed; inset: 0; z-index: 999; background: var(--bg);
+      position: fixed; inset: 0; z-index: 999;
+      background: radial-gradient(circle at 50% 40%, rgba(12, 20, 36, 0.85) 0%, rgba(3, 6, 12, 0.96) 100%);
+      backdrop-filter: blur(4px);
       display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
     }
     #loading-overlay.show { display: flex; }
@@ -96,8 +98,8 @@
       border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loader-text { color: var(--muted); font-size: 13px; }
-    body.zooming { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+    .loader-text { color: var(--gold); font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
+    body.zooming #globe-wrap, body.zooming .title, body.zooming .spawn-card, body.zooming .features, body.zooming .footer { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
 
     /* ── Small screens (under 380px) ──────────────── */
     @media (max-height: 640px) {
