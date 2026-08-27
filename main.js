@@ -979,7 +979,7 @@ waterMat.onBeforeCompile = (sh) => {
 };
 const water = new THREE.Mesh(new THREE.CircleGeometry(220, 128), waterMat);
 water.rotation.x = -Math.PI / 2;
-water.position.set(homePos.x, SEA_LEVEL + 0.35, homePos.z);
+water.position.set(0, SEA_LEVEL + 0.35, 0);
 scene.add(water);
 
 // fullscreen tint + drifting light rays shown while the camera is underwater
@@ -11356,6 +11356,8 @@ function animate() {
       chunkMat.userData.shader.uniforms.uHomePos.value.set(homePos.x, 0, homePos.z);
     }
   }
+  water.position.x = homePos.x;
+  water.position.z = homePos.z;
   if (waterMat.userData.shader) {
     waterMat.userData.shader.uniforms.uCurvature.value = curvatureVal;
     if (waterMat.userData.shader.uniforms.uHomePos) {
