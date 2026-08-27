@@ -10377,7 +10377,13 @@ async function triggerGrunkCinematicSequence() {
     t.sprB.visible = false;
   }
 
-  // STEP 1: Zoom camera directly onto Grunk's face from Player's opposite side
+  // STEP 1: Zoom camera directly onto Grunk's face (Hide Player so Player never blocks Grunk's view)
+  if (meSpr) meSpr.visible = false;
+  if (grunkSpr) grunkSpr.visible = true;
+  for (const cm of cavemen) {
+    if (cm.spr && cm.spr !== grunkSpr) cm.spr.visible = false;
+  }
+
   const grunkFaceTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 2.45, grunkPos.z);
   const grunkCamPos = grunkFaceTgt.clone().addScaledVector(facingDir, -1.45);
 
@@ -10390,7 +10396,10 @@ async function triggerGrunkCinematicSequence() {
   await showSubtitle('Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
   grunkIsTalking = false;
 
-  // STEP 3: Transition camera onto Player's face from Grunk's opposite side (Reverse Shot)
+  // STEP 3: Transition camera onto Player's face (Show Player, Hide Grunk so Grunk never blocks Player's view)
+  if (meSpr) meSpr.visible = true;
+  if (grunkSpr) grunkSpr.visible = false;
+
   const playerFaceTgt = new THREE.Vector3(playerPos.x, playerPos.y + 2.25, playerPos.z);
   const playerCamPos = playerFaceTgt.clone().addScaledVector(facingDir, 1.45);
 
@@ -10400,10 +10409,16 @@ async function triggerGrunkCinematicSequence() {
   // STEP 4: Player says "OK, I will!"
   await showSubtitle('OK, I will!', 2800);
 
-  // STEP 5: Smoothly return camera to original view & restore control and UI
+  // STEP 5: Smoothly return camera to original view & restore control, UI, and character visibility
   hideSubtitles();
   setCinematicBars(false);
   setCutsceneUIVisibility(true);
+  if (meSpr) meSpr.visible = true;
+  if (grunkSpr) grunkSpr.visible = true;
+  for (const cm of cavemen) {
+    if (cm.spr) cm.spr.visible = !iconMode && !spaceMode;
+  }
+
   tweenCameraToExplicit(origTarget, origPos, 1.1);
   await new Promise(r => setTimeout(r, 1150));
 
