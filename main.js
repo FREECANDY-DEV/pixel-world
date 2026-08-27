@@ -10802,11 +10802,7 @@ function animate() {
   requestAnimationFrame(animate);
   if (mapGenLoaderActive) {
     mapGenLoaderActive = false;
-    const loader = document.getElementById('map-gen-overlay');
-    if (loader) {
-      loader.style.opacity = '0';
-      setTimeout(() => { loader.style.display = 'none'; }, 650);
-    }
+    if (typeof window.dismissMapGenOverlay === 'function') window.dismissMapGenOverlay();
   }
   const dt = Math.min(clock.getDelta(), 0.1);
   const t = clock.getElapsedTime();
