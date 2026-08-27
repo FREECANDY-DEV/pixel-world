@@ -5785,26 +5785,38 @@ function ensureSolarSystem() {
   if (solarSystemGroup) return;
   solarSystemGroup = new THREE.Group();
 
-  // 0. Central 3D Glowing Solar Sun
-  const sunGeom = new THREE.SphereGeometry(PLANET_R * 2.8, 32, 24);
+  // 0. Central 3D Glowing Solar Sun with Corona Flare & Atmosphere Glow
+  const sunGeom = new THREE.SphereGeometry(PLANET_R * 3.5, 48, 32);
   const sunMat = new THREE.MeshBasicMaterial({ map: getPlanetTexture('sun'), fog: false });
   const sunMesh = new THREE.Mesh(sunGeom, sunMat);
   solarSystemGroup.add(sunMesh);
 
+  // Translucent Solar Atmosphere Aura
+  const sunAuraGeom = new THREE.SphereGeometry(PLANET_R * 4.6, 32, 24);
+  const sunAuraMat = new THREE.MeshBasicMaterial({
+    color: 0xff9900,
+    transparent: true,
+    opacity: 0.35,
+    blending: THREE.AdditiveBlending,
+    side: THREE.BackSide,
+    fog: false,
+  });
+  solarSystemGroup.add(new THREE.Mesh(sunAuraGeom, sunAuraMat));
+
   // Add solar corona flare sprite at Sun core
   const coronaSpr = sunSprite.clone();
   coronaSpr.visible = true;
-  coronaSpr.scale.setScalar(PLANET_R * 14.0);
+  coronaSpr.scale.setScalar(PLANET_R * 18.0);
   solarSystemGroup.add(coronaSpr);
 
   // Solar-centered orbital path ring builder
   const addOrbitRing = (dist, col = 0xffe8a0) => {
-    const ringGeom = new THREE.RingGeometry(dist - 0.7, dist + 0.7, 128);
+    const ringGeom = new THREE.RingGeometry(dist - 0.9, dist + 0.9, 128);
     const ringMat = new THREE.MeshBasicMaterial({
       color: col,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: 0.32,
+      opacity: 0.35,
       fog: false,
     });
     const ringMesh = new THREE.Mesh(ringGeom, ringMat);
@@ -5830,35 +5842,35 @@ function ensureSolarSystem() {
     return pPivot;
   };
 
-  // Real Proportional Planet Scale Ratios relative to Earth (PLANET_R = 60u):
-  // 1. Mercury (0.38 Earth radius) + Orbit Ring
-  makePlanet(PLANET_R * 0.38, 'mercury', PLANET_R * 4.5, 0.35, 0.03);
+  // Expanded Orbital Distances for Realistic Space Between Planets (PLANET_R = 60u):
+  // 1. Mercury (0.38 Earth radius)
+  makePlanet(PLANET_R * 0.38, 'mercury', PLANET_R * 8.0, 0.35, 0.03);
 
-  // 2. Venus (0.95 Earth radius) + Orbit Ring
-  makePlanet(PLANET_R * 0.95, 'venus', PLANET_R * 7.2, 0.24, 0.05);
+  // 2. Venus (0.95 Earth radius)
+  makePlanet(PLANET_R * 0.95, 'venus', PLANET_R * 14.0, 0.24, 0.05);
 
-  // 3. Earth Orbit Path Ring (Earth + Moon orbit at PLANET_R * 10.5)
-  addOrbitRing(PLANET_R * 10.5, 0x88ccff);
+  // 3. Earth Orbit Path Ring (Earth + Moon orbit at PLANET_R * 22.0)
+  addOrbitRing(PLANET_R * 22.0, 0x88ccff);
 
-  // 4. Mars (0.53 Earth radius) + Orbit Ring
-  makePlanet(PLANET_R * 0.53, 'mars', PLANET_R * 14.8, -0.18, -0.15);
+  // 4. Mars (0.53 Earth radius)
+  makePlanet(PLANET_R * 0.53, 'mars', PLANET_R * 30.0, -0.18, -0.15);
 
-  // 5. Jupiter (11.2x Earth radius -> 4.8x scaled) + Orbit Ring
-  makePlanet(PLANET_R * 4.8, 'jupiter', PLANET_R * 22.0, 0.08, 0.05);
+  // 5. Jupiter (4.8x scaled radius)
+  makePlanet(PLANET_R * 4.8, 'jupiter', PLANET_R * 44.0, 0.08, 0.05);
 
-  // 6. Saturn (9.5x Earth radius -> 4.1x scaled) + Orbit Ring & 3D Rings
-  const sat = makePlanet(PLANET_R * 4.1, 'saturn', PLANET_R * 31.0, -0.05, 0.45);
+  // 6. Saturn (4.1x scaled radius) + 3D Rings
+  const sat = makePlanet(PLANET_R * 4.1, 'saturn', PLANET_R * 60.0, -0.05, 0.45);
   const ringGeom = new THREE.RingGeometry(PLANET_R * 5.2, PLANET_R * 8.5, 32);
   const ringMat = new THREE.MeshBasicMaterial({ color: 0xd4be88, side: THREE.DoubleSide, transparent: true, opacity: 0.78, fog: false });
   const ringMesh = new THREE.Mesh(ringGeom, ringMat);
   ringMesh.rotation.x = Math.PI / 2.2;
   sat.userData.pMesh.add(ringMesh);
 
-  // 7. Uranus (4.0x Earth radius -> 2.2x scaled) + Orbit Ring
-  makePlanet(PLANET_R * 2.2, 'uranus', PLANET_R * 40.0, 0.03, 0.85);
+  // 7. Uranus (2.2x scaled radius)
+  makePlanet(PLANET_R * 2.2, 'uranus', PLANET_R * 78.0, 0.03, 0.85);
 
-  // 8. Neptune (3.9x Earth radius -> 2.1x scaled) + Orbit Ring
-  makePlanet(PLANET_R * 2.1, 'neptune', PLANET_R * 48.0, -0.02, 0.30);
+  // 8. Neptune (2.1x scaled radius)
+  makePlanet(PLANET_R * 2.1, 'neptune', PLANET_R * 96.0, -0.02, 0.30);
 
   solarSystemGroup.visible = false;
   scene.add(solarSystemGroup);
@@ -5873,7 +5885,7 @@ function updateSolarSystem(dt, gs) {
 
   // Earth orbit angle around the central Sun
   earthOrbitAngle += dt * 0.05;
-  const earthDist = PLANET_R * 10.5;
+  const earthDist = PLANET_R * 22.0;
   const earthOffsetX = Math.cos(earthOrbitAngle) * earthDist;
   const earthOffsetZ = Math.sin(earthOrbitAngle) * earthDist;
 
@@ -6328,12 +6340,8 @@ function updateWorldLod(dt) {
     spaceDome.position.copy(camera.position);
     spaceDome.scale.setScalar(Math.min(2400, camera.far * 0.7));
     spaceDome.material.opacity = 1;
-    // sun: MASSIVE radiant solar star motionless in deep celestial space
-    sunSprite.visible = true;
-    const sunDist = Math.min(2200, camera.far * 0.65);
-    sunSprite.position.copy(camera.position).addScaledVector(SUN_SPACE_DIR, sunDist);
-    const ss = Math.min(1800, camera.far * 0.45);
-    sunSprite.scale.set(ss, ss, 1);
+    // sunSprite is hidden in spaceMode so only the central 3D Solar Sun renders
+    sunSprite.visible = false;
     // solar system planets orbiting in space
     updateSolarSystem(dt, gs);
     // moon: circles the earth once every ~18s, shrinking with the globe
