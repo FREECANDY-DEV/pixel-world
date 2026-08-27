@@ -93,9 +93,12 @@ let NEAR_RADIUS = IS_MOBILE ? 3 : 4;               // full-detail ring (caves + 
 const SEA_LEVEL = 24;
 const MAX_HEIGHT = 96;
 
-const DEMO_MODE = new URLSearchParams(location.search).has('demo');
-const DEMO_SEED = 7777777;
-let SEED = DEMO_MODE ? DEMO_SEED : Math.floor(Math.random() * 1e9);
+const urlParams = new URLSearchParams(location.search);
+const DEMO_MODE = urlParams.has('demo');
+const urlSeed = urlParams.get('seed');
+const DEFAULT_SEED = 987654321;
+const DEMO_SEED = urlSeed ? (parseInt(urlSeed, 10) || DEFAULT_SEED) : DEFAULT_SEED;
+let SEED = DEMO_MODE ? DEMO_SEED : (urlSeed ? (parseInt(urlSeed, 10) || Math.floor(Math.random() * 1e9)) : Math.floor(Math.random() * 1e9));
 
 // Terrain elevation in blocks (y). Deterministic for every world column.
 function terrainHeight(x, z, seed) {
