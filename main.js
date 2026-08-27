@@ -5864,14 +5864,25 @@ function ensureSolarSystem() {
   scene.add(solarSystemGroup);
 }
 
+let earthOrbitAngle = 0;
 function updateSolarSystem(dt, gs) {
   ensureSolarSystem();
   if (!solarSystemGroup) return;
   solarSystemGroup.visible = spaceMode;
   if (!spaceMode) return;
 
-  // Solar system central origin is positioned in deep space
-  solarSystemGroup.position.set(homePos.x - 200, 0, homePos.z - 300);
+  // Earth orbit angle around the central Sun
+  earthOrbitAngle += dt * 0.05;
+  const earthDist = PLANET_R * 10.5;
+  const earthOffsetX = Math.cos(earthOrbitAngle) * earthDist;
+  const earthOffsetZ = Math.sin(earthOrbitAngle) * earthDist;
+
+  // Position solar system origin so Earth sits EXACTLY on its orbit ring at homePos (where camera is focused!)
+  solarSystemGroup.position.set(
+    homePos.x - earthOffsetX * gs,
+    0,
+    homePos.z - earthOffsetZ * gs
+  );
   solarSystemGroup.scale.setScalar(gs);
 
   for (const child of solarSystemGroup.children) {
