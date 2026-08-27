@@ -974,7 +974,7 @@ waterMat.onBeforeCompile = (sh) => {
       `#include <begin_vertex>
        vec4 wPos = modelMatrix * vec4(position, 1.0);
        vec2 distVec = vec2(wPos.x - uCamTarget.x, wPos.z - uCamTarget.z);
-       float distSq = min(dot(distVec, distVec), 360000.0);
+       float distSq = dot(distVec, distVec);
        transformed.z -= distSq * uCurvature;
 
        // Multi-harmonic wave system:
@@ -1008,6 +1008,21 @@ const horizonRingMat = new THREE.MeshBasicMaterial({
   depthWrite: false,
   fog: false,
 });
+horizonRingMat.onBeforeCompile = (sh) => {
+  sh.uniforms.uCurvature = { value: 0 };
+  sh.uniforms.uCamTarget = { value: new THREE.Vector3(0, 0, 0) };
+  sh.vertexShader =
+    'uniform float uCurvature;\nuniform vec3 uCamTarget;\n' +
+    sh.vertexShader.replace(
+      '#include <begin_vertex>',
+      `#include <begin_vertex>
+       vec4 wPos = modelMatrix * vec4(position, 1.0);
+       vec2 distVec = vec2(wPos.x - uCamTarget.x, wPos.z - uCamTarget.z);
+       float distSq = dot(distVec, distVec);
+       transformed.z -= distSq * uCurvature;`
+    );
+  horizonRingMat.userData.shader = sh;
+};
 const horizonRing = new THREE.Mesh(new THREE.RingGeometry(1400, 3800, 128), horizonRingMat);
 horizonRing.rotation.x = -Math.PI / 2;
 horizonRing.position.set(0, SEA_LEVEL - 0.3, 0);
@@ -11773,6 +11788,12 @@ function animate() {
     horizonRing.material.opacity = hOpacity * (0.6 + 0.4 * dayF);
     horizonRing.material.color.copy(skyCol).lerp(new THREE.Color(0x8fb7e8), 0.4);
     horizonRing.visible = !spaceMode && hOpacity > 0.01;
+    if (horizonRingMat.userData.shader) {
+      horizonRingMat.userData.shader.uniforms.uCurvature.value = curvatureVal;
+      if (horizonRingMat.userData.shader.uniforms.uCamTarget) {
+        horizonRingMat.userData.shader.uniforms.uCamTarget.value.set(camT.x, 0, camT.z);
+      }
+    }
   }
   if (waterMat.userData.shader) {
     waterMat.userData.shader.uniforms.uCurvature.value = curvatureVal;
