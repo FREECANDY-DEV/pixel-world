@@ -971,14 +971,14 @@ waterMat.onBeforeCompile = (sh) => {
       `#include <begin_vertex>
        vec4 wPos = modelMatrix * vec4(position, 1.0);
        vec2 distVec = vec2(wPos.x - uCamTarget.x, wPos.z - uCamTarget.z);
-       float distSq = dot(distVec, distVec);
+       float distSq = min(dot(distVec, distVec), 360000.0);
        transformed.z -= distSq * uCurvature;
        transformed.z += sin((position.x + uOffset.x) * 0.045 + uTime * 1.6) * 0.09
                       + cos((position.y + uOffset.z) * 0.037 - uTime * 1.1) * 0.07;`
     );
   waterMat.userData.shader = sh;
 };
-const water = new THREE.Mesh(new THREE.CircleGeometry(2500, 128), waterMat);
+const water = new THREE.Mesh(new THREE.PlaneGeometry(1400, 1400, 64, 64), waterMat);
 water.rotation.x = -Math.PI / 2;
 water.position.set(0, SEA_LEVEL + 0.35, 0);
 scene.add(water);
