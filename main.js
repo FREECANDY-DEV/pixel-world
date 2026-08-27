@@ -993,11 +993,25 @@ waterMat.onBeforeCompile = (sh) => {
     );
   waterMat.userData.shader = sh;
 };
-// Thin fluid layer plane geometry with high subdivision for silky smooth waves
-const water = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600, 128, 128), waterMat);
+// Circular ocean disk geometry with high subdivision for seamless horizon curves
+const water = new THREE.Mesh(new THREE.CircleGeometry(3200, 128), waterMat);
 water.rotation.x = -Math.PI / 2;
 water.position.set(0, SEA_LEVEL + 0.35, 0);
 scene.add(water);
+
+// Atmospheric Horizon Haze Ring (blends the distant terrain/ocean boundary into space/sky)
+const horizonRingMat = new THREE.MeshBasicMaterial({
+  color: 0x8fb7e8,
+  transparent: true,
+  opacity: 0,
+  side: THREE.DoubleSide,
+  depthWrite: false,
+  fog: false,
+});
+const horizonRing = new THREE.Mesh(new THREE.RingGeometry(1400, 3800, 128), horizonRingMat);
+horizonRing.rotation.x = -Math.PI / 2;
+horizonRing.position.set(0, SEA_LEVEL - 0.3, 0);
+scene.add(horizonRing);
 
 // fullscreen tint + drifting light rays shown while the camera is underwater
 const underwaterOverlay = document.createElement('div');
@@ -11650,17 +11664,17 @@ function animate() {
   skyCol.multiplyScalar(envDim);
 
   const fogDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
-  // Zoom space factor: smoothly ramps up to 1.0 as camera zooms out from 135u to 400u+
+  // Deep atmospheric blue sky tone on zoom-out (never pitch black in map view)
   const zoomSpaceK = THREE.MathUtils.clamp((fogDist - 135) / 260, 0, 1);
-  const pitchBlack = new THREE.Color(0x000000);
-  skyCol.lerp(pitchBlack, zoomSpaceK);
+  const spaceBlueSky = new THREE.Color(0x0c1e36);
+  skyCol.lerp(spaceBlueSky, zoomSpaceK * 0.75);
 
   scene.background.copy(skyCol);
   scene.fog.color.copy(skyCol);
 
-  const fogZoomMul = Math.max(1.0, fogDist / 120);
+  const fogZoomMul = Math.max(1.0, fogDist / 100);
   scene.fog.near = FOG_BASE_NEAR * envFogMul * fogZoomMul;
-  scene.fog.far = FOG_BASE_FAR * envFogMul * fogZoomMul;
+  scene.fog.far = FOG_BASE_FAR * envFogMul * fogZoomMul * 1.8;
   treeMat.uniforms.uFogColor.value.copy(scene.fog.color);
   // seasons + sun on every tree
   treeMat.uniforms.uSeasonA.value = b.i;
@@ -11736,6 +11750,14 @@ function animate() {
   }
   water.position.x = camT.x;
   water.position.z = camT.z;
+  if (horizonRing) {
+    horizonRing.position.x = camT.x;
+    horizonRing.position.z = camT.z;
+    const hOpacity = THREE.MathUtils.clamp((curDist - 90) / 280, 0, 0.52);
+    horizonRing.material.opacity = hOpacity * (0.6 + 0.4 * dayF);
+    horizonRing.material.color.copy(skyCol).lerp(new THREE.Color(0x8fb7e8), 0.4);
+    horizonRing.visible = !spaceMode && hOpacity > 0.01;
+  }
   if (waterMat.userData.shader) {
     waterMat.userData.shader.uniforms.uCurvature.value = curvatureVal;
     if (waterMat.userData.shader.uniforms.uCamTarget) {
