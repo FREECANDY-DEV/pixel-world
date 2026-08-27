@@ -5697,16 +5697,45 @@ function getPlanetTexture(type) {
   const g = c.getContext('2d');
 
   if (type === 'sun') {
-    const gr = g.createLinearGradient(0, 0, 0, 128);
-    gr.addColorStop(0, '#fff5cc');
-    gr.addColorStop(0.5, '#ffbb33');
-    gr.addColorStop(1, '#ff5500');
+    c.width = 512;
+    c.height = 256;
+    // Radiant golden solar photosphere gradient base
+    const gr = g.createLinearGradient(0, 0, 0, 256);
+    gr.addColorStop(0, '#fffbe6');
+    gr.addColorStop(0.15, '#ffd700');
+    gr.addColorStop(0.45, '#ff9900');
+    gr.addColorStop(0.75, '#ff5500');
+    gr.addColorStop(1, '#cc2200');
     g.fillStyle = gr;
-    g.fillRect(0, 0, 256, 128);
-    g.fillStyle = 'rgba(220, 50, 0, 0.45)';
-    for (let i = 0; i < 40; i++) {
-      const rx = Math.random() * 256, ry = Math.random() * 128, rw = 3 + Math.random() * 10;
-      g.beginPath(); g.arc(rx, ry, rw, 0, Math.PI * 2); g.fill();
+    g.fillRect(0, 0, 512, 256);
+
+    // Solar Granulation Noise (photosphere granules)
+    for (let i = 0; i < 1800; i++) {
+      const rx = Math.random() * 512, ry = Math.random() * 256;
+      const rw = 1.5 + Math.random() * 4;
+      g.fillStyle = Math.random() > 0.4 ? 'rgba(255, 255, 200, 0.35)' : 'rgba(180, 40, 0, 0.25)';
+      g.fillRect(rx, ry, rw, rw);
+    }
+
+    // Sunspots with dark cores (umbra) and orange penumbras
+    for (let i = 0; i < 16; i++) {
+      const sx = Math.random() * 512, sy = 40 + Math.random() * 176;
+      const sr = 6 + Math.random() * 14;
+      g.fillStyle = 'rgba(140, 30, 0, 0.75)';
+      g.beginPath(); g.arc(sx, sy, sr, 0, Math.PI * 2); g.fill();
+      g.fillStyle = 'rgba(30, 5, 0, 0.95)';
+      g.beginPath(); g.arc(sx + (Math.random() - 0.5) * 2, sy + (Math.random() - 0.5) * 2, sr * 0.45, 0, Math.PI * 2); g.fill();
+    }
+
+    // Solar Prominence / Flare Filaments
+    g.strokeStyle = 'rgba(255, 230, 100, 0.5)';
+    g.lineWidth = 3;
+    for (let i = 0; i < 12; i++) {
+      const fx = Math.random() * 512, fy = Math.random() * 256;
+      g.beginPath();
+      g.moveTo(fx, fy);
+      g.quadraticCurveTo(fx + 20, fy - 15, fx + 40, fy + 5);
+      g.stroke();
     }
   } else if (type === 'mercury') {
     g.fillStyle = '#8e8e88';
@@ -7109,6 +7138,7 @@ function stepCamTween() {
   const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
   controls.target.lerpVectors(camTween.fromT, camTween.toT, e);
   camera.position.lerpVectors(camTween.fromP, camTween.toP, e);
+  camera.lookAt(controls.target);
   if (k >= 1) camTween = null;
 }
 // any direct camera input from the user takes over and cancels the fly-to
@@ -10338,9 +10368,9 @@ async function triggerGrunkCinematicSequence() {
 
   // Find Grunk (hologram elder) and player (me) positions
   const grunkSpr = demoState.botGhost ? demoState.botGhost.spr : null;
-  const meSpr = (demoState.me && demoState.me.spr) ? demoState.me.spr : (selectedCm ? selectedCm.spr : null);
+  const meSpr = (demoState.me && demoState.me.spr) ? demoState.me.spr : (cavemen[0] ? cavemen[0].spr : null);
 
-  const playerPos = meSpr ? meSpr.position.clone() : new THREE.Vector3(homePos.x + 3, groundYAt(homePos.x + 3, homePos.z + 3), homePos.z + 3);
+  const playerPos = meSpr ? meSpr.position.clone() : new THREE.Vector3(homePos.x + 2, groundYAt(homePos.x + 2, homePos.z + 2), homePos.z + 2);
   const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x + 0.5, groundYAt(homePos.x + 0.5, homePos.z + 0.5), homePos.z + 0.5);
 
   // Line of sight vector between Player and Grunk (for opposite-side reverse-shot framing)
@@ -10350,53 +10380,24 @@ async function triggerGrunkCinematicSequence() {
   facingDir.normalize();
 
   // STEP 1: Zoom camera directly onto Grunk's face from Player's opposite side
-  const getGrunkFaceTgt = () => {
-    const curSpr = demoState.botGhost ? demoState.botGhost.spr : grunkSpr;
-    const p = curSpr ? curSpr.position : grunkPos;
-    return new THREE.Vector3(p.x, p.y + 2.45, p.z);
-  };
-  const getGrunkCamPos = () => {
-    const tgt = getGrunkFaceTgt();
-    // Camera is positioned on Player's side looking directly opposite at Grunk's face
-    return new THREE.Vector3().copy(tgt).subScaledVector(facingDir, 1.45);
-  };
+  const grunkFaceTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 2.45, grunkPos.z);
+  const grunkCamPos = grunkFaceTgt.clone().subScaledVector(facingDir, 1.45);
 
-  tweenCameraToExplicit(getGrunkFaceTgt(), getGrunkCamPos(), 1.1);
-  await new Promise(r => setTimeout(r, 1100));
+  tweenCameraToExplicit(grunkFaceTgt, grunkCamPos, 1.1);
+  await new Promise(r => setTimeout(r, 1150));
 
-  // STEP 2: Grunk speaks subtitles (Live Face Lock from Player's opposite view)
+  // STEP 2: Grunk speaks subtitles
   grunkIsTalking = true;
-  const grunkTrackInterval = setInterval(() => {
-    if (!cinematicActive || !grunkIsTalking) {
-      clearInterval(grunkTrackInterval);
-      return;
-    }
-    const tgt = getGrunkFaceTgt();
-    const camP = getGrunkCamPos();
-    controls.target.copy(tgt);
-    camera.position.copy(camP);
-    camera.lookAt(tgt);
-  }, 16);
-
   await showSubtitle('Greetings Traveler! This project is actively under development!', 3600);
   await showSubtitle('Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
   grunkIsTalking = false;
-  clearInterval(grunkTrackInterval);
 
   // STEP 3: Transition camera onto Player's face from Grunk's opposite side (Reverse Shot)
-  const getPlayerFaceTgt = () => {
-    const curSpr = (demoState.me && demoState.me.spr) ? demoState.me.spr : (selectedCm ? selectedCm.spr : meSpr);
-    const p = curSpr ? curSpr.position : playerPos;
-    return new THREE.Vector3(p.x, p.y + 2.25, p.z);
-  };
-  const getPlayerCamPos = () => {
-    const tgt = getPlayerFaceTgt();
-    // Camera is positioned on Grunk's side looking directly opposite at Player's face
-    return new THREE.Vector3().copy(tgt).addScaledVector(facingDir, 1.45);
-  };
+  const playerFaceTgt = new THREE.Vector3(playerPos.x, playerPos.y + 2.25, playerPos.z);
+  const playerCamPos = playerFaceTgt.clone().addScaledVector(facingDir, 1.45);
 
-  tweenCameraToExplicit(getPlayerFaceTgt(), getPlayerCamPos(), 1.1);
-  await new Promise(r => setTimeout(r, 1100));
+  tweenCameraToExplicit(playerFaceTgt, playerCamPos, 1.1);
+  await new Promise(r => setTimeout(r, 1150));
 
   // STEP 4: Player says "OK, I will!"
   await showSubtitle('OK, I will!', 2800);
@@ -10406,7 +10407,7 @@ async function triggerGrunkCinematicSequence() {
   setCinematicBars(false);
   setCutsceneUIVisibility(true);
   tweenCameraToExplicit(origTarget, origPos, 1.1);
-  await new Promise(r => setTimeout(r, 1100));
+  await new Promise(r => setTimeout(r, 1150));
 
   controls.enabled = true;
   controls.update();
