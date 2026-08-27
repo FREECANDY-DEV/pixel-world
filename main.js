@@ -10359,8 +10359,17 @@ async function triggerGrunkCinematicSequence() {
   const grunkSpr = demoState.botGhost ? demoState.botGhost.spr : null;
   const meSpr = (demoState.me && demoState.me.spr) ? demoState.me.spr : (cavemen[0] ? cavemen[0].spr : null);
 
-  const playerPos = meSpr ? meSpr.position.clone() : new THREE.Vector3(homePos.x + 2, groundYAt(homePos.x + 2, homePos.z + 2), homePos.z + 2);
-  const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x + 0.5, groundYAt(homePos.x + 0.5, homePos.z + 0.5), homePos.z + 0.5);
+  const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x + 2.1, charGroundY(homePos.x + 2.1, homePos.z + 1.9) + 0.18, homePos.z + 1.9);
+
+  // Dedicated Dialogue Spot: step player 2.8 units in front of Grunk so they face each other face-to-face!
+  const standX = grunkPos.x - 2.2;
+  const standZ = grunkPos.z + 1.6;
+  const standY = charGroundY(standX, standZ);
+
+  if (meSpr) {
+    meSpr.position.set(standX, standY, standZ);
+  }
+  const playerPos = new THREE.Vector3(standX, standY, standZ);
 
   // Line of sight vector between Player and Grunk (for opposite-side reverse-shot framing)
   const facingDir = new THREE.Vector3().subVectors(grunkPos, playerPos);
@@ -10377,15 +10386,16 @@ async function triggerGrunkCinematicSequence() {
     t.sprB.visible = false;
   }
 
-  // STEP 1: Zoom camera directly onto Grunk's face (Hide Player so Player never blocks Grunk's view)
-  if (meSpr) meSpr.visible = false;
+  // STEP 1: Zoom camera directly onto Grunk's face (Head-on portrait view)
+  if (meSpr) meSpr.visible = true;
   if (grunkSpr) grunkSpr.visible = true;
   for (const cm of cavemen) {
-    if (cm.spr && cm.spr !== grunkSpr) cm.spr.visible = false;
+    if (cm.spr && cm.spr !== grunkSpr && cm.spr !== meSpr) cm.spr.visible = false;
   }
 
   const grunkFaceTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 2.45, grunkPos.z);
-  const grunkCamPos = grunkFaceTgt.clone().addScaledVector(facingDir, -1.45);
+  // Position camera head-on facing Grunk (from player's standing side)
+  const grunkCamPos = new THREE.Vector3(grunkFaceTgt.x - 1.2, grunkFaceTgt.y + 0.1, grunkFaceTgt.z + 1.5);
 
   tweenCameraToExplicit(grunkFaceTgt, grunkCamPos, 1.1);
   await new Promise(r => setTimeout(r, 1150));
@@ -10396,12 +10406,10 @@ async function triggerGrunkCinematicSequence() {
   await showSubtitle('Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
   grunkIsTalking = false;
 
-  // STEP 3: Transition camera onto Player's face (Show Player, Hide Grunk so Grunk never blocks Player's view)
-  if (meSpr) meSpr.visible = true;
-  if (grunkSpr) grunkSpr.visible = false;
-
+  // STEP 3: Transition camera onto Player's face (Head-on portrait view from Grunk's side)
   const playerFaceTgt = new THREE.Vector3(playerPos.x, playerPos.y + 2.25, playerPos.z);
-  const playerCamPos = playerFaceTgt.clone().addScaledVector(facingDir, 1.45);
+  // Position camera head-on facing Player (from Grunk's side)
+  const playerCamPos = new THREE.Vector3(playerFaceTgt.x + 1.2, playerFaceTgt.y + 0.1, playerFaceTgt.z - 1.5);
 
   tweenCameraToExplicit(playerFaceTgt, playerCamPos, 1.1);
   await new Promise(r => setTimeout(r, 1150));
