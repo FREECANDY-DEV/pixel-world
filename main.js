@@ -138,6 +138,13 @@ function terrainHeight(x, z, seed) {
     e += (roll - 0.5) * 0.12;
   }
 
+  // --- circular island boundary falloff: smoothly slope terrain into deep sea at 190u radius ---
+  const hX = (typeof homePos !== 'undefined' && homePos) ? homePos.x : 0;
+  const hZ = (typeof homePos !== 'undefined' && homePos) ? homePos.z : 0;
+  const distFromHome = Math.hypot(x - hX, z - hZ);
+  const circK = THREE.MathUtils.clamp((distFromHome - 145) / 45, 0, 1);
+  e = lerp(e, -1.2, circK * circK * (3 - 2 * circK));
+
   return Math.max(1, Math.min(MAX_HEIGHT, Math.round(SEA_LEVEL + e * 22)));
 }
 
@@ -968,9 +975,9 @@ waterMat.onBeforeCompile = (sh) => {
     );
   waterMat.userData.shader = sh;
 };
-const water = new THREE.Mesh(new THREE.CircleGeometry(1600, 128), waterMat);
+const water = new THREE.Mesh(new THREE.CircleGeometry(220, 128), waterMat);
 water.rotation.x = -Math.PI / 2;
-water.position.y = SEA_LEVEL + 0.35;
+water.position.set(homePos.x, SEA_LEVEL + 0.35, homePos.z);
 scene.add(water);
 
 // fullscreen tint + drifting light rays shown while the camera is underwater
@@ -5375,7 +5382,7 @@ function ensureCmIcon(cm) {
 
 // --- zoom-stage state machine ----------------------------------------------
 
-const ICON_ENTER = 135, ICON_EXIT = 115;
+const ICON_ENTER = 90, ICON_EXIT = 75;
 const GLOBE_ENTER = 3500, GLOBE_EXIT = 2500;
 // once the pull-out crosses into space it glides here on its own — the user
 // doesn't have to keep scrolling to get the full framed planet
@@ -5446,8 +5453,8 @@ function syncDetailIcons() {
   const isTopView = (controls && controls.target && Math.abs(camera.position.x - controls.target.x) < 5 && Math.abs(camera.position.z - controls.target.z) < 5 && (camera.position.y - controls.target.y) > 40);
 
   // Aggressive exponential zoom stride: thins out visible icons drastically down to 3%-10% when zoomed out
-  const zoomFactor = Math.max(0, (camDist - 130) / 45);
-  const zoomStride = Math.max(1, Math.floor(1 + Math.pow(zoomFactor, 1.6) * 2.5));
+  const zoomFactor = Math.max(0, (camDist - 85) / 32);
+  const zoomStride = Math.max(1, Math.floor(1 + Math.pow(zoomFactor, 1.8) * 3.2));
 
   for (const ch of chunks.values()) {
     if (ch.icons && ch.icons.geometry) {
