@@ -10335,13 +10335,15 @@ let playerIsTalking = false;
 
 function getGrunkFaceTgt() {
   const spr = (typeof demoState !== 'undefined' && demoState && demoState.botGhost) ? demoState.botGhost.spr : null;
-  const p = spr ? spr.position : (typeof homePos !== 'undefined' ? new THREE.Vector3(homePos.x + 2.1, 18.5, homePos.z + 1.9) : new THREE.Vector3());
-  return new THREE.Vector3(p.x, p.y + 2.35, p.z);
+  const px = spr ? spr.position.x : (typeof homePos !== 'undefined' ? homePos.x + 2.1 : 0);
+  const pz = spr ? spr.position.z : (typeof homePos !== 'undefined' ? homePos.z + 1.9 : 0);
+  const py = (typeof charGroundY === 'function') ? charGroundY(px, pz) + 0.18 : 18.68;
+  return new THREE.Vector3(px, py + 2.35, pz);
 }
 
 function getGrunkCamPos() {
   const tgt = getGrunkFaceTgt();
-  return new THREE.Vector3(tgt.x, tgt.y + 0.1, tgt.z + 1.85);
+  return new THREE.Vector3(tgt.x, tgt.y, tgt.z + 1.85);
 }
 
 function getPlayerFaceTgt() {
@@ -11656,13 +11658,12 @@ function animate() {
   }
   if (demoState.botGhost && demoState.botGhost.spr) {
     const gSpr = demoState.botGhost.spr;
-    const gBaseY = groundYAt(gSpr.position.x, gSpr.position.z);
+    const gBaseY = groundYAt(gSpr.position.x, gSpr.position.z) + 0.18;
+    gSpr.position.y = gBaseY;
     if (grunkIsTalking) {
-      gSpr.position.y = gBaseY + Math.sin(animT * 9.0) * 0.14;
-      const speakPulse = Math.sin(animT * 16.0) * 0.12;
-      gSpr.scale.set(2.7 + speakPulse, 3.0 - speakPulse * 0.8, 1);
+      const speakPulse = Math.sin(animT * 8.0) * 0.04;
+      gSpr.scale.set(2.7 + speakPulse, 3.0 - speakPulse * 0.5, 1);
     } else {
-      gSpr.position.y = THREE.MathUtils.damp(gSpr.position.y, gBaseY, 8, dt);
       gSpr.scale.x = THREE.MathUtils.damp(gSpr.scale.x, 2.7, 8, dt);
       gSpr.scale.y = THREE.MathUtils.damp(gSpr.scale.y, 3.0, 8, dt);
     }
