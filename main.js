@@ -11119,9 +11119,16 @@ function animate() {
   tmpSeasonColor.copy(SEASONS[b.i].skyTint).lerp(SEASONS[b.next].skyTint, b.w);
   skyCol.lerp(tmpSeasonColor, lerp(SEASONS[b.i].tintK, SEASONS[b.next].tintK, b.w));
   skyCol.multiplyScalar(envDim);
+
+  const fogDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
+  // Zoom space factor: smoothly ramps up to 1.0 as camera zooms out from 160u to 500u+
+  const zoomSpaceK = THREE.MathUtils.clamp((fogDist - 160) / 340, 0, 1);
+  const darkSpaceColor = new THREE.Color(0x040612);
+  skyCol.lerp(darkSpaceColor, zoomSpaceK * 0.92);
+
   scene.background.copy(skyCol);
   scene.fog.color.copy(skyCol);
-  const fogDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
+
   const fogZoomMul = Math.max(1.0, fogDist / 120);
   scene.fog.near = FOG_BASE_NEAR * envFogMul * fogZoomMul;
   scene.fog.far = FOG_BASE_FAR * envFogMul * fogZoomMul;
@@ -11192,9 +11199,12 @@ function animate() {
 
   starsA.position.copy(controls.target);
   starsB.position.copy(controls.target);
-  const sBase = nightF * starVis;
+  // Stars opacity: increases with nighttime AND increases as you zoom out to space
+  const sBase = Math.max(nightF * starVis, zoomSpaceK * 0.95);
   starsA.material.opacity = sBase * (0.55 + 0.3 * Math.sin(t * 1.7));
   starsB.material.opacity = sBase * (0.55 + 0.3 * Math.sin(t * 2.3 + 2));
+  starsA.visible = true;
+  starsB.visible = true;
 
   // --- underwater camera: submerge the view when diving below the surface ---
   {
