@@ -10387,30 +10387,31 @@ async function triggerGrunkCinematicSequence() {
 
   const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x + 2.1, charGroundY(homePos.x + 2.1, homePos.z + 1.9) + 0.18, homePos.z + 1.9);
 
-  // Dedicated Dialogue Spot: step player 2.8 units in front of Grunk so they face each other face-to-face!
+  // Animate Player taking distance: smoothly step back 3.2 units from Grunk
+  const startP = meSpr ? meSpr.position.clone() : new THREE.Vector3(homePos.x, charGroundY(homePos.x, homePos.z), homePos.z);
   const standX = grunkPos.x;
-  const standZ = grunkPos.z + 2.8;
+  const standZ = grunkPos.z + 3.2;
   const standY = charGroundY(standX, standZ);
+  const standP = new THREE.Vector3(standX, standY, standZ);
 
+  // Smooth 0.8s animated step-back taking distance
   if (meSpr) {
-    meSpr.position.set(standX, standY, standZ);
+    const tStep0 = performance.now();
+    const stepDur = 800;
+    while (performance.now() - tStep0 < stepDur) {
+      const k = Math.min(1, (performance.now() - tStep0) / stepDur);
+      const e = k < 0.5 ? 2 * k * k : -1 + (4 - 2 * k) * k;
+      meSpr.position.x = THREE.MathUtils.lerp(startP.x, standP.x, e);
+      meSpr.position.z = THREE.MathUtils.lerp(startP.z, standP.z, e);
+      meSpr.position.y = charGroundY(meSpr.position.x, meSpr.position.z);
+      await new Promise(r => requestAnimationFrame(r));
+    }
+    meSpr.position.copy(standP);
   }
 
-  // Temporarily hide foliage tree occluders during cutscene so assets never cover talking humans
-  for (const ch of chunks.values()) {
-    if (ch.trees) ch.trees.visible = false;
-  }
-  for (const t of placedTrees) {
-    t.sprA.visible = false;
-    t.sprB.visible = false;
-  }
-
-  // STEP 1: Zoom camera directly onto Grunk's face (Hide Player so Player NEVER blocks Grunk's view)
-  if (meSpr) meSpr.visible = false;
+  // STEP 1: Zoom camera directly onto Grunk's face
+  if (meSpr) meSpr.visible = true;
   if (grunkSpr) grunkSpr.visible = true;
-  for (const cm of cavemen) {
-    if (cm.spr && cm.spr !== grunkSpr) cm.spr.visible = false;
-  }
 
   tweenCameraToExplicit(getGrunkFaceTgt(), getGrunkCamPos(), 1.1);
   await new Promise(r => setTimeout(r, 1150));
@@ -10421,10 +10422,7 @@ async function triggerGrunkCinematicSequence() {
   await showSubtitle('Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
   grunkIsTalking = false;
 
-  // STEP 3: Transition camera onto Player's face (Show Player, Hide Grunk so Grunk NEVER blocks Player's view)
-  if (meSpr) meSpr.visible = true;
-  if (grunkSpr) grunkSpr.visible = false;
-
+  // STEP 3: Transition camera onto Player's face (Shot 2)
   tweenCameraToExplicit(getPlayerFaceTgt(), getPlayerCamPos(), 1.1);
   await new Promise(r => setTimeout(r, 1150));
 
@@ -10439,21 +10437,9 @@ async function triggerGrunkCinematicSequence() {
   setCutsceneUIVisibility(true);
   if (meSpr) meSpr.visible = true;
   if (grunkSpr) grunkSpr.visible = true;
-  for (const cm of cavemen) {
-    if (cm.spr) cm.spr.visible = !iconMode && !spaceMode;
-  }
 
   tweenCameraToExplicit(origTarget, origPos, 1.1);
   await new Promise(r => setTimeout(r, 1150));
-
-  // Restore foliage tree visibility after cutscene
-  for (const ch of chunks.values()) {
-    if (ch.trees) ch.trees.visible = !iconMode && !spaceMode;
-  }
-  for (const t of placedTrees) {
-    t.sprA.visible = !spaceMode;
-    t.sprB.visible = !spaceMode;
-  }
 
   controls.enabled = true;
   controls.update();
