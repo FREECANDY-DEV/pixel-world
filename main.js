@@ -139,10 +139,11 @@ function terrainHeight(x, z, seed) {
   }
 
   // --- circular island boundary falloff: smoothly slope terrain into deep sea at 190u radius ---
-  const hX = (typeof homePos !== 'undefined' && homePos) ? homePos.x : 0;
-  const hZ = (typeof homePos !== 'undefined' && homePos) ? homePos.z : 0;
+  const hX = (typeof HOME_FLAT !== 'undefined' && HOME_FLAT) ? HOME_FLAT.x : ((typeof homePos !== 'undefined' && homePos) ? homePos.x : 0);
+  const hZ = (typeof HOME_FLAT !== 'undefined' && HOME_FLAT) ? HOME_FLAT.z : ((typeof homePos !== 'undefined' && homePos) ? homePos.z : 0);
   const distFromHome = Math.hypot(x - hX, z - hZ);
-  const circK = THREE.MathUtils.clamp((distFromHome - 145) / 45, 0, 1);
+  const rawK = (distFromHome - 145) / 45;
+  const circK = Math.max(0, Math.min(1, rawK));
   e = lerp(e, -1.2, circK * circK * (3 - 2 * circK));
 
   return Math.max(1, Math.min(MAX_HEIGHT, Math.round(SEA_LEVEL + e * 22)));
