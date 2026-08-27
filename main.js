@@ -10013,6 +10013,7 @@ function demoConnect(idx) {
     connectTimeout: 9000,
     reconnectPeriod: 4000,
     keepalive: 30,
+    store: null,
     will,
   });
   demoState.mqtt = c;
@@ -10364,7 +10365,7 @@ async function triggerGrunkCinematicSequence() {
 
   // STEP 1: Zoom camera directly onto Grunk's face from Player's opposite side
   const grunkFaceTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 2.45, grunkPos.z);
-  const grunkCamPos = grunkFaceTgt.clone().subScaledVector(facingDir, 1.45);
+  const grunkCamPos = grunkFaceTgt.clone().addScaledVector(facingDir, -1.45);
 
   tweenCameraToExplicit(grunkFaceTgt, grunkCamPos, 1.1);
   await new Promise(r => setTimeout(r, 1150));
