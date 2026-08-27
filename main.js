@@ -6764,8 +6764,8 @@ function stepCamTween() {
   if (k >= 1) camTween = null;
 }
 // any direct camera input from the user takes over and cancels the fly-to
-window.addEventListener('pointerdown', () => { camTween = null; }, true);
-window.addEventListener('wheel', () => { camTween = null; }, { passive: true, capture: true });
+window.addEventListener('pointerdown', () => { if (!cinematicActive) camTween = null; }, true);
+window.addEventListener('wheel', () => { if (!cinematicActive) camTween = null; }, { passive: true, capture: true });
 
 function wakeCaveman(cm) {
   if (!cm || !cm.sleeping) return;
@@ -9173,10 +9173,18 @@ renderer.domElement.addEventListener('pointerup', (e) => {
     pickObjs.push(c.spr);
     if (c.iconSpr && c.iconSpr.visible) pickObjs.push(c.iconSpr);
   }
+  if (demoState.botGhost && demoState.botGhost.spr) {
+    pickObjs.push(demoState.botGhost.spr);
+  }
   closeActionMenu(true); // any tap away closes the options popup
   const sprHits = raycaster.intersectObjects(pickObjs, false);
   if (sprHits.length) {
-    const hitCm = sprHits[0].object.userData.cm || null;
+    const hitObj = sprHits[0].object;
+    if (demoState.botGhost && hitObj === demoState.botGhost.spr) {
+      triggerGrunkCinematicSequence();
+      return;
+    }
+    const hitCm = hitObj.userData.cm || null;
     // Move mode: tapping another human highlights them in white and opens
     // the options popup (pick up & carry / add to party). Tap the one you're
     // carrying to set them back down; tap a party member to lead them.
@@ -9825,6 +9833,130 @@ function makeHologramMat() {
   });
   return grunkHoloMat;
 }
+
+// --- Cinematic Cutscene Sequence for Holographic Human (Grunk) ---
+let cinematicActive = false;
+let cinematicSubtitlesEl = null;
+
+function getSubtitlesElement() {
+  if (!cinematicSubtitlesEl) {
+    cinematicSubtitlesEl = document.createElement('div');
+    cinematicSubtitlesEl.id = 'cinematic-subtitles';
+    cinematicSubtitlesEl.style.cssText = `
+      position: fixed;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10000;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(255, 210, 63, 0.6);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.25);
+      border-radius: 12px;
+      padding: 12px 24px;
+      color: #ffd23f;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-align: center;
+      max-width: 90vw;
+      width: max-content;
+      pointer-events: none;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      font-family: system-ui, -apple-system, sans-serif;
+    `;
+    document.body.appendChild(cinematicSubtitlesEl);
+  }
+  return cinematicSubtitlesEl;
+}
+
+function showSubtitle(text, durationMs) {
+  const el = getSubtitlesElement();
+  el.innerHTML = text;
+  el.style.display = 'block';
+  requestAnimationFrame(() => {
+    el.style.opacity = '1';
+    el.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  return new Promise((resolve) => setTimeout(resolve, durationMs));
+}
+
+function hideSubtitles() {
+  if (cinematicSubtitlesEl) {
+    cinematicSubtitlesEl.style.opacity = '0';
+    cinematicSubtitlesEl.style.transform = 'translateX(-50%) translateY(10px)';
+    setTimeout(() => {
+      cinematicSubtitlesEl.style.display = 'none';
+    }, 300);
+  }
+}
+
+function tweenCameraToExplicit(toT, toP, durSec = 1.2) {
+  camTween = {
+    t0: performance.now(),
+    dur: durSec * 1000,
+    fromT: controls.target.clone(),
+    toT: toT.clone(),
+    fromP: camera.position.clone(),
+    toP: toP.clone(),
+  };
+}
+
+async function triggerGrunkCinematicSequence() {
+  if (cinematicActive) return;
+  cinematicActive = true;
+
+  const origTarget = controls.target.clone();
+  const origPos = camera.position.clone();
+
+  // Find Grunk (hologram elder) and player (me) positions
+  const grunkSpr = demoState.botGhost ? demoState.botGhost.spr : null;
+  const meSpr = (demoState.me && demoState.me.spr) ? demoState.me.spr : (selectedCm ? selectedCm.spr : null);
+
+  const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x, groundYAt(homePos.x, homePos.z), homePos.z);
+  const playerPos = meSpr ? meSpr.position.clone() : new THREE.Vector3(homePos.x + 3, groundYAt(homePos.x + 3, homePos.z + 3), homePos.z + 3);
+
+  // STEP 1: Zoom camera to Grunk (Holographic Bot)
+  const grunkTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 1.2, grunkPos.z);
+  const grunkCamPos = new THREE.Vector3(grunkPos.x + 1.8, grunkPos.y + 1.6, grunkPos.z + 2.4);
+
+  tweenCameraToExplicit(grunkTgt, grunkCamPos, 1.2);
+  await new Promise(r => setTimeout(r, 1200));
+
+  // STEP 2: Grunk speaks subtitles & chat bubbles
+  if (demoState.botGhost) {
+    demoShowBubble(demoState.botGhost.bubble, demoState.botGhost, 'Grunk the Elder', demoState.botGhost.color, 'This project is actively under development!');
+  }
+  await showSubtitle('<span style="color:#00f0ff;">🤖 Grunk the Elder:</span> Greetings Traveler! This project is actively under development!', 3600);
+
+  if (demoState.botGhost) {
+    demoShowBubble(demoState.botGhost.bubble, demoState.botGhost, 'Grunk the Elder', demoState.botGhost.color, 'Starring on GitHub & donations help us grow!');
+  }
+  await showSubtitle('<span style="color:#00f0ff;">🤖 Grunk the Elder:</span> Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
+
+  // STEP 3: Transition camera to Player (Hazmat Suit)
+  const playerTgt = new THREE.Vector3(playerPos.x, playerPos.y + 1.2, playerPos.z);
+  const playerCamPos = new THREE.Vector3(playerPos.x - 1.8, playerPos.y + 1.5, playerPos.z + 2.2);
+
+  tweenCameraToExplicit(playerTgt, playerCamPos, 1.2);
+  await new Promise(r => setTimeout(r, 1200));
+
+  // STEP 4: Player says "OK, I will!"
+  const playerName = demoState.name || 'Player';
+  if (demoState.meBubble && demoState.me) {
+    demoShowBubble(demoState.meBubble, demoState.me, playerName, '#ffd23f', 'OK, I will!');
+  }
+  await showSubtitle('<span style="color:#ffd23f;">☣️ ' + playerName + ':</span> OK, I will!', 2800);
+
+  // STEP 5: Smoothly return camera to original view & restore control
+  hideSubtitles();
+  tweenCameraToExplicit(origTarget, origPos, 1.2);
+  await new Promise(r => setTimeout(r, 1200));
+
+  cinematicActive = false;
+}
+window.triggerGrunkCutscene = triggerGrunkCinematicSequence;
 
 // --- DEMO MODULE part 3: ghosts & bubbles ------------------------------------
 function demoMakeGhostMat(female, look) {
