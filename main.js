@@ -1254,7 +1254,7 @@ const moonDisc = new THREE.Sprite(new THREE.SpriteMaterial({
 moonDisc.scale.set(90, 90, 1);
 scene.add(moonDisc);
 
-// Stars — two layers for twinkle, spread across full 360-degree sphere (top and bottom)
+// Stars — two layers for twinkle, distributed across deep 3D volume depth (no dome ring)
 function makeStars(n, size, color) {
   const pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) {
@@ -1262,7 +1262,8 @@ function makeStars(n, size, color) {
     const v = Math.random();
     const theta = u * 2.0 * Math.PI;
     const phi = Math.acos(2.0 * v - 1.0);
-    const r = 850;
+    // Randomize depth across a wide 3D volume (600u to 3500u) so there is zero dome circle shell
+    const r = 600 + Math.pow(Math.random(), 0.5) * 2900;
     pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
     pos[i * 3 + 1] = r * Math.cos(phi);
     pos[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
@@ -1283,8 +1284,8 @@ function makeStars(n, size, color) {
   scene.add(p);
   return p;
 }
-const starsA = makeStars(550, 1.6, 0xdfe8ff);
-const starsB = makeStars(350, 2.4, 0xffffff);
+const starsA = makeStars(650, 1.6, 0xdfe8ff);
+const starsB = makeStars(450, 2.4, 0xffffff);
 
 // Precipitation particles — one pool each for rain / snow / dust
 const FX_BOX = { w: 70, h: 42, d: 70 };
@@ -5596,15 +5597,16 @@ function ensureMoon() {
 
 // full-sphere starfield for the planet view (the night domes only cover up)
 const spaceDome = (() => {
-  const n = 460;
+  const n = 560;
   const pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) {
     const u = Math.random() * 2 - 1;
     const a = Math.random() * Math.PI * 2;
     const rr = Math.sqrt(Math.max(0, 1 - u * u));
-    pos[i * 3] = Math.cos(a) * rr;
-    pos[i * 3 + 1] = u;
-    pos[i * 3 + 2] = Math.sin(a) * rr;
+    const d = 0.45 + Math.pow(Math.random(), 0.5) * 1.35;
+    pos[i * 3] = Math.cos(a) * rr * d;
+    pos[i * 3 + 1] = u * d;
+    pos[i * 3 + 2] = Math.sin(a) * rr * d;
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
