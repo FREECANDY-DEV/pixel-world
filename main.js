@@ -10307,10 +10307,16 @@ async function triggerGrunkCinematicSequence() {
   const grunkSpr = demoState.botGhost ? demoState.botGhost.spr : null;
   const meSpr = (demoState.me && demoState.me.spr) ? demoState.me.spr : (selectedCm ? selectedCm.spr : null);
 
-  const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x, groundYAt(homePos.x, homePos.z), homePos.z);
   const playerPos = meSpr ? meSpr.position.clone() : new THREE.Vector3(homePos.x + 3, groundYAt(homePos.x + 3, homePos.z + 3), homePos.z + 3);
+  const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x + 0.5, groundYAt(homePos.x + 0.5, homePos.z + 0.5), homePos.z + 0.5);
 
-  // STEP 1: Zoom camera directly onto Grunk's face (Holographic Human Face Centered)
+  // Line of sight vector between Player and Grunk (for opposite-side reverse-shot framing)
+  const facingDir = new THREE.Vector3().subVectors(grunkPos, playerPos);
+  facingDir.y = 0;
+  if (facingDir.lengthSq() < 1e-4) facingDir.set(0, 0, -1);
+  facingDir.normalize();
+
+  // STEP 1: Zoom camera directly onto Grunk's face from Player's opposite side
   const getGrunkFaceTgt = () => {
     const curSpr = demoState.botGhost ? demoState.botGhost.spr : grunkSpr;
     const p = curSpr ? curSpr.position : grunkPos;
@@ -10318,13 +10324,14 @@ async function triggerGrunkCinematicSequence() {
   };
   const getGrunkCamPos = () => {
     const tgt = getGrunkFaceTgt();
-    return new THREE.Vector3(tgt.x, tgt.y, tgt.z + 1.45);
+    // Camera is positioned on Player's side looking directly opposite at Grunk's face
+    return new THREE.Vector3().copy(tgt).subScaledVector(facingDir, 1.45);
   };
 
   tweenCameraToExplicit(getGrunkFaceTgt(), getGrunkCamPos(), 1.1);
   await new Promise(r => setTimeout(r, 1100));
 
-  // STEP 2: Grunk speaks subtitles (Live Holographic Face Lock Active)
+  // STEP 2: Grunk speaks subtitles (Live Face Lock from Player's opposite view)
   grunkIsTalking = true;
   const grunkTrackInterval = setInterval(() => {
     if (!cinematicActive || !grunkIsTalking) {
@@ -10332,8 +10339,9 @@ async function triggerGrunkCinematicSequence() {
       return;
     }
     const tgt = getGrunkFaceTgt();
+    const camP = getGrunkCamPos();
     controls.target.copy(tgt);
-    camera.position.set(tgt.x, tgt.y, tgt.z + 1.45);
+    camera.position.copy(camP);
   }, 16);
 
   await showSubtitle('Greetings Traveler! This project is actively under development!', 3600);
@@ -10341,7 +10349,7 @@ async function triggerGrunkCinematicSequence() {
   grunkIsTalking = false;
   clearInterval(grunkTrackInterval);
 
-  // STEP 3: Transition camera directly onto Player's face (Hazmat Suit Face Centered)
+  // STEP 3: Transition camera onto Player's face from Grunk's opposite side (Reverse Shot)
   const getPlayerFaceTgt = () => {
     const curSpr = (demoState.me && demoState.me.spr) ? demoState.me.spr : (selectedCm ? selectedCm.spr : meSpr);
     const p = curSpr ? curSpr.position : playerPos;
@@ -10349,7 +10357,8 @@ async function triggerGrunkCinematicSequence() {
   };
   const getPlayerCamPos = () => {
     const tgt = getPlayerFaceTgt();
-    return new THREE.Vector3(tgt.x, tgt.y, tgt.z + 1.45);
+    // Camera is positioned on Grunk's side looking directly opposite at Player's face
+    return new THREE.Vector3().copy(tgt).addScaledVector(facingDir, 1.45);
   };
 
   tweenCameraToExplicit(getPlayerFaceTgt(), getPlayerCamPos(), 1.1);
