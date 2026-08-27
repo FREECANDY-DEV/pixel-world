@@ -10331,6 +10331,31 @@ function hideSubtitles() {
   }
 }
 
+let grunkIsTalking = false;
+let playerIsTalking = false;
+
+function getGrunkFaceTgt() {
+  const spr = (typeof demoState !== 'undefined' && demoState && demoState.botGhost) ? demoState.botGhost.spr : null;
+  const p = spr ? spr.position : (typeof homePos !== 'undefined' ? new THREE.Vector3(homePos.x + 2.1, 18.5, homePos.z + 1.9) : new THREE.Vector3());
+  return new THREE.Vector3(p.x, p.y + 2.35, p.z);
+}
+
+function getGrunkCamPos() {
+  const tgt = getGrunkFaceTgt();
+  return new THREE.Vector3(tgt.x, tgt.y + 0.1, tgt.z + 1.85);
+}
+
+function getPlayerFaceTgt() {
+  const spr = (typeof demoState !== 'undefined' && demoState && demoState.me && demoState.me.spr) ? demoState.me.spr : (cavemen[0] ? cavemen[0].spr : null);
+  const p = spr ? spr.position : (typeof homePos !== 'undefined' ? new THREE.Vector3(homePos.x, 18.5, homePos.z) : new THREE.Vector3());
+  return new THREE.Vector3(p.x, p.y + 2.20, p.z);
+}
+
+function getPlayerCamPos() {
+  const tgt = getPlayerFaceTgt();
+  return new THREE.Vector3(tgt.x, tgt.y + 0.1, tgt.z - 1.85);
+}
+
 function tweenCameraToExplicit(toT, toP, durSec = 1.1) {
   camTween = {
     t0: performance.now(),
@@ -10362,20 +10387,13 @@ async function triggerGrunkCinematicSequence() {
   const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x + 2.1, charGroundY(homePos.x + 2.1, homePos.z + 1.9) + 0.18, homePos.z + 1.9);
 
   // Dedicated Dialogue Spot: step player 2.8 units in front of Grunk so they face each other face-to-face!
-  const standX = grunkPos.x - 2.2;
-  const standZ = grunkPos.z + 1.6;
+  const standX = grunkPos.x;
+  const standZ = grunkPos.z + 2.8;
   const standY = charGroundY(standX, standZ);
 
   if (meSpr) {
     meSpr.position.set(standX, standY, standZ);
   }
-  const playerPos = new THREE.Vector3(standX, standY, standZ);
-
-  // Line of sight vector between Player and Grunk (for opposite-side reverse-shot framing)
-  const facingDir = new THREE.Vector3().subVectors(grunkPos, playerPos);
-  facingDir.y = 0;
-  if (facingDir.lengthSq() < 1e-4) facingDir.set(0, 0, -1);
-  facingDir.normalize();
 
   // Temporarily hide foliage tree occluders during cutscene so assets never cover talking humans
   for (const ch of chunks.values()) {
@@ -10393,29 +10411,23 @@ async function triggerGrunkCinematicSequence() {
     if (cm.spr && cm.spr !== grunkSpr && cm.spr !== meSpr) cm.spr.visible = false;
   }
 
-  const grunkFaceTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 2.45, grunkPos.z);
-  // Position camera head-on facing Grunk (from player's standing side)
-  const grunkCamPos = new THREE.Vector3(grunkFaceTgt.x - 1.2, grunkFaceTgt.y + 0.1, grunkFaceTgt.z + 1.5);
-
-  tweenCameraToExplicit(grunkFaceTgt, grunkCamPos, 1.1);
+  tweenCameraToExplicit(getGrunkFaceTgt(), getGrunkCamPos(), 1.1);
   await new Promise(r => setTimeout(r, 1150));
 
-  // STEP 2: Grunk speaks subtitles
+  // STEP 2: Grunk speaks subtitles (60 FPS camera focus lock onto Grunk's face)
   grunkIsTalking = true;
   await showSubtitle('Greetings Traveler! This project is actively under development!', 3600);
   await showSubtitle('Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
   grunkIsTalking = false;
 
   // STEP 3: Transition camera onto Player's face (Head-on portrait view from Grunk's side)
-  const playerFaceTgt = new THREE.Vector3(playerPos.x, playerPos.y + 2.25, playerPos.z);
-  // Position camera head-on facing Player (from Grunk's side)
-  const playerCamPos = new THREE.Vector3(playerFaceTgt.x + 1.2, playerFaceTgt.y + 0.1, playerFaceTgt.z - 1.5);
-
-  tweenCameraToExplicit(playerFaceTgt, playerCamPos, 1.1);
+  tweenCameraToExplicit(getPlayerFaceTgt(), getPlayerCamPos(), 1.1);
   await new Promise(r => setTimeout(r, 1150));
 
-  // STEP 4: Player says "OK, I will!"
+  // STEP 4: Player says "OK, I will!" (60 FPS camera focus lock onto Player's face)
+  playerIsTalking = true;
   await showSubtitle('OK, I will!', 2800);
+  playerIsTalking = false;
 
   // STEP 5: Smoothly return camera to original view & restore control, UI, and character visibility
   hideSubtitles();
@@ -11726,6 +11738,22 @@ function animate() {
   starsB.material.opacity = sBase * (0.55 + 0.3 * Math.sin(t * 2.3 + 2));
   starsA.visible = true;
   starsB.visible = true;
+
+  if (cinematicActive && !camTween) {
+    if (grunkIsTalking) {
+      const tgt = getGrunkFaceTgt();
+      const camP = getGrunkCamPos();
+      controls.target.copy(tgt);
+      camera.position.copy(camP);
+      camera.lookAt(controls.target);
+    } else if (playerIsTalking) {
+      const tgt = getPlayerFaceTgt();
+      const camP = getPlayerCamPos();
+      controls.target.copy(tgt);
+      camera.position.copy(camP);
+      camera.lookAt(controls.target);
+    }
+  }
 
   // --- underwater camera: submerge the view when diving below the surface ---
   {
