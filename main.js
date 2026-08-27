@@ -5475,20 +5475,31 @@ function syncDetailIcons() {
     }
   }
 
+  const camT = (typeof controls !== 'undefined' && controls && controls.target) ? controls.target : homePos;
+  const curDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
+  const curveK = THREE.MathUtils.clamp((curDist - 75) / 220, 0, 1);
+  const curvatureVal = curveK * 0.00055;
+
   for (let idx = 0; idx < placedTrees.length; idx++) {
     const s = placedTrees[idx];
     const ic = ensurePlacedIcon(s);
     if (!ic) continue;
-    ic.position.copy(s.sprA.position);
-    ic.position.y += s.sprA.scale.y + 1.6;
+    const dx = s.sprA.position.x - camT.x;
+    const dz = s.sprA.position.z - camT.z;
+    const dSq = dx * dx + dz * dz;
+    const curY = s.sprA.position.y - dSq * curvatureVal;
+    ic.position.set(s.sprA.position.x, curY + s.sprA.scale.y + 1.6, s.sprA.position.z);
     ic.scale.setScalar(markerScale(camera.position.distanceTo(ic.position)));
     ic.scale.z = 1;
     ic.visible = true; // All placed assets and trees are 100% visible on map zoom out!
   }
   const fi = ensureHomeFireIcon();
   if (fi && homeFire) {
-    fi.position.copy(homeFire.position);
-    fi.position.y += 0.9;
+    const dx = homeFire.position.x - camT.x;
+    const dz = homeFire.position.z - camT.z;
+    const dSq = dx * dx + dz * dz;
+    const curY = homeFire.position.y - dSq * curvatureVal;
+    fi.position.set(homeFire.position.x, curY + 0.9, homeFire.position.z);
     const sc = fireIconScale(camera.position.distanceTo(fi.position));
     fi.scale.set(sc, sc, 1);
     fi.visible = true;
@@ -5500,8 +5511,11 @@ function syncDetailIcons() {
       scene.add(ic);
       extraFireIcons.set(f, ic);
     }
-    ic.position.copy(f.position);
-    ic.position.y += 0.9;
+    const dx = f.position.x - camT.x;
+    const dz = f.position.z - camT.z;
+    const dSq = dx * dx + dz * dz;
+    const curY = f.position.y - dSq * curvatureVal;
+    ic.position.set(f.position.x, curY + 0.9, f.position.z);
     const sc = fireIconScale(camera.position.distanceTo(ic.position));
     ic.scale.set(sc, sc, 1);
     ic.visible = true;
@@ -5509,10 +5523,13 @@ function syncDetailIcons() {
   for (const cm of cavemen) {
     const ic = ensureCmIcon(cm);
     if (!ic) continue;
-    ic.position.copy(cm.spr.position);
-    ic.position.y += 1.7; // float above the head: never hidden by their block
-    const sc = markerScale(camera.position.distanceTo(ic.position)) * 0.55;
-    ic.scale.set(sc, sc, 1);
+    const dx = cm.spr.position.x - camT.x;
+    const dz = cm.spr.position.z - camT.z;
+    const dSq = dx * dx + dz * dz;
+    const curY = cm.spr.position.y - dSq * curvatureVal;
+    ic.position.set(cm.spr.position.x, curY + cm.spr.scale.y + 0.35, cm.spr.position.z);
+    ic.scale.setScalar(markerScale(camera.position.distanceTo(ic.position)));
+    ic.scale.z = 1;
     ic.visible = true;
     if (cm.react) cm.react.spr.visible = false;
   }
@@ -11850,6 +11867,11 @@ function animate() {
     else if (rx < -CLOUD_RANGE) c.position.x += CLOUD_RANGE * 2;
     if (rz > CLOUD_RANGE) c.position.z -= CLOUD_RANGE * 2;
     else if (rz < -CLOUD_RANGE) c.position.z += CLOUD_RANGE * 2;
+
+    // Curve clouds downward along with planetary terrain horizon shader!
+    const distSq = rx * rx + rz * rz;
+    const baseY = c.userData.baseY || 80;
+    c.position.y = baseY - distSq * curvatureVal;
   }
 
   if (readout) {
