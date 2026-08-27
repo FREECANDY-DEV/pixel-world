@@ -963,14 +963,14 @@ waterMat.onBeforeCompile = (sh) => {
   sh.uniforms.uTime = { value: 0 };
   sh.uniforms.uOffset = { value: new THREE.Vector3() };
   sh.uniforms.uCurvature = { value: 0 };
-  sh.uniforms.uHomePos = { value: new THREE.Vector3(0, 0, 0) };
+  sh.uniforms.uCamTarget = { value: new THREE.Vector3(0, 0, 0) };
   sh.vertexShader =
-    'uniform float uTime;\nuniform vec3 uOffset;\nuniform float uCurvature;\nuniform vec3 uHomePos;\n' +
+    'uniform float uTime;\nuniform vec3 uOffset;\nuniform float uCurvature;\nuniform vec3 uCamTarget;\n' +
     sh.vertexShader.replace(
       '#include <begin_vertex>',
       `#include <begin_vertex>
        vec4 wPos = modelMatrix * vec4(position, 1.0);
-       vec2 distVec = vec2(wPos.x - uHomePos.x, wPos.z - uHomePos.z);
+       vec2 distVec = vec2(wPos.x - uCamTarget.x, wPos.z - uCamTarget.z);
        float distSq = dot(distVec, distVec);
        transformed.z -= distSq * uCurvature;
        transformed.z += sin((position.x + uOffset.x) * 0.045 + uTime * 1.6) * 0.09
@@ -1451,14 +1451,14 @@ chunkMat.onBeforeCompile = (shader) => {
   shader.uniforms.uParched = { value: 0 };
   shader.uniforms.uAtlasW = { value: 1 / BT_COLS };
   shader.uniforms.uCurvature = { value: 0 };
-  shader.uniforms.uHomePos = { value: new THREE.Vector3(0, 0, 0) };
+  shader.uniforms.uCamTarget = { value: new THREE.Vector3(0, 0, 0) };
   chunkMat.userData.shader = shader;
   // --- vertex shader: pass AO + worldY + smooth normal to fragment ---
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', [
       '#include <common>',
       'uniform float uCurvature;',
-      'uniform vec3 uHomePos;',
+      'uniform vec3 uCamTarget;',
       'attribute float ao;',
       'varying float vAO;',
       'varying float vWorldY;',
@@ -1469,7 +1469,7 @@ chunkMat.onBeforeCompile = (shader) => {
       '#include <begin_vertex>',
       `#include <begin_vertex>
        vec4 wPos = modelMatrix * vec4(position, 1.0);
-       vec2 distVec = vec2(wPos.x - uHomePos.x, wPos.z - uHomePos.z);
+       vec2 distVec = vec2(wPos.x - uCamTarget.x, wPos.z - uCamTarget.z);
        float distSq = dot(distVec, distVec);
        transformed.y -= distSq * uCurvature;`
     );
@@ -1651,27 +1651,26 @@ function syncChunks(force = false) {
   if (spaceMode) return; // planet view: no terrain streaming
   const c = centerChunk();
   
-  // Calculate dynamic render radius based on camera zoom distance
-  const currentDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
-  const zoomMult = Math.min(4.5, Math.max(1.0, currentDist / 150));
-  const effectiveRadius = Math.min(128, Math.ceil(RENDER_RADIUS * zoomMult));
-
   // Dynamically expand camera far plane so far map is never clipped
+  const currentDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
   const targetFar = Math.max(5000, currentDist * 4.0);
   if (typeof camera !== 'undefined' && camera && camera.far !== targetFar) {
     camera.far = targetFar;
     camera.updateProjectionMatrix();
   }
 
-  if (!force && lastChunk && lastChunk.x === c.x && lastChunk.z === c.z && lastChunk.rad === effectiveRadius) return;
-  lastChunk = { x: c.x, z: c.z, rad: effectiveRadius };
+  const effectiveRadius = RENDER_RADIUS;
+  if (!force && lastChunk && lastChunk.x === c.x && lastChunk.z === c.z) return;
+  lastChunk = { x: c.x, z: c.z };
 
   const needed = new Map();
-  const rad2 = effectiveRadius * effectiveRadius;
+  const MAX_ISLAND_R2 = 190 * 190;
   for (let dx = -effectiveRadius; dx <= effectiveRadius; dx++) {
     for (let dz = -effectiveRadius; dz <= effectiveRadius; dz++) {
-      if (dx * dx + dz * dz > rad2) continue; // Circular map boundary radius check
       const cx = c.x + dx, cz = c.z + dz;
+      const wx = (cx * CHUNK + CHUNK / 2) - homePos.x;
+      const wz = (cz * CHUNK + CHUNK / 2) - homePos.z;
+      if (wx * wx + wz * wz > MAX_ISLAND_R2) continue; // Pure 190u Circular Island Boundary!
       needed.set(cx + ',' + cz, requiredLod(cx, cz, c));
     }
   }
@@ -4095,7 +4094,7 @@ const treeMat = new THREE.ShaderMaterial({
     uInvW: { value: 1 / (ATLAS_CELL * ATLAS_COLS) },
     uInvH: { value: 1 / (ATLAS_CELL * ATLAS_ROWS) },
     uCurvature: { value: 0 },
-    uHomePos: { value: new THREE.Vector3(0, 0, 0) },
+    uCamTarget: { value: new THREE.Vector3(0, 0, 0) },
   },
   vertexShader: `
     attribute vec3 iPos;
@@ -4115,7 +4114,7 @@ const treeMat = new THREE.ShaderMaterial({
     uniform float uWindPow;
     uniform float uWindAng;
     uniform float uCurvature;
-    uniform vec3 uHomePos;
+    uniform vec3 uCamTarget;
     float hash21(vec2 p) {
       p = fract(p * vec2(123.34, 345.45));
       p += dot(p, p + 34.345);
@@ -4151,8 +4150,8 @@ const treeMat = new THREE.ShaderMaterial({
       vec3 bendWorld = vec3(wdir.x, 0.0, wdir.y) * (flutter * lmag * position.y * iH * 0.14);
       vec3 basePos = iPos + vec3(0.0, 0.08 + aLift * 0.32, 0.0) + bendWorld;
 
-      // Planetary Curvature: bend instanced flora downward as distance from world center increases
-      vec2 distVec = vec2(basePos.x - uHomePos.x, basePos.z - uHomePos.z);
+      // Planetary Curvature: bend instanced flora downward as distance from camera target increases
+      vec2 distVec = vec2(basePos.x - uCamTarget.x, basePos.z - uCamTarget.z);
       float distSq = dot(distVec, distVec);
       basePos.y -= distSq * uCurvature;
       // Transform base anchor position (top of block) into view space (Exact THREE.Sprite alignment)
@@ -5072,9 +5071,9 @@ function ensureChunkIcons(ch) {
   const count = col.length;
   if (count === 0) return;
 
-  // Cluster nearby tree positions onto a 28x28 spatial grid cell so zoomed-out view shows merged grove markers
+  // Cluster nearby tree positions onto an 80x80 spatial grid cell so zoomed-out view shows sparse merged grove markers
   const clusters = new Map();
-  const CELL_SIZE = 28.0;
+  const CELL_SIZE = 80.0;
 
   for (let i = 0; i < count; i++) {
     const px = pos[i * 3];
@@ -5472,14 +5471,14 @@ function syncDetailIcons() {
   const camDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
   const isTopView = (controls && controls.target && Math.abs(camera.position.x - controls.target.x) < 5 && Math.abs(camera.position.z - controls.target.z) < 5 && (camera.position.y - controls.target.y) > 40);
 
-  // Aggressive exponential zoom stride: thins out visible icons drastically down to 3%-10% when zoomed out
-  const zoomFactor = Math.max(0, (camDist - 85) / 32);
-  const zoomStride = Math.max(1, Math.floor(1 + Math.pow(zoomFactor, 1.8) * 3.2));
+  // Super aggressive exponential zoom stride: thins out tree icons down to ~1% - 3% when zoomed out
+  const zoomFactor = Math.max(0, (camDist - 85) / 18);
+  const zoomStride = Math.max(1, Math.floor(1 + Math.pow(zoomFactor, 2.2) * 12.0));
 
   for (const ch of chunks.values()) {
     if (ch.icons && ch.icons.geometry) {
       const totalPts = ch.icons.geometry.attributes.position.count;
-      const visiblePts = Math.max(1, Math.floor(totalPts / zoomStride));
+      const visiblePts = Math.floor(totalPts / zoomStride);
       ch.icons.geometry.setDrawRange(0, visiblePts);
     }
   }
@@ -5669,14 +5668,41 @@ function ensureMoon() {
   scene.add(moonPivot);
 }
 
-// --- Real Proportional Solar System Background Planets Orbiting in Space ---
+// --- Professional Solar System with Central Sun, Orbital Path Rings & Real Proportional Planets ---
 let solarSystemGroup = null;
 
 function ensureSolarSystem() {
   if (solarSystemGroup) return;
   solarSystemGroup = new THREE.Group();
 
+  // 0. Central 3D Glowing Solar Sun
+  const sunGeom = new THREE.SphereGeometry(PLANET_R * 2.6, 32, 24);
+  const sunMat = new THREE.MeshBasicMaterial({ color: 0xfffae0, fog: false });
+  const sunMesh = new THREE.Mesh(sunGeom, sunMat);
+  solarSystemGroup.add(sunMesh);
+
+  // Add solar corona flare sprite at Sun core
+  const coronaSpr = sunSprite.clone();
+  coronaSpr.visible = true;
+  coronaSpr.scale.setScalar(PLANET_R * 14.0);
+  solarSystemGroup.add(coronaSpr);
+
+  const addOrbitRing = (dist, col = 0xffe8a0) => {
+    const ringGeom = new THREE.RingGeometry(dist - 0.7, dist + 0.7, 128);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: col,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.32,
+      fog: false,
+    });
+    const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+    ringMesh.rotation.x = Math.PI / 2;
+    solarSystemGroup.add(ringMesh);
+  };
+
   const makePlanet = (r, col, dist, speed, tilt = 0, roughness = 0.8) => {
+    addOrbitRing(dist);
     const pMat = new THREE.MeshStandardMaterial({
       color: col,
       roughness: roughness,
@@ -5695,32 +5721,33 @@ function ensureSolarSystem() {
 
   // Real Proportional Planet Scale Ratios relative to Earth (PLANET_R = 60u):
   // 1. Mercury (0.38 Earth radius)
-  makePlanet(PLANET_R * 0.38, 0x8c8c88, PLANET_R * 2.3, 0.35, 0.03);
+  makePlanet(PLANET_R * 0.38, 0x9c9c96, PLANET_R * 4.5, 0.35, 0.03);
 
   // 2. Venus (0.95 Earth radius)
-  makePlanet(PLANET_R * 0.95, 0xe3bb76, PLANET_R * 3.8, 0.24, 0.05);
+  makePlanet(PLANET_R * 0.95, 0xe8c687, PLANET_R * 7.2, 0.24, 0.05);
 
-  // (Earth + Moon are in globe.group at PLANET_R * 1.0)
+  // 3. Earth Orbit Path Ring (Earth + Moon are in globe.group)
+  addOrbitRing(PLANET_R * 10.5, 0x88ccff);
 
-  // 3. Mars (0.53 Earth radius)
-  makePlanet(PLANET_R * 0.53, 0xc1440e, PLANET_R * 5.6, -0.18, -0.15);
+  // 4. Mars (0.53 Earth radius)
+  makePlanet(PLANET_R * 0.53, 0xd24d15, PLANET_R * 14.8, -0.18, -0.15);
 
-  // 4. Jupiter (11.2x Earth radius -> 4.8x scaled for view)
-  makePlanet(PLANET_R * 4.8, 0xd8a070, PLANET_R * 11.8, 0.08, 0.05);
+  // 5. Jupiter (11.2x Earth radius -> 4.8x scaled for view)
+  makePlanet(PLANET_R * 4.8, 0xdca878, PLANET_R * 22.0, 0.08, 0.05);
 
-  // 5. Saturn (9.5x Earth radius -> 4.1x scaled for view)
-  const sat = makePlanet(PLANET_R * 4.1, 0xe4d090, PLANET_R * 18.8, -0.05, 0.45);
+  // 6. Saturn (9.5x Earth radius -> 4.1x scaled for view)
+  const sat = makePlanet(PLANET_R * 4.1, 0xe8d598, PLANET_R * 31.0, -0.05, 0.45);
   const ringGeom = new THREE.RingGeometry(PLANET_R * 5.2, PLANET_R * 8.5, 32);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0xcbb682, side: THREE.DoubleSide, transparent: true, opacity: 0.75, fog: false });
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xd4be88, side: THREE.DoubleSide, transparent: true, opacity: 0.78, fog: false });
   const ringMesh = new THREE.Mesh(ringGeom, ringMat);
   ringMesh.rotation.x = Math.PI / 2.2;
   sat.userData.pMesh.add(ringMesh);
 
-  // 6. Uranus (4.0x Earth radius -> 2.2x scaled)
-  makePlanet(PLANET_R * 2.2, 0x76d7ea, PLANET_R * 25.5, 0.03, 0.85);
+  // 7. Uranus (4.0x Earth radius -> 2.2x scaled)
+  makePlanet(PLANET_R * 2.2, 0x7de0f2, PLANET_R * 40.0, 0.03, 0.85);
 
-  // 7. Neptune (3.9x Earth radius -> 2.1x scaled)
-  makePlanet(PLANET_R * 2.1, 0x2e52b2, PLANET_R * 32.0, -0.02, 0.30);
+  // 8. Neptune (3.9x Earth radius -> 2.1x scaled)
+  makePlanet(PLANET_R * 2.1, 0x3258c4, PLANET_R * 48.0, -0.02, 0.30);
 
   solarSystemGroup.visible = false;
   scene.add(solarSystemGroup);
@@ -11411,21 +11438,22 @@ function animate() {
   const curveK = THREE.MathUtils.clamp((curDist - 85) / 280, 0, 1);
   const curvatureVal = curveK * 0.00028;
 
+  const camT = (typeof controls !== 'undefined' && controls && controls.target) ? controls.target : homePos;
   treeMat.uniforms.uCurvature.value = curvatureVal;
-  if (treeMat.uniforms.uHomePos) treeMat.uniforms.uHomePos.value.set(homePos.x, 0, homePos.z);
+  if (treeMat.uniforms.uCamTarget) treeMat.uniforms.uCamTarget.value.set(camT.x, 0, camT.z);
 
   if (chunkMat.userData.shader) {
     chunkMat.userData.shader.uniforms.uCurvature.value = curvatureVal;
-    if (chunkMat.userData.shader.uniforms.uHomePos) {
-      chunkMat.userData.shader.uniforms.uHomePos.value.set(homePos.x, 0, homePos.z);
+    if (chunkMat.userData.shader.uniforms.uCamTarget) {
+      chunkMat.userData.shader.uniforms.uCamTarget.value.set(camT.x, 0, camT.z);
     }
   }
   water.position.x = homePos.x;
   water.position.z = homePos.z;
   if (waterMat.userData.shader) {
     waterMat.userData.shader.uniforms.uCurvature.value = curvatureVal;
-    if (waterMat.userData.shader.uniforms.uHomePos) {
-      waterMat.userData.shader.uniforms.uHomePos.value.set(homePos.x, 0, homePos.z);
+    if (waterMat.userData.shader.uniforms.uCamTarget) {
+      waterMat.userData.shader.uniforms.uCamTarget.value.set(camT.x, 0, camT.z);
     }
   }
 
