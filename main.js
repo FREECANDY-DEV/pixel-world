@@ -5063,9 +5063,9 @@ function ensureChunkIcons(ch) {
   const count = col.length;
   if (count === 0) return;
 
-  // Cluster nearby tree positions onto an 80x80 spatial grid cell so zoomed-out view shows sparse merged grove markers
+  // Cluster nearby tree positions onto a 32x32 spatial grid cell so zoomed-out view shows crisp merged grove markers
   const clusters = new Map();
-  const CELL_SIZE = 80.0;
+  const CELL_SIZE = 32.0;
 
   for (let i = 0; i < count; i++) {
     const px = pos[i * 3];
@@ -5463,14 +5463,14 @@ function syncDetailIcons() {
   const camDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
   const isTopView = (controls && controls.target && Math.abs(camera.position.x - controls.target.x) < 5 && Math.abs(camera.position.z - controls.target.z) < 5 && (camera.position.y - controls.target.y) > 40);
 
-  // Super aggressive exponential zoom stride: thins out tree icons down to ~1% - 3% when zoomed out
-  const zoomFactor = Math.max(0, (camDist - 85) / 18);
-  const zoomStride = Math.max(1, Math.floor(1 + Math.pow(zoomFactor, 2.2) * 12.0));
+  // Smooth exponential zoom stride: thins out dense tree icons while guaranteeing regional markers remain visible
+  const zoomFactor = Math.max(0, (camDist - 85) / 25);
+  const zoomStride = Math.max(1, Math.floor(1 + Math.pow(zoomFactor, 1.6) * 3.5));
 
   for (const ch of chunks.values()) {
     if (ch.icons && ch.icons.geometry) {
       const totalPts = ch.icons.geometry.attributes.position.count;
-      const visiblePts = Math.floor(totalPts / zoomStride);
+      const visiblePts = Math.max(1, Math.floor(totalPts / zoomStride));
       ch.icons.geometry.setDrawRange(0, visiblePts);
     }
   }
@@ -5483,10 +5483,7 @@ function syncDetailIcons() {
     ic.position.y += s.sprA.scale.y + 1.6;
     ic.scale.setScalar(markerScale(camera.position.distanceTo(ic.position)));
     ic.scale.z = 1;
-    // Calculate grid height of item to handle top-view visibility + zoom density stride
-    const gridH = s.gridH || (s.sprA ? s.sprA.scale.y : 1);
-    const passZoomStride = (idx % zoomStride === 0);
-    ic.visible = (!isTopView || gridH >= 1.5) && passZoomStride;
+    ic.visible = true; // All placed assets and trees are 100% visible on map zoom out!
   }
   const fi = ensureHomeFireIcon();
   if (fi && homeFire) {
