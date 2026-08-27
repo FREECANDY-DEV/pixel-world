@@ -10183,24 +10183,49 @@ async function triggerGrunkCinematicSequence() {
   const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x, groundYAt(homePos.x, homePos.z), homePos.z);
   const playerPos = meSpr ? meSpr.position.clone() : new THREE.Vector3(homePos.x + 3, groundYAt(homePos.x + 3, homePos.z + 3), homePos.z + 3);
 
-  // STEP 1: Zoom camera directly onto Grunk's face (Holographic Human Face Framing)
-  const grunkTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 2.35, grunkPos.z);
-  const grunkCamPos = new THREE.Vector3(grunkPos.x + 0.45, grunkPos.y + 2.35, grunkPos.z + 1.15);
+  // STEP 1: Zoom camera directly onto Grunk's face (Holographic Human Face Centered)
+  const getGrunkFaceTgt = () => {
+    const curSpr = demoState.botGhost ? demoState.botGhost.spr : grunkSpr;
+    const p = curSpr ? curSpr.position : grunkPos;
+    return new THREE.Vector3(p.x, p.y + 2.45, p.z);
+  };
+  const getGrunkCamPos = () => {
+    const tgt = getGrunkFaceTgt();
+    return new THREE.Vector3(tgt.x, tgt.y, tgt.z + 1.45);
+  };
 
-  tweenCameraToExplicit(grunkTgt, grunkCamPos, 1.1);
+  tweenCameraToExplicit(getGrunkFaceTgt(), getGrunkCamPos(), 1.1);
   await new Promise(r => setTimeout(r, 1100));
 
-  // STEP 2: Grunk speaks subtitles (Holographic Talking Animation Active)
+  // STEP 2: Grunk speaks subtitles (Live Holographic Face Lock Active)
   grunkIsTalking = true;
+  const grunkTrackInterval = setInterval(() => {
+    if (!cinematicActive || !grunkIsTalking) {
+      clearInterval(grunkTrackInterval);
+      return;
+    }
+    const tgt = getGrunkFaceTgt();
+    controls.target.copy(tgt);
+    camera.position.set(tgt.x, tgt.y, tgt.z + 1.45);
+  }, 16);
+
   await showSubtitle('Greetings Traveler! This project is actively under development!', 3600);
   await showSubtitle('Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
   grunkIsTalking = false;
+  clearInterval(grunkTrackInterval);
 
-  // STEP 3: Transition camera directly onto Player's face (Hazmat Suit Face Framing)
-  const playerTgt = new THREE.Vector3(playerPos.x, playerPos.y + 2.1, playerPos.z);
-  const playerCamPos = new THREE.Vector3(playerPos.x - 0.45, playerPos.y + 2.1, playerPos.z + 1.15);
+  // STEP 3: Transition camera directly onto Player's face (Hazmat Suit Face Centered)
+  const getPlayerFaceTgt = () => {
+    const curSpr = (demoState.me && demoState.me.spr) ? demoState.me.spr : (selectedCm ? selectedCm.spr : meSpr);
+    const p = curSpr ? curSpr.position : playerPos;
+    return new THREE.Vector3(p.x, p.y + 2.25, p.z);
+  };
+  const getPlayerCamPos = () => {
+    const tgt = getPlayerFaceTgt();
+    return new THREE.Vector3(tgt.x, tgt.y, tgt.z + 1.45);
+  };
 
-  tweenCameraToExplicit(playerTgt, playerCamPos, 1.1);
+  tweenCameraToExplicit(getPlayerFaceTgt(), getPlayerCamPos(), 1.1);
   await new Promise(r => setTimeout(r, 1100));
 
   // STEP 4: Player says "OK, I will!"
