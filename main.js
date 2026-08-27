@@ -10378,7 +10378,7 @@ function getGrunkFaceTgt() {
 
 function getGrunkCamPos() {
   const tgt = getGrunkFaceTgt();
-  return new THREE.Vector3(tgt.x, tgt.y, tgt.z + 1.85);
+  return new THREE.Vector3(tgt.x, tgt.y + 0.25, tgt.z + 3.4);
 }
 
 function getPlayerFaceTgt() {
@@ -10389,7 +10389,7 @@ function getPlayerFaceTgt() {
 
 function getPlayerCamPos() {
   const tgt = getPlayerFaceTgt();
-  return new THREE.Vector3(tgt.x, tgt.y + 0.1, tgt.z - 1.85);
+  return new THREE.Vector3(tgt.x, tgt.y + 0.25, tgt.z - 3.4);
 }
 
 function tweenCameraToExplicit(toT, toP, durSec = 1.1) {
