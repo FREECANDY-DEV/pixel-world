@@ -5542,6 +5542,39 @@ let prevDesired = null;
 
 // --- space dressing: a blazing distant sun + a moon circling the earth -----
 // --- space dressing: a massive blazing sun + solar system planets + deep space starfield -----
+// --- space dressing: a massive blazing sun + real-proportional solar system + textured starfield -----
+
+function makeStarTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const g = c.getContext('2d');
+  
+  // Radial glow core
+  const grad = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+  grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+  grad.addColorStop(0.2, 'rgba(230, 240, 255, 0.9)');
+  grad.addColorStop(0.5, 'rgba(180, 210, 255, 0.4)');
+  grad.addColorStop(1, 'rgba(140, 180, 255, 0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 64, 64);
+  
+  // 4-point lens diffraction star flare spikes
+  g.fillStyle = 'rgba(255, 255, 255, 0.75)';
+  // Horizontal spike
+  g.beginPath();
+  g.moveTo(4, 32); g.lineTo(60, 32); g.lineTo(32, 30); g.lineTo(32, 34);
+  g.closePath(); g.fill();
+  // Vertical spike
+  g.beginPath();
+  g.moveTo(32, 4); g.lineTo(32, 60); g.lineTo(30, 32); g.lineTo(34, 32);
+  g.closePath(); g.fill();
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+const starTex = makeStarTexture();
+
 const sunSprite = (() => {
   const c = document.createElement('canvas');
   c.width = c.height = 256;
@@ -5618,8 +5651,9 @@ function ensureMoon() {
   if (moonPivot) return;
   if (!moonTex) moonTex = makeMoonTexture();
   moonPivot = new THREE.Group();
+  // Moon: real size is 0.27x Earth radius
   const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(PLANET_R * 0.16, 20, 14),
+    new THREE.SphereGeometry(PLANET_R * 0.27, 20, 14),
     new THREE.MeshStandardMaterial({
       map: moonTex,
       roughness: 1,
@@ -5627,44 +5661,65 @@ function ensureMoon() {
       fog: false,
     })
   );
-  moon.position.set(PLANET_R * 1.75, 0, 0);
+  moon.position.set(PLANET_R * 1.95, 0, 0);
   moonPivot.add(moon);
   moonPivot.rotation.z = 0.16; // slight orbital tilt
   moonPivot.visible = false;
   scene.add(moonPivot);
 }
 
-// --- Solar System Background Planets Orbiting in Space ---
+// --- Real Proportional Solar System Background Planets Orbiting in Space ---
 let solarSystemGroup = null;
 
 function ensureSolarSystem() {
   if (solarSystemGroup) return;
   solarSystemGroup = new THREE.Group();
 
-  const makePlanet = (r, col, dist, speed, tilt = 0) => {
-    const pMat = new THREE.MeshBasicMaterial({ color: col, fog: false });
-    const pMesh = new THREE.Mesh(new THREE.SphereGeometry(r, 16, 12), pMat);
+  const makePlanet = (r, col, dist, speed, tilt = 0, roughness = 0.8) => {
+    const pMat = new THREE.MeshStandardMaterial({
+      color: col,
+      roughness: roughness,
+      metalness: 0.1,
+      fog: false,
+    });
+    const pMesh = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 18), pMat);
     const pPivot = new THREE.Group();
     pMesh.position.set(dist, 0, 0);
     pPivot.add(pMesh);
     pPivot.rotation.z = tilt;
-    pPivot.userData = { speed, pMesh };
+    pPivot.userData = { speed, pMesh, r };
     solarSystemGroup.add(pPivot);
     return pPivot;
   };
 
-  // Venus (golden), Mars (red), Jupiter (gas giant), Saturn (ringed)
-  makePlanet(PLANET_R * 0.18, 0xe8c87d, PLANET_R * 2.8, 0.22, 0.08); // Venus
-  makePlanet(PLANET_R * 0.15, 0xd14e32, PLANET_R * 4.2, -0.15, -0.12); // Mars
-  makePlanet(PLANET_R * 0.38, 0xd6a77a, PLANET_R * 6.5, 0.08, 0.05); // Jupiter
+  // Real Proportional Planet Scale Ratios relative to Earth (PLANET_R = 60u):
+  // 1. Mercury (0.38 Earth radius)
+  makePlanet(PLANET_R * 0.38, 0x8c8c88, PLANET_R * 2.3, 0.35, 0.03);
 
-  // Saturn ringed gas giant
-  const sat = makePlanet(PLANET_R * 0.32, 0xe3c988, PLANET_R * 9.2, -0.05, 0.25);
-  const ringGeom = new THREE.RingGeometry(PLANET_R * 0.42, PLANET_R * 0.68, 24);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0xc8b078, side: THREE.DoubleSide, transparent: true, opacity: 0.7, fog: false });
+  // 2. Venus (0.95 Earth radius)
+  makePlanet(PLANET_R * 0.95, 0xe3bb76, PLANET_R * 3.8, 0.24, 0.05);
+
+  // (Earth + Moon are in globe.group at PLANET_R * 1.0)
+
+  // 3. Mars (0.53 Earth radius)
+  makePlanet(PLANET_R * 0.53, 0xc1440e, PLANET_R * 5.6, -0.18, -0.15);
+
+  // 4. Jupiter (11.2x Earth radius -> 4.8x scaled for view)
+  makePlanet(PLANET_R * 4.8, 0xd8a070, PLANET_R * 11.8, 0.08, 0.05);
+
+  // 5. Saturn (9.5x Earth radius -> 4.1x scaled for view)
+  const sat = makePlanet(PLANET_R * 4.1, 0xe4d090, PLANET_R * 18.8, -0.05, 0.45);
+  const ringGeom = new THREE.RingGeometry(PLANET_R * 5.2, PLANET_R * 8.5, 32);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xcbb682, side: THREE.DoubleSide, transparent: true, opacity: 0.75, fog: false });
   const ringMesh = new THREE.Mesh(ringGeom, ringMat);
-  ringMesh.rotation.x = Math.PI / 2.3;
+  ringMesh.rotation.x = Math.PI / 2.2;
   sat.userData.pMesh.add(ringMesh);
+
+  // 6. Uranus (4.0x Earth radius -> 2.2x scaled)
+  makePlanet(PLANET_R * 2.2, 0x76d7ea, PLANET_R * 25.5, 0.03, 0.85);
+
+  // 7. Neptune (3.9x Earth radius -> 2.1x scaled)
+  makePlanet(PLANET_R * 2.1, 0x2e52b2, PLANET_R * 32.0, -0.02, 0.30);
 
   solarSystemGroup.visible = false;
   scene.add(solarSystemGroup);
@@ -5686,7 +5741,7 @@ function updateSolarSystem(dt, gs) {
   }
 }
 
-// full-sphere starfield for the solar planet view (1,800+ twinkling stars)
+// full-sphere starfield with lens-flared star texture (1,800+ twinkling stars)
 const spaceDome = (() => {
   const n = 1800;
   const pos = new Float32Array(n * 3);
@@ -5702,13 +5757,15 @@ const spaceDome = (() => {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   const p = new THREE.Points(g, new THREE.PointsMaterial({
-    size: 2.1,
+    map: starTex,
+    size: 16,
     color: 0xffffff,
     transparent: true,
     opacity: 0,
     depthWrite: false,
+    blending: THREE.AdditiveBlending,
     fog: false,
-    sizeAttenuation: false,
+    sizeAttenuation: true,
   }));
   p.renderOrder = -6;
   p.frustumCulled = false;
@@ -6100,12 +6157,11 @@ function updateWorldLod(dt) {
     spaceDome.position.copy(camera.position);
     spaceDome.scale.setScalar(Math.min(2400, camera.far * 0.7));
     spaceDome.material.opacity = 1;
-    // sun: MASSIVE glowing solar titan motionless in deep space
+    // sun: MASSIVE radiant solar star motionless in deep celestial space
     sunSprite.visible = true;
-    sunSprite.position
-      .copy(globe.group.position)
-      .addScaledVector(SUN_SPACE_DIR, Math.min(3800, 1100 * Math.max(1, gs)));
-    const ss = Math.max(1600, 520 * gs); // MASSIVE Sun!
+    const sunDist = Math.min(2200, camera.far * 0.65);
+    sunSprite.position.copy(camera.position).addScaledVector(SUN_SPACE_DIR, sunDist);
+    const ss = Math.min(1800, camera.far * 0.45);
     sunSprite.scale.set(ss, ss, 1);
     // solar system planets orbiting in space
     updateSolarSystem(dt, gs);
