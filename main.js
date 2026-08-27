@@ -10079,6 +10079,7 @@ function tweenCameraToExplicit(toT, toP, durSec = 1.1) {
     fromP: camera.position.clone(),
     toP: toP.clone(),
   };
+  desiredDist = toP.distanceTo(toT);
 }
 
 async function triggerGrunkCinematicSequence() {
@@ -11043,8 +11044,8 @@ function animate() {
   controls.update();
 
   // apply the smoothed cinematic dolly: glide the radial distance toward
-  // the user's zoom intent every frame (paused during mode tweens)
-  if (!lodTween) {
+  // the user's zoom intent every frame (paused during mode tweens & cutscene camera moves)
+  if (!lodTween && !cinematicActive && !camTween) {
     const zOff = camera.position.clone().sub(controls.target);
     const zCur = Math.max(zOff.length(), 0.001);
     const zWant = THREE.MathUtils.damp(zCur, desiredDist, 6, dt);
