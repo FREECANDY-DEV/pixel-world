@@ -1254,16 +1254,18 @@ const moonDisc = new THREE.Sprite(new THREE.SpriteMaterial({
 moonDisc.scale.set(90, 90, 1);
 scene.add(moonDisc);
 
-// Stars — two layers for twinkle, fade with daylight/cloud cover
+// Stars — two layers for twinkle, spread across full 360-degree sphere (top and bottom)
 function makeStars(n, size, color) {
   const pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) {
-    const a = Math.random() * Math.PI * 2;
-    const y = 0.08 + Math.random() * 0.92;
-    const rxz = Math.sqrt(Math.max(0, 1 - y * y));
-    pos[i * 3] = Math.cos(a) * rxz * 820;
-    pos[i * 3 + 1] = y * 820;
-    pos[i * 3 + 2] = Math.sin(a) * rxz * 820;
+    const u = Math.random();
+    const v = Math.random();
+    const theta = u * 2.0 * Math.PI;
+    const phi = Math.acos(2.0 * v - 1.0);
+    const r = 850;
+    pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+    pos[i * 3 + 1] = r * Math.cos(phi);
+    pos[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -1281,8 +1283,8 @@ function makeStars(n, size, color) {
   scene.add(p);
   return p;
 }
-const starsA = makeStars(220, 1.6, 0xdfe8ff);
-const starsB = makeStars(140, 2.4, 0xffffff);
+const starsA = makeStars(550, 1.6, 0xdfe8ff);
+const starsB = makeStars(350, 2.4, 0xffffff);
 
 // Precipitation particles — one pool each for rain / snow / dust
 const FX_BOX = { w: 70, h: 42, d: 70 };
@@ -5370,7 +5372,7 @@ function ensureCmIcon(cm) {
 
 // --- zoom-stage state machine ----------------------------------------------
 
-const ICON_ENTER = 170, ICON_EXIT = 148;
+const ICON_ENTER = 135, ICON_EXIT = 115;
 const GLOBE_ENTER = 3500, GLOBE_EXIT = 2500;
 // once the pull-out crosses into space it glides here on its own — the user
 // doesn't have to keep scrolling to get the full framed planet
@@ -5936,7 +5938,7 @@ function setSpaceMode(on) {
 
 let lastLodDist = 0;
 function updateWorldLod(dt) {
-  if (!atlasBuilt || !iconAtlasBuilt) return;
+  if (!iconAtlasBuilt) buildIconAtlas();
 
   // active camera transition tween — runs across both modes so the ride
   // out to space and the dive back are one smooth continuous move
@@ -11122,10 +11124,10 @@ function animate() {
   skyCol.multiplyScalar(envDim);
 
   const fogDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
-  // Zoom space factor: smoothly ramps up to 1.0 as camera zooms out from 160u to 500u+
-  const zoomSpaceK = THREE.MathUtils.clamp((fogDist - 160) / 340, 0, 1);
-  const darkSpaceColor = new THREE.Color(0x040612);
-  skyCol.lerp(darkSpaceColor, zoomSpaceK * 0.92);
+  // Zoom space factor: smoothly ramps up to 1.0 as camera zooms out from 135u to 400u+
+  const zoomSpaceK = THREE.MathUtils.clamp((fogDist - 135) / 260, 0, 1);
+  const pitchBlack = new THREE.Color(0x000000);
+  skyCol.lerp(pitchBlack, zoomSpaceK);
 
   scene.background.copy(skyCol);
   scene.fog.color.copy(skyCol);
@@ -11173,7 +11175,7 @@ function animate() {
   treeMat.uniforms.uWindPow.value = Math.max(0, envWind - 1) * 0.055;
   windDirX = Math.cos(windAng);
   windDirZ = Math.sin(windAng);
-  water.material.color.copy(waterNight).lerp(waterDay, dayF);
+  water.material.color.copy(waterNight).lerp(waterDay, dayF).lerp(pitchBlack, zoomSpaceK * 0.95);
 
   const skyDist = Math.max(900, camera.position.distanceTo(controls.target) * 1.8);
   sunDisc.position.set(
