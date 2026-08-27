@@ -5040,9 +5040,9 @@ function ensureChunkIcons(ch) {
   const count = col.length;
   if (count === 0) return;
 
-  // Cluster nearby tree positions onto an 8x8 spatial grid cell so zoomed-out view shows merged grove markers
+  // Cluster nearby tree positions onto a 12x12 spatial grid cell so zoomed-out view shows merged grove markers
   const clusters = new Map();
-  const CELL_SIZE = 8.0;
+  const CELL_SIZE = 12.0;
 
   for (let i = 0; i < count; i++) {
     const px = pos[i * 3];
@@ -5437,18 +5437,32 @@ function setIconMode(on) {
 }
 
 function syncDetailIcons() {
+  const camDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
   const isTopView = (controls && controls.target && Math.abs(camera.position.x - controls.target.x) < 5 && Math.abs(camera.position.z - controls.target.z) < 5 && (camera.position.y - controls.target.y) > 40);
 
-  for (const s of placedTrees) {
+  // Dynamic zoom stride: as you zoom out further, icons thin out significantly into fewer regional markers
+  const zoomStride = Math.max(1, Math.floor(camDist / 130));
+
+  for (const ch of chunks.values()) {
+    if (ch.icons && ch.icons.geometry) {
+      const totalPts = ch.icons.geometry.attributes.position.count;
+      const visiblePts = Math.max(1, Math.floor(totalPts / zoomStride));
+      ch.icons.geometry.setDrawRange(0, visiblePts);
+    }
+  }
+
+  for (let idx = 0; idx < placedTrees.length; idx++) {
+    const s = placedTrees[idx];
     const ic = ensurePlacedIcon(s);
     if (!ic) continue;
     ic.position.copy(s.sprA.position);
     ic.position.y += s.sprA.scale.y + 1.6;
     ic.scale.setScalar(markerScale(camera.position.distanceTo(ic.position)));
     ic.scale.z = 1;
-    // Calculate grid height of item to handle top-view visibility
+    // Calculate grid height of item to handle top-view visibility + zoom density stride
     const gridH = s.gridH || (s.sprA ? s.sprA.scale.y : 1);
-    ic.visible = !isTopView || (gridH >= 1.5);
+    const passZoomStride = (idx % zoomStride === 0);
+    ic.visible = (!isTopView || gridH >= 1.5) && passZoomStride;
   }
   const fi = ensureHomeFireIcon();
   if (fi && homeFire) {
