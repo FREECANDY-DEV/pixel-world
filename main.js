@@ -10331,7 +10331,6 @@ function hideSubtitles() {
   }
 }
 
-let grunkIsTalking = false;
 let playerIsTalking = false;
 
 function getGrunkFaceTgt() {
