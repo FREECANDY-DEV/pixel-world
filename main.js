@@ -10800,10 +10800,6 @@ let mapGenLoaderActive = true;
 
 function animate() {
   requestAnimationFrame(animate);
-  if (mapGenLoaderActive) {
-    mapGenLoaderActive = false;
-    if (typeof window.dismissMapGenOverlay === 'function') window.dismissMapGenOverlay();
-  }
   const dt = Math.min(clock.getDelta(), 0.1);
   const t = clock.getElapsedTime();
 
