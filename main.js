@@ -10327,6 +10327,7 @@ function tweenCameraToExplicit(toT, toP, durSec = 1.1) {
 async function triggerGrunkCinematicSequence() {
   if (cinematicActive) return;
   cinematicActive = true;
+  controls.enabled = false;
 
   // Activate Cinematic Letterbox & Hide all UI elements
   setCinematicBars(true);
@@ -10374,6 +10375,7 @@ async function triggerGrunkCinematicSequence() {
     const camP = getGrunkCamPos();
     controls.target.copy(tgt);
     camera.position.copy(camP);
+    camera.lookAt(tgt);
   }, 16);
 
   await showSubtitle('Greetings Traveler! This project is actively under development!', 3600);
@@ -10406,6 +10408,8 @@ async function triggerGrunkCinematicSequence() {
   tweenCameraToExplicit(origTarget, origPos, 1.1);
   await new Promise(r => setTimeout(r, 1100));
 
+  controls.enabled = true;
+  controls.update();
   cinematicActive = false;
 }
 window.triggerGrunkCutscene = triggerGrunkCinematicSequence;
