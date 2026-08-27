@@ -5394,10 +5394,10 @@ function ensureCmIcon(cm) {
 // --- zoom-stage state machine ----------------------------------------------
 
 const ICON_ENTER = 90, ICON_EXIT = 75;
-const GLOBE_ENTER = 3500, GLOBE_EXIT = 2500;
+const GLOBE_ENTER = 380, GLOBE_EXIT = 280;
 // once the pull-out crosses into space it glides here on its own — the user
 // doesn't have to keep scrolling to get the full framed planet
-const SPACE_SETTLE_DIST = 4500;
+const SPACE_SETTLE_DIST = 1600;
 let iconMode = false;
 let spaceMode = false;
 let lodTween = null;
@@ -6193,9 +6193,26 @@ function setSpaceMode(on) {
     // planet centre so the camp stays centred while the earth shrinks
     controls.target.set(homePos.x, 0, homePos.z);
     snapZoom();
-    // complete the zoom-out automatically: the cinematic dolly keeps easing
-    // outward until the whole planet sits framed in view
-    desiredDist = Math.max(desiredDist, SPACE_SETTLE_DIST);
+    // complete the zoom-out automatically: smooth cinematic dolly glides camera outward into deep space
+    const dir = camera.position.clone().sub(controls.target);
+    dir.y = 0;
+    if (dir.lengthSq() < 1e-4) dir.set(0, 0, 1);
+    dir.normalize();
+    const spaceCamPos = new THREE.Vector3(
+      homePos.x + dir.x * 1100,
+      1200,
+      homePos.z + dir.z * 1100
+    );
+    lodTween = {
+      t: 0,
+      toSpace: true,
+      fromT: controls.target.clone(),
+      toT: new THREE.Vector3(homePos.x, 0, homePos.z),
+      fromC: camera.position.clone(),
+      toC: spaceCamPos,
+    };
+    controls.enabled = false;
+    desiredDist = SPACE_SETTLE_DIST;
   } else {
     // smooth dive back: keep the planet/space look until halfway down,
     // then swap the world in while the camera is already moving fast
@@ -6225,7 +6242,7 @@ function updateWorldLod(dt) {
   // active camera transition tween — runs across both modes so the ride
   // out to space and the dive back are one smooth continuous move
   if (lodTween) {
-    lodTween.t = Math.min(1, lodTween.t + dt / (lodTween.out ? 1.5 : 0.9));
+    lodTween.t = Math.min(1, lodTween.t + dt / (lodTween.toSpace ? 1.1 : (lodTween.out ? 1.5 : 0.9)));
     const k = lodTween.t * lodTween.t * (3 - 2 * lodTween.t);
     // cloud wash: rises fast, covers the world/planet swap, falls away
     setCloudFade(cloudEnv(lodTween.t));
