@@ -10073,9 +10073,9 @@ async function triggerGrunkCinematicSequence() {
   const grunkPos = grunkSpr ? grunkSpr.position.clone() : new THREE.Vector3(homePos.x, groundYAt(homePos.x, homePos.z), homePos.z);
   const playerPos = meSpr ? meSpr.position.clone() : new THREE.Vector3(homePos.x + 3, groundYAt(homePos.x + 3, homePos.z + 3), homePos.z + 3);
 
-  // STEP 1: Zoom camera CLOSE to Grunk (Holographic Bot)
-  const grunkTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 1.4, grunkPos.z);
-  const grunkCamPos = new THREE.Vector3(grunkPos.x + 0.85, grunkPos.y + 1.5, grunkPos.z + 1.35);
+  // STEP 1: Zoom camera directly onto Grunk's face (Holographic Human Face Framing)
+  const grunkTgt = new THREE.Vector3(grunkPos.x, grunkPos.y + 2.35, grunkPos.z);
+  const grunkCamPos = new THREE.Vector3(grunkPos.x + 0.45, grunkPos.y + 2.35, grunkPos.z + 1.15);
 
   tweenCameraToExplicit(grunkTgt, grunkCamPos, 1.1);
   await new Promise(r => setTimeout(r, 1100));
@@ -10086,9 +10086,9 @@ async function triggerGrunkCinematicSequence() {
   await showSubtitle('Starring on GitHub ⭐ and donations 💖 will greatly help accelerate the development of Pixel World!', 4400);
   grunkIsTalking = false;
 
-  // STEP 3: Transition camera CLOSE to Player (Hazmat Suit)
-  const playerTgt = new THREE.Vector3(playerPos.x, playerPos.y + 1.4, playerPos.z);
-  const playerCamPos = new THREE.Vector3(playerPos.x - 0.85, playerPos.y + 1.5, playerPos.z + 1.35);
+  // STEP 3: Transition camera directly onto Player's face (Hazmat Suit Face Framing)
+  const playerTgt = new THREE.Vector3(playerPos.x, playerPos.y + 2.1, playerPos.z);
+  const playerCamPos = new THREE.Vector3(playerPos.x - 0.45, playerPos.y + 2.1, playerPos.z + 1.15);
 
   tweenCameraToExplicit(playerTgt, playerCamPos, 1.1);
   await new Promise(r => setTimeout(r, 1100));
