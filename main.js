@@ -958,11 +958,11 @@ const waterMat = new THREE.MeshStandardMaterial({
   opacity: 0.76,
   roughness: 0.16,
   metalness: 0.18,
-  depthWrite: false,   // no blend-order flicker against the shoreline
+  depthWrite: true,    // write to depth buffer so terrain blocks cleanly occlude water
   depthTest: true,
   polygonOffset: true, // push water depth behind solid land blocks to prevent land overflow
-  polygonOffsetFactor: 1.0,
-  polygonOffsetUnits: 4.0,
+  polygonOffsetFactor: 2.0,
+  polygonOffsetUnits: 8.0,
   fog: false,          // prevent fog from fading ocean water into pitch black on zoom-out
 });
 // Multi-harmonic smooth wave systems (individual waves for oceans, lakes, ponds & rivers)
@@ -1000,7 +1000,8 @@ waterMat.onBeforeCompile = (sh) => {
 // Circular ocean disk geometry with high subdivision for seamless horizon curves
 const water = new THREE.Mesh(new THREE.CircleGeometry(3200, 128), waterMat);
 water.rotation.x = -Math.PI / 2;
-water.position.set(0, SEA_LEVEL - 0.15, 0);
+water.position.set(0, SEA_LEVEL - 0.25, 0);
+water.renderOrder = -1; // render water BEFORE terrain so solid land blocks ALWAYS draw cleanly on top
 scene.add(water);
 
 // Atmospheric Horizon Haze Ring (blends the distant terrain/ocean boundary into space/sky)
@@ -11699,10 +11700,10 @@ function animate() {
   skyCol.multiplyScalar(envDim);
 
   const fogDist = (typeof camera !== 'undefined' && camera && controls && controls.target) ? camera.position.distanceTo(controls.target) : 100;
-  // Deep atmospheric blue sky tone on zoom-out (never pitch black in map view)
-  const zoomSpaceK = THREE.MathUtils.clamp((fogDist - 135) / 260, 0, 1);
-  const spaceBlueSky = new THREE.Color(0x0c1e36);
-  skyCol.lerp(spaceBlueSky, zoomSpaceK * 0.75);
+  // Darken sky sooner on zoom-out (starting at 70u, fully dark space tone by 200u)
+  const zoomSpaceK = THREE.MathUtils.clamp((fogDist - 70) / 130, 0, 1);
+  const spaceDarkSky = new THREE.Color(0x040a14);
+  skyCol.lerp(spaceDarkSky, zoomSpaceK * 0.92);
 
   scene.background.copy(skyCol);
   scene.fog.color.copy(skyCol);
