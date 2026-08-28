@@ -974,7 +974,7 @@ waterMat.onBeforeCompile = (sh) => {
       `#include <begin_vertex>
        vec4 wPos = modelMatrix * vec4(position, 1.0);
        vec2 distVec = vec2(wPos.x - uCamTarget.x, wPos.z - uCamTarget.z);
-       float distSq = dot(distVec, distVec);
+       float distSq = min(dot(distVec, distVec), 360000.0);
        transformed.z -= distSq * uCurvature;
 
        // Multi-harmonic wave system:
@@ -1018,7 +1018,7 @@ horizonRingMat.onBeforeCompile = (sh) => {
       `#include <begin_vertex>
        vec4 wPos = modelMatrix * vec4(position, 1.0);
        vec2 distVec = vec2(wPos.x - uCamTarget.x, wPos.z - uCamTarget.z);
-       float distSq = dot(distVec, distVec);
+       float distSq = min(dot(distVec, distVec), 360000.0);
        transformed.z -= distSq * uCurvature;`
     );
   horizonRingMat.userData.shader = sh;
