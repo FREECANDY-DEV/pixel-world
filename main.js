@@ -1004,12 +1004,12 @@ water.position.set(0, SEA_LEVEL - 0.25, 0);
 water.renderOrder = -1; // render water BEFORE terrain so solid land blocks ALWAYS draw cleanly on top
 scene.add(water);
 
-// Atmospheric Horizon Haze Ring (blends the distant terrain/ocean boundary into space/sky)
+// Atmospheric Horizon Haze Dome (curved 3D planetary atmosphere shell)
 const horizonRingMat = new THREE.MeshBasicMaterial({
-  color: 0x8fb7e8,
+  color: 0x6bb5f0,
   transparent: true,
   opacity: 0,
-  side: THREE.DoubleSide,
+  side: THREE.BackSide,
   depthWrite: false,
   fog: false,
 });
@@ -1024,13 +1024,12 @@ horizonRingMat.onBeforeCompile = (sh) => {
        vec4 wPos = modelMatrix * vec4(position, 1.0);
        vec2 distVec = vec2(wPos.x - uCamTarget.x, wPos.z - uCamTarget.z);
        float distSq = min(dot(distVec, distVec), 360000.0);
-       transformed.z -= distSq * uCurvature;`
+       transformed.y -= distSq * uCurvature * 0.5;`
     );
   horizonRingMat.userData.shader = sh;
 };
-const horizonRing = new THREE.Mesh(new THREE.RingGeometry(1400, 3800, 128), horizonRingMat);
-horizonRing.rotation.x = -Math.PI / 2;
-horizonRing.position.set(0, SEA_LEVEL - 0.3, 0);
+const horizonRing = new THREE.Mesh(new THREE.SphereGeometry(1800, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.42), horizonRingMat);
+horizonRing.position.set(0, SEA_LEVEL - 40, 0);
 scene.add(horizonRing);
 
 // fullscreen tint + drifting light rays shown while the camera is underwater
@@ -11783,9 +11782,8 @@ function animate() {
   water.position.x = camT.x;
   water.position.z = camT.z;
   if (horizonRing) {
-    horizonRing.position.x = camT.x;
-    horizonRing.position.z = camT.z;
-    const hOpacity = THREE.MathUtils.clamp((curDist - 90) / 280, 0, 0.52);
+    horizonRing.position.set(camT.x, SEA_LEVEL - 40, camT.z);
+    const hOpacity = THREE.MathUtils.clamp((curDist - 90) / 280, 0, 0.42);
     horizonRing.material.opacity = hOpacity * (0.6 + 0.4 * dayF);
     horizonRing.material.color.copy(skyCol).lerp(new THREE.Color(0x8fb7e8), 0.4);
     horizonRing.visible = !spaceMode && hOpacity > 0.01;
