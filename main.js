@@ -958,8 +958,12 @@ const waterMat = new THREE.MeshStandardMaterial({
   opacity: 0.76,
   roughness: 0.16,
   metalness: 0.18,
-  depthWrite: false, // no blend-order flicker against the shoreline
-  fog: false,        // prevent fog from fading ocean water into pitch black on zoom-out
+  depthWrite: false,   // no blend-order flicker against the shoreline
+  depthTest: true,
+  polygonOffset: true, // push water depth behind solid land blocks to prevent land overflow
+  polygonOffsetFactor: 1.0,
+  polygonOffsetUnits: 4.0,
+  fog: false,          // prevent fog from fading ocean water into pitch black on zoom-out
 });
 // Multi-harmonic smooth wave systems (individual waves for oceans, lakes, ponds & rivers)
 waterMat.onBeforeCompile = (sh) => {
@@ -996,7 +1000,7 @@ waterMat.onBeforeCompile = (sh) => {
 // Circular ocean disk geometry with high subdivision for seamless horizon curves
 const water = new THREE.Mesh(new THREE.CircleGeometry(3200, 128), waterMat);
 water.rotation.x = -Math.PI / 2;
-water.position.set(0, SEA_LEVEL + 0.35, 0);
+water.position.set(0, SEA_LEVEL - 0.15, 0);
 scene.add(water);
 
 // Atmospheric Horizon Haze Ring (blends the distant terrain/ocean boundary into space/sky)
