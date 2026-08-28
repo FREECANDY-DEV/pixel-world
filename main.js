@@ -5151,7 +5151,7 @@ function ensureChunkIcons(ch) {
 
   for (let i = 0; i < count; i++) {
     const px = pos[i * 3];
-    const py = pos[i * 3 + 1] + (hasH ? ud.h[i] : 0);
+    const py = pos[i * 3 + 1] + 1.2; // anchor icon near ground level so trees never float in mid-air
     const pz = pos[i * 3 + 2];
 
     const cx = Math.floor(px / CELL_SIZE);
