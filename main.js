@@ -1546,16 +1546,12 @@ chunkMat.onBeforeCompile = (shader) => {
       'uniform float uParched;',
     ].join('\n'))
     .replace('#include <fog_fragment>', [
-        // ambient occlusion: smoothstep so the transition from dark corners
-        // to bright centres looks like rounded block edges, not a hard line
+        // ambient occlusion: smooth gradient for organic depth without block grid lines
         'float aoK = smoothstep(0.0, 1.0, vAO);',
-        'gl_FragColor.rgb *= mix(0.55, 1.0, aoK);',
-        // edge softening: darken pixels near the UV border of each face
-        // so the hard 1-block boundary fades into a gentle shadow
-        'float edgeX = smoothstep(0.0, 0.12, vUV.x) * smoothstep(0.0, 0.12, 1.0 - vUV.x);',
-        'float edgeY = smoothstep(0.0, 0.12, vUV.y) * smoothstep(0.0, 0.12, 1.0 - vUV.y);',
-        'float edgeK = edgeX * edgeY;',
-        'gl_FragColor.rgb *= mix(0.7, 1.0, edgeK);',
+        'gl_FragColor.rgb *= mix(0.82, 1.0, aoK);',
+        // Seamless block merging: zero edge border lines so adjacent block faces blend smoothly
+        'float edgeK = 1.0;',
+        'gl_FragColor.rgb *= edgeK;',
         // distance fog
         'float shadeDistK = smoothstep(uShadeNear, uShadeFar, vFogDepth);',
         'float shadeLowK = clamp(1.0 - (vWorldY - 6.0) / 30.0, 0.0, 1.0);',
